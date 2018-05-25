@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
 import { ApiComponent } from './pages/api/api.component';
 import { TutorialsComponent } from './pages/tutorials/tutorials.component';
+import { AppRoutingModule } from './/app-routing.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
     TutorialsComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
