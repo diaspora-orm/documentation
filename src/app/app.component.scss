@@ -1,0 +1,73 @@
+@import '../scss/vars.scss';
+
+$normalHeaderHeight: 100px;
+$reducedHeaderHeight: 33px;
+nav{
+	display: flex;
+	height: $normalHeaderHeight;
+	position: fixed;
+	top: 0;
+	left:0;
+	right: 0;
+	z-index: 1;
+	transition: height 0.5s;
+	
+	menu {
+		flex: 1 1 auto;
+		padding: 0;
+		margin: 0;
+		transition: padding 0.5s, margin 0.5s, background-color 0.5s;
+		
+		&:first-child{
+			background-color: $c2dark;
+			padding-right: $normalHeaderHeight / 2;
+			margin-right: -$normalHeaderHeight / 2;
+		}
+		&:last-child{
+			background-color: $c1light;
+			padding-left: $normalHeaderHeight / 2;
+			margin-left: -$normalHeaderHeight / 2;
+		}
+	}
+	#logoLink {
+		flex: 0 0 $normalHeaderHeight;
+		position: relative;
+		z-index: 1;
+		transition: flex-basis 0.5s;
+	}
+}
+
+.container{
+	padding-top: $normalHeaderHeight;
+	transition: padding-top 0.5s;
+}
+
+:host:not(.attop){
+	.container{
+		padding-top: $reducedHeaderHeight;
+	}
+	nav{
+		height: $reducedHeaderHeight;
+		menu{
+			&:first-child{
+				&:hover{
+					background-color: $c2dark;
+				}
+				background-color: rgba($c2dark, 0.75);
+				padding-right: $reducedHeaderHeight / 2;
+				margin-right: -$reducedHeaderHeight / 2;
+			}
+			&:last-child{
+				&:hover{
+					background-color: $c1light;
+				}
+				background-color: rgba($c1light, 0.75);
+				padding-left: $reducedHeaderHeight / 2;
+				margin-left: -$reducedHeaderHeight / 2;
+			}
+		}
+		#logoLink {
+			flex: 0 0 $reducedHeaderHeight;
+		}
+	}
+}
