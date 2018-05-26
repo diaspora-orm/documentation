@@ -4,15 +4,9 @@ $progress-color: $c1light;
 :host {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	height: 100vh;
 }
 
-#resize-handle{
-	border-left: 5px double #333;
-	cursor: ew-resize;
-	position: relative;
-	user-select: none;
-}
 #toggle-text{
 	position: absolute;
 	right: 5px;
@@ -87,16 +81,11 @@ $cursor-height:10px;
 	right: 0;
 	top: 0;
 	opacity: 0;
+    transition: 0.5s top;
 }
 
 $foot-padding: 10px;
 $meter-height: 5px;
-footer{
-	background-color: #333;
-	color: #ddd;
-	padding: $meter-height + $foot-padding $foot-padding $foot-padding;
-	text-align: center;
-}
 
 @keyframes animate-shine { 
 	0% {opacity: 0; width: 0;}
@@ -117,10 +106,15 @@ figure{
 
 
 
+#resize-handle{
+	border-left: 5px simple #333;
+	cursor: ew-resize;
+	position: relative;
+	user-select: none;
+	box-shadow: -2px 0 5px 1px #333;
+}
 .player-buttons{
-	margin: 0 auto;
-	width: 150px;
-	display: flex;
+    display: inline-flex;
 	flex-direction: row;
 	justify-content: space-around;
 	align-items: center;
@@ -136,7 +130,7 @@ figure{
 	background-color: $c1light;
 	border-color: $c1dark;
 	transition: all 0.5s;
-	margin: 1rem;
+	margin: 0.5rem;
 	text-align: center;
 	flex: 0 0 1em;
 	
@@ -147,6 +141,11 @@ figure{
 }
 footer {
 	background-color: $c2dark;
+	//    padding: 0.3rem;
+	color: #ddd;
+	//	padding: $meter-height + $foot-padding $foot-padding $foot-padding;
+	text-align: center;
+	line-height: 1rem;
 }
 
 
@@ -174,6 +173,7 @@ footer {
 
 progress{
 	cursor: pointer;
+	margin: 0;
 	
 	&:not(value) {
 		/* Add your styles here. As part of this walkthrough we will focus only on determinate progress bars. */
@@ -200,7 +200,6 @@ progress{
 		color: royalblue;
 		
 		position: relative;
-		margin: 0 0 1.5em; 
 		
 		
 		/*

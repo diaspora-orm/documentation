@@ -8,17 +8,17 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 import { AppRoutingModule } from './/app-routing.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    IndexComponent,
-    ApiComponent,
-    TutorialsComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		IndexComponent,
+		ApiComponent,
+		TutorialsComponent,
+	],
+	imports: [
+		BrowserModule,
+		AppRoutingModule
+	],
+	providers: [],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }

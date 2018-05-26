@@ -1,6 +1,6 @@
 
 <figure>
-	<figcaption>
+	<figcaption #tutoContent (mousewheel)="handleScroll($event)">
 		<h1>Diaspora</h1>
 		
 		<h2>Introduction</h2>
@@ -18,7 +18,7 @@
 			</ul>
 		</section>
 		
-		<i id="cursor"></i>
+		<i id="cursor" #cursor></i>
 	</figcaption>
 	<div id="resize-handle">
 		<div id="toggle-text"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
@@ -29,7 +29,7 @@
 	</div>
 </figure>
 <footer>
-	<progress max="100" value="0">
+	<progress max="100" value="0" #progress>
 		<!-- Browsers that support HTML5 progress element will ignore the html inside `progress` element. Whereas older browsers will ignore the `progress` element and instead render the html inside it. -->
 		<div class="progress-bar">
 			<span style="width: 0%">0%</span>
