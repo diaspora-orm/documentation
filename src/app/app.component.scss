@@ -37,15 +37,16 @@ nav{
 	}
 }
 
-.container{
+:host{
+	display: block;
 	padding-top: $normalHeaderHeight;
 	transition: padding-top 0.5s;
 }
 
 :host:not(.attop){
-	.container{
-		padding-top: $reducedHeaderHeight;
-	}
+	padding-top: $reducedHeaderHeight;
+	/*.container{
+	}*/
 	nav{
 		height: $reducedHeaderHeight;
 		menu{

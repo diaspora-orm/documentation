@@ -1,3 +1,43 @@
-<p>
-  tutorials works!
-</p>
+
+<figure>
+	<figcaption>
+		<h1>Diaspora</h1>
+		
+		<h2>Introduction</h2>
+		
+		<section>Diaspora is </section>
+		
+		<section>Diaspora est d'ores et déjà un gros projet, sur lequel nous avons investi plus de 200h de travail.</section>
+		
+		<section>Nous nous sommes imposé des processus de développement rigoureux, afin de maximiser maintenabilité,  fiabilité, qualité et compatibilité.
+			<ul>
+				<li>Les tests unitaires sont réalisés avec <a href="https://travis-ci.org/GerkinDev/diaspora"  target="_blank" rel="nofollow">Travis-CI</a>, <a href="codeclimate.com/github/GerkinDev/diaspora"  target="_blank" rel="nofollow">CodeClimate</a> & <a href="https://saucelabs.com"  target="_blank" rel="nofollow">SauceLabs</a>, sur Node 6, 7 et 8, ainsi que sur les navigateurs Google Chrome & Firefox.</li>
+				<li>Les dépendances sont inspectées pour d'éventuelles failles de sécurité en utilisant <a href="gemnasium.com/github.com/GerkinDev/diaspora"  target="_blank" rel="nofollow">Gemnasium</a>.</li>
+				<li>Une norme stricte est validée avec <a href="codeclimate.com/github/GerkinDev/diaspora"  target="_blank" rel="nofollow">CodeClimate</a>.</li>
+				<li>Enfin, la bibliothèque est concaténée et transtypée en EcmaScript 5.</li>
+			</ul>
+		</section>
+		
+		<i id="cursor"></i>
+	</figcaption>
+	<div id="resize-handle">
+		<div id="toggle-text"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+	</div>
+	<!--<img width="400" height="400" src=""/>-->
+	<div id="canvas-container">
+		<div id="canvas"></div>
+	</div>
+</figure>
+<footer>
+	<progress max="100" value="0">
+		<!-- Browsers that support HTML5 progress element will ignore the html inside `progress` element. Whereas older browsers will ignore the `progress` element and instead render the html inside it. -->
+		<div class="progress-bar">
+			<span style="width: 0%">0%</span>
+		</div>
+	</progress>
+	<div class="player-buttons">
+		<button id="toggle-autoplay" title="Toggle auto-play" class="player-button"><i class="fa fa-play" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
+		<button id="enable-fullscreen" title="Go fullscreen" class="player-button"><i class="fa fa-arrows-alt" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
+		<button id="toggle-sound" title="Toggle sound" class="player-button"><i class="fa fa-volume-off" aria-hidden="true" aria-label="Toggle sound"></i></button>
+	</div>
+</footer>
