@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { NgxMdModule } from 'ngx-md';
+
 import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
 import { ApiComponent } from './pages/api/api.component';
@@ -16,7 +18,8 @@ import { AppRoutingModule } from './/app-routing.module';
 	],
 	imports: [
 		BrowserModule,
-		AppRoutingModule
+		AppRoutingModule,
+		NgxMdModule.forRoot(),
 	],
 	providers: [],
 	bootstrap: [AppComponent]

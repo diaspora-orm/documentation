@@ -1,4 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { NgxMdComponent } from 'ngx-md';
 
 
 export enum SectionChange {
@@ -17,7 +18,7 @@ export class TutorialsComponent implements OnInit {
 	private static autoPlay = false;
 
 
-	@ViewChild('tutoContent') private tutoContent?: ElementRef<HTMLElement>;
+	@ViewChild(NgxMdComponent) private tutoComponent?: NgxMdComponent;
 	@ViewChild('progress') private progress?: ElementRef<HTMLProgressElement>;
 	@ViewChild('cursor') private cursor?: ElementRef<HTMLElement>;
 	private sections: HTMLElement[];
