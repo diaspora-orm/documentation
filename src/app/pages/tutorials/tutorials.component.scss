@@ -4,7 +4,8 @@ $progress-color: $c1light;
 :host {
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
+    height: 100vh;
+    padding-top: $reducedHeaderHeight;
 }
 
 #toggle-text{
@@ -55,7 +56,7 @@ figcaption {
 	padding: 0 15px;
 	text-align: justify;
 }
-section{
+:host ::ng-deep ngx-md > *{
 	margin-bottom: 15px;
 	border-left: 0 solid $progress-color;
 	transition: 0.5s all;
@@ -197,7 +198,7 @@ progress{
 		box-shadow: 0 2px 3px rgba(0,0,0,.5) inset;
 		
 		/* Of all IE, only IE10 supports progress element that too partially. It only allows to change the background-color of the progress value using the 'color' attribute. */
-		color: royalblue;
+		color: $c1light;
 		
 		position: relative;
 		
@@ -215,6 +216,8 @@ progress{
 		}
 		
 		&::-webkit-progress-value {
+            transition: width 0.5s;
+            
 			position: relative;
 			
 			background-size: 35px 20px, 100% 100%, 100% 100%;
@@ -234,7 +237,7 @@ progress{
 			-webkit-linear-gradient( top,
 			rgba(255, 255, 255, .25),
 			rgba(0,0,0,.2)),
-			-webkit-linear-gradient( left, #09c, #f44);
+			-webkit-linear-gradient( left, $c1light, $c1dark);
 			
 			/* Let's spice up things little bit by using pseudo elements. */
 			
@@ -254,6 +257,8 @@ progress{
 		/* Firefox provides a single pseudo class to style the progress element value and not for container. -moz-progress-bar */
 		
 		&::-moz-progress-bar {
+            transition: width 0.5s;
+
 			/* Gradient background with Stripes */
 			background-image:
 			-moz-linear-gradient( 135deg,
@@ -265,7 +270,7 @@ progress{
 			-moz-linear-gradient( top,
 			rgba(255, 255, 255, .25),
 			rgba(0,0,0,.2)),
-			-moz-linear-gradient( left, #09c, #f44);
+			-moz-linear-gradient( left, $c1light, $c1dark);
 			
 			background-size: 35px 20px, 100% 100%, 100% 100%;
 			border-radius:3px;
@@ -283,7 +288,7 @@ progress{
 			-moz-linear-gradient( top,
 			rgba(255, 255, 255, .25),
 			rgba(0,0,0,.2)),
-			-moz-linear-gradient( left, #09c, #f44);
+			-moz-linear-gradient( left, $c1light, $c1dark);
 		}
 	}
 	

@@ -6,6 +6,20 @@ export enum SectionChange {
 	Next = 1,
 	Previous = -1,
 }
+enum VolumeIcons {
+	Enabled = 'fa-volume-up',
+	Disabled = 'fa-volume-off',
+}
+enum PlayIcons {
+	Enabled = 'fa-step-forward',
+	Disabled = 'fa-pause',
+}
+enum AutoPlayIcons {
+	Enabled = 'fa-play',
+	Disabled = 'fa-stop',
+}
+
+const MUTE_STORAGE_KEY = 'muted';
 
 @Component({
 	selector: 'app-tutorials',
@@ -14,26 +28,177 @@ export enum SectionChange {
 })
 export class TutorialsComponent implements OnInit {
 	private static supportsSpeechSynthesis = typeof speechSynthesis !== 'undefined';
-	private static allowScroll = true;
-	private static autoPlay = false;
+	private allowScroll = true;
 
 
 	@ViewChild(NgxMdComponent) private tutoComponent?: NgxMdComponent;
+	@ViewChild('scroller') private scroller?: ElementRef<HTMLElement>;
 	@ViewChild('progress') private progress?: ElementRef<HTMLProgressElement>;
 	@ViewChild('cursor') private cursor?: ElementRef<HTMLElement>;
+	@ViewChild('autoPlayButton') private autoPlayButton?: ElementRef<HTMLButtonElement>;
+	@ViewChild('playButton') private playButton?: ElementRef<HTMLButtonElement>;
+	@ViewChild('fullScreenButton') private fullScreenButton?: ElementRef<HTMLButtonElement>;
+	@ViewChild('muteButton') private muteButton?: ElementRef<HTMLButtonElement>;
+	@ViewChild('presentation') private presentation?: ElementRef<HTMLElement>;
 	private sections: HTMLElement[];
 	private currentUtter: SpeechSynthesisUtterance | null = null;
 
-	private isPlaying = false;
-	private sectionIndex = -1;
-	private soundEnabled = true;
+
+
+	public get target() {
+		return this.sectionIndex >= 0 ? this.sections[this.sectionIndex] : null;
+	}
+	private get tutoContent() {
+		return this.tutoComponent ? ((this.tutoComponent as any)._el as ElementRef<HTMLElement>) : null;
+	}
+
+
+	private _sectionIndex = -1;
+	public get sectionIndex() {return this._sectionIndex; }
+	public set sectionIndex(index: number) {
+		console.log('Change slide', index);
+		if ( this.allowScroll ) {
+			window.scrollTo(0, document.body.scrollHeight);
+			// Set a timeout before which we won't be able to trigger a second scroll
+			this.allowScroll = false;
+			setTimeout(() => {
+				this.allowScroll = true;
+			}, 250 );
+
+			console.log( `Changing slide from ${ this.sectionIndex } to ${ index }` );
+
+			/*const wasAutoPlaying = this.autoPlay;
+			// Prevent autoplay if scrolling back
+			if()
+			this._autoPlay = false;*/
+			// Do scroll
+			this._sectionIndex = index;
+			// Restore autoplay status
+			// this._autoPlay = wasAutoPlaying;
+
+			this.refreshScollAndCursor( this.target );
+			// Update progress infos
+			const frac = (( index + 1 ) / this.sections.length );
+			const percent = Math.round( frac * 1000 ) / 10;
+			if (this.progress) {
+				this.progress.nativeElement.value = percent;
+
+				const inSpan = this.progress.nativeElement.querySelector('span');
+				if (inSpan) {
+					const percentWithSymbol = percent + '%';
+					inSpan.innerText = percentWithSymbol;
+					inSpan.style.width = percentWithSymbol;
+				}
+			}
+
+			// Start speech synthesis
+			if (this.autoPlay) {
+				this.isPlaying = true;
+			}
+
+			// Finalize
+			if (this.target) {
+				location.hash = this.target.id;
+			}
+		}
+	}
+
+	private _autoPlay = false;
+	public get autoPlay() {return this._autoPlay; }
+	public set autoPlay(autoPlay: boolean) {
+		if (this.autoPlayButton) {
+			const icon = this.autoPlayButton.nativeElement.querySelector('.fa');
+			if (icon) {
+				const iconClassList = icon.classList;
+				iconClassList.remove(autoPlay ? AutoPlayIcons.Enabled : AutoPlayIcons.Disabled );
+				iconClassList.add(autoPlay ? AutoPlayIcons.Disabled : AutoPlayIcons.Enabled );
+			}
+		}
+		this._autoPlay = autoPlay;
+		this.isPlaying = autoPlay;
+	}
+
+	private _isPlaying = false;
+	public get isPlaying() {return this._isPlaying; }
+	public set isPlaying(isPlaying: boolean) {
+		console.log('Setting isPlaying', isPlaying);
+		if (this.playButton) {
+			const icon = this.playButton.nativeElement.querySelector('.fa');
+			if (icon) {
+				const iconClassList = icon.classList;
+				iconClassList.remove(isPlaying ? PlayIcons.Enabled : PlayIcons.Disabled );
+				iconClassList.add(isPlaying ? PlayIcons.Disabled : PlayIcons.Enabled );
+			}
+		}
+		const wasPlaying = this._isPlaying;
+		this._isPlaying = isPlaying;
+		if ( this.currentUtter && wasPlaying && !this.isPlaying ) {
+			speechSynthesis.cancel();
+		} else if (this.isPlaying) {
+			// If this is our first trigger on index -1, delegate by setting the index @ 0, that will call play again
+			if (this.sectionIndex === -1) {
+				this.sectionIndex = 0;
+			} else {
+				// Start speech synthesis
+				this.speechForElement( this.target ).then(() => {
+					this.isPlaying = false;
+				});
+			}
+		}
+	}
+
+	private _fullscreen = false;
+	public get fullscreen() {return this._fullscreen; }
+	public set fullscreen(fullscreen: boolean) {
+		this._fullscreen = fullscreen;
+		if ( this.fullScreenButton && this.presentation && this.fullscreen) {
+			const requestFullscreen = (this.presentation.nativeElement as any).requestFullscreen ||
+			(this.presentation.nativeElement as any).webkitRequestFullscreen ||
+			(this.presentation.nativeElement as any).mozRequestFullScreen ||
+			(this.presentation.nativeElement as any).msRequestFullscreen;
+			if (requestFullscreen) {
+				requestFullscreen.call(this.presentation.nativeElement);
+			} else {
+				console.error('Could not set fullscreen');
+			}
+		}
+		this._fullscreen = false;
+	}
+
+	private _mute = true;
+	public get mute() {return this._mute; }
+	public set mute(mute: boolean) {
+		if (this.muteButton) {
+			const icon = this.muteButton.nativeElement.querySelector('.fa');
+			if (icon) {
+				const iconClassList = icon.classList;
+				iconClassList.remove(mute ? VolumeIcons.Enabled : VolumeIcons.Disabled );
+				iconClassList.add(mute ? VolumeIcons.Disabled : VolumeIcons.Enabled );
+			}
+		}
+		this._mute = mute;
+		if ( this.mute ) {
+			localStorage.setItem( MUTE_STORAGE_KEY, 'yes' );
+		} else {
+			localStorage.removeItem( MUTE_STORAGE_KEY );
+		}
+		if ( this.currentUtter && this.mute ) {
+			speechSynthesis.cancel();
+		}
+	}
 
 	constructor(private el: ElementRef) {
 		this.sections = [];
 	}
 
 	private static getTextFromDomElement(element: HTMLElement) {
-		return element.textContent || '';
+		if (element.tagName.toUpperCase() === 'PRE' &&
+			element.childNodes.length === 1 &&
+			(element.childNodes[0] as HTMLElement).tagName.toUpperCase() === 'CODE'
+		) {
+			return (element.childNodes[0] as HTMLElement).getAttribute('title');
+		}
+		return element.textContent;
 	}
 
 	private static getVoice(lang?: string) {
@@ -43,7 +208,6 @@ export class TutorialsComponent implements OnInit {
 		});
 		return validVoices[0];
 	}
-
 
 	private static getVMiddle(element: HTMLElement) {
 		return element.offsetTop +
@@ -68,63 +232,26 @@ export class TutorialsComponent implements OnInit {
 		}, 15 );
 	}
 
-	public ngOnInit() {
+	public async ngOnInit() {
 		if (this.tutoContent) {
-			this.sections = Array
-			.from(this.tutoContent.nativeElement.childNodes)
-			.filter(element => element instanceof HTMLElement && element.tagName.toLowerCase() === 'section') as HTMLElement[];
-		}
-	}
-
-	public setFullScreen(fullScreen: boolean) {
-
-	}
-
-	public changeSlide( direction: SectionChange ) {
-		console.log('Change slide', direction);
-		if ( TutorialsComponent.allowScroll ) {
-			window.scrollTo(0, document.body.scrollHeight);
-			// Set a timeout before which we won't be able to trigger a second scroll
-			TutorialsComponent.allowScroll = false;
-			setTimeout(() => {
-				TutorialsComponent.allowScroll = true;
-			}, 250 );
-
-			const newIndex = this.sectionIndex + direction;
-
-			console.log( `Changing slide from ${ this.sectionIndex } to ${ newIndex }` );
-			const target = this.sections[newIndex];
-			// Do scroll
-			this.refreshScollAndCursor( target );
-			// Update progress infos
-			const frac = (( newIndex + 1 ) / this.sections.length );
-			const percent = Math.round( frac * 1000 ) / 10;
-			if (this.progress) {
-				this.progress.nativeElement.value = percent;
-
-				const inSpan = this.progress.nativeElement.querySelector('span');
-				if (inSpan) {
-					const percentWithSymbol = percent + '%';
-					inSpan.innerText = percentWithSymbol;
-					inSpan.style.width = percentWithSymbol;
-				}
+			let childNodes = this.tutoContent.nativeElement.childNodes;
+			while (childNodes.length === 0) {
+				await new Promise(resolve => setTimeout(resolve, 10));
+				childNodes = this.tutoContent.nativeElement.childNodes;
 			}
-
-			// Call the subclass method
-			this.doSlideTransition( newIndex, {
-				fullScreen: false,
-			});
-			// Finalize
-			this.sectionIndex = newIndex;
-
-			// Start speech synthesis
-			this.speechForElement( target );
-
-			location.hash = target.id;
+			this.sections = Array
+			.from(childNodes)
+			.filter(element => element instanceof HTMLElement) as HTMLElement[];
 		}
+		this.mute = localStorage.getItem( MUTE_STORAGE_KEY ) === 'yes';
+		this.sectionIndex = -1;
+		this.autoPlay = false;
 	}
 
-	private refreshScollAndCursor(target: HTMLElement) {
+	private refreshScollAndCursor(target: HTMLElement | null) {
+		if (!target) {
+			return;
+		}
 		this.sections.forEach(element => element.classList.remove( 'active' ));
 		target.classList.add( 'active' );
 		const targetMiddle = TutorialsComponent.getVMiddle( target );
@@ -132,13 +259,9 @@ export class TutorialsComponent implements OnInit {
 			this.cursor.nativeElement.style.opacity = '1';
 			this.cursor.nativeElement.style.top =  (targetMiddle - 25 / 2) + 'px';
 		}
-		if (this.tutoContent) {
-			const tutoContentRect = this.tutoContent.nativeElement.getBoundingClientRect();
-			console.log('Scrolling:', {
-				old: this.tutoContent.nativeElement.scrollTop,
-				new: targetMiddle - tutoContentRect.height / 2
-			});
-			this.tutoContent.nativeElement.scrollTop = targetMiddle - tutoContentRect.height / 2;
+		if (this.scroller) {
+			const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
+			this.scroller.nativeElement.scrollTop = targetMiddle - tutoContentRect.height / 2;
 		}
 	}
 
@@ -147,14 +270,14 @@ export class TutorialsComponent implements OnInit {
 		const delta = event.wheelDelta / 120;
 		if ( delta >= SectionChange.Next ) {
 			if ( this.sectionIndex > 0 ) {
-				this.changeSlide(SectionChange.Previous );
+				this.sectionIndex += SectionChange.Previous;
 				return true;
 			} else {
 				console.warn( 'Can\'t go to previous section' );
 			}
 		} else if ( delta <= SectionChange.Previous ) {
 			if ( this.sectionIndex < this.sections.length - 1 ) {
-				this.changeSlide( SectionChange.Next );
+				this.sectionIndex += SectionChange.Next;
 				return true;
 			} else {
 				console.warn( 'Can\'t go to next section' );
@@ -163,49 +286,31 @@ export class TutorialsComponent implements OnInit {
 		return false;
 	}
 
-	private maybeAutoPlayNext() {
+	private speechForElement(element: HTMLElement | null) {
+		speechSynthesis.cancel();
 		this.currentUtter = null;
-		if ( TutorialsComponent.autoPlay ) {
-			setTimeout( () => {
-				this.changeSlide(SectionChange.Next);
-			}, 1000 );
-		}
-	}
-
-
-	private doSlideTransition(
-		newIndex: number,
-		optionsHash: {
-			fullScreen: boolean
-		}
-	): void {
-	}
-
-	private playAudioSection(optionsHash: {
-		fullScreen: boolean,
-	}): void {
-	}
-
-
-
-
-
-
-	private speechForElement(element: HTMLElement) {
-		if ( this.playAudioSection( {
-			fullScreen: false,
-		})) {
-			// Function call already done
-		} else if ( TutorialsComponent.supportsSpeechSynthesis && this.soundEnabled ) {
-			speechSynthesis.cancel();
-			this.isPlaying = true;
-			this.currentUtter = new SpeechSynthesisUtterance( TutorialsComponent.getTextFromDomElement( element ));
-			this.currentUtter.voice = TutorialsComponent.getVoice( document.documentElement.lang );
-			speechSynthesis.speak( this.currentUtter );
-			this.currentUtter.addEventListener( 'end', () => {
-				this.isPlaying = false;
-				this.maybeAutoPlayNext();
-			});
-		}
+		return new Promise(resolve => {
+			if (!element) {
+				return resolve();
+			}
+			if ( TutorialsComponent.supportsSpeechSynthesis && !this._mute ) {
+				const text = TutorialsComponent.getTextFromDomElement( element );
+				if (text) {
+					this.currentUtter = new SpeechSynthesisUtterance( text );
+					this.currentUtter.voice = TutorialsComponent.getVoice( document.documentElement.lang );
+					speechSynthesis.speak( this.currentUtter );
+					return this.currentUtter.addEventListener( 'end', () => {
+						this.currentUtter = null;
+						if ( this.autoPlay ) {
+							setTimeout( () => {
+								this.sectionIndex += SectionChange.Next;
+							}, 1000 );
+						}
+						return resolve(true);
+					});
+				}
+			}
+			return resolve(false);
+		});
 	}
 }

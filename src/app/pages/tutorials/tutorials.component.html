@@ -1,7 +1,6 @@
 
 <figure>
-	<figcaption #tutoContent (mousewheel)="handleScroll($event)">
-		<h1>Diaspora</h1>
+	<figcaption #scroller (mousewheel)="handleScroll($event)">
 		
 		<ngx-md [path]="'/assets/tutorials/1.md'"></ngx-md>
 		
@@ -12,7 +11,7 @@
 	</div>
 	<!--<img width="400" height="400" src=""/>-->
 	<div id="canvas-container">
-		<div id="canvas"></div>
+		<div id="canvas" #presentation></div>
 	</div>
 </figure>
 <footer>
@@ -23,8 +22,9 @@
 		</div>
 	</progress>
 	<div class="player-buttons">
-		<button id="toggle-autoplay" title="Toggle auto-play" class="player-button"><i class="fa fa-play" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
-		<button id="enable-fullscreen" title="Go fullscreen" class="player-button"><i class="fa fa-arrows-alt" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
-		<button id="toggle-sound" title="Toggle sound" class="player-button"><i class="fa fa-volume-off" aria-hidden="true" aria-label="Toggle sound"></i></button>
+		<button #autoPlayButton   title="Toggle auto-play" class="player-button" (click)="autoPlay   = !autoPlay  "><i class="fa"               aria-hidden="true" aria-label="Toggle auto-play"></i></button>
+		<button #playButton       title="Toggle play"      class="player-button" (click)="isPlaying  = !isPlaying "><i class="fa"               aria-hidden="true" aria-label="Toggle play"     ></i></button>
+		<button #fullScreenButton title="Go fullscreen"    class="player-button" (click)="fullscreen = !fullscreen"><i class="fa fa-arrows-alt" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
+		<button #muteButton       title="Toggle sound"     class="player-button" (click)="mute       = !mute      "><i class="fa"               aria-hidden="true" aria-label="Toggle sound"    ></i></button>
 	</div>
 </footer>
