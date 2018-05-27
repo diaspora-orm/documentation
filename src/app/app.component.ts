@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
 	selector: 'app-root',
@@ -8,12 +9,16 @@ import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
 export class AppComponent {
 	private title = 'app';
 
-	constructor(private el: ElementRef) {
+	public constructor(private el: ElementRef, private titleService: Title) {
 		this.doScroll();
 	}
 
+	public setTitle( newTitle: string) {
+		this.titleService.setTitle( newTitle );
+	}
+
 	@HostListener('document:scroll')
-	doScroll() {
+	private doScroll() {
 		if (window.scrollY === 0) {
 			this.el.nativeElement.classList.add('attop');
 		} else {
