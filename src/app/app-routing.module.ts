@@ -9,7 +9,7 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 const routes: Routes = [
     { path: '', component: IndexComponent },
     { path: 'api', component: ApiComponent },
-    { path: 'tutorials', component: TutorialsComponent },
+    { path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
   ];
 
 @NgModule({
