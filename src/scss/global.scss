@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import './vars.scss';
+
+pre{
+    border-left-color: $c1dark;
+}
+a{
+    color: $c1light;
+    transition: 0.33s color;
+
+    &:hover{
+        color: $c1dark;
+    }
+    &:visited{
+        color: $c2dark;
+    }
+}
