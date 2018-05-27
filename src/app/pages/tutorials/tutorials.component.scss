@@ -4,8 +4,8 @@ $progress-color: $c1light;
 :host {
 	display: flex;
 	flex-direction: column;
-    height: 100vh;
-    padding-top: $reducedHeaderHeight;
+	height: 100vh;
+	padding-top: $reducedHeaderHeight;
 }
 
 #toggle-text{
@@ -56,19 +56,6 @@ figcaption {
 	padding: 0 15px;
 	text-align: justify;
 }
-:host ::ng-deep ngx-md > *{
-	margin-bottom: 15px;
-	border-left: 0 solid $progress-color;
-	transition: 0.5s all;
-	margin-left: 0;
-	padding-left: 0;
-	
-	&.active{
-		border-left-width: 5px;
-		margin-left: -10px;
-		padding-left: 5px;
-	}
-}
 
 $cursor-height:10px;
 #cursor {
@@ -82,7 +69,7 @@ $cursor-height:10px;
 	right: 0;
 	top: 0;
 	opacity: 0;
-    transition: 0.5s top;
+	transition: 0.5s top;
 }
 
 $foot-padding: 10px;
@@ -115,7 +102,7 @@ figure{
 	box-shadow: -2px 0 5px 1px #333;
 }
 .player-buttons{
-    display: inline-flex;
+	display: inline-flex;
 	flex-direction: row;
 	justify-content: space-around;
 	align-items: center;
@@ -176,6 +163,10 @@ progress{
 	cursor: pointer;
 	margin: 0;
 	
+	/* Add dimensions */
+	width: 100%;
+	height: 1rem;
+	
 	&:not(value) {
 		/* Add your styles here. As part of this walkthrough we will focus only on determinate progress bars. */
 	}
@@ -188,9 +179,6 @@ progress{
 		
 		/* This unfortunately leaves a trail of border behind in Firefox and Opera. We can remove that by setting the border to none. */
 		border: none;
-		
-		/* Add dimensions */
-		width: 100%; height: 20px;
 		
 		/* Although firefox doesn't provide any additional pseudo class to style the progress element container, any style applied here works on the container. */
 		background-color: whiteSmoke;
@@ -216,8 +204,8 @@ progress{
 		}
 		
 		&::-webkit-progress-value {
-            transition: width 0.5s;
-            
+			transition: width 0.5s;
+			
 			position: relative;
 			
 			background-size: 35px 20px, 100% 100%, 100% 100%;
@@ -257,8 +245,8 @@ progress{
 		/* Firefox provides a single pseudo class to style the progress element value and not for container. -moz-progress-bar */
 		
 		&::-moz-progress-bar {
-            transition: width 0.5s;
-
+			transition: width 0.5s;
+			
 			/* Gradient background with Stripes */
 			background-image:
 			-moz-linear-gradient( 135deg,
@@ -329,3 +317,42 @@ p[data-value] {
 
 
 /* THE END */
+
+
+
+
+
+
+:host ::ng-deep ngx-md {
+	& > *{
+		margin-bottom: 15px;
+		position: relative;
+		padding-left: 5px;
+		
+		&::before{
+			content: "";
+			top: 0;
+			bottom: 0;
+			left: -5px;
+			position: absolute;
+			transition: 0.5s border-left;
+			border-left: 0 solid $progress-color;
+		}
+		&.active::before{
+			border-left-width: 5px;
+		}
+	}
+	& > pre{
+		overflow-y: visible;
+	}
+	& > pre, & > blockquote{
+		margin-left:3px;
+
+		&::before{
+			left: -8px;
+		}
+	}
+	& > ul li{
+		margin-bottom: 0;
+	}
+}

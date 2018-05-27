@@ -2,7 +2,7 @@
 <figure>
 	<figcaption #scroller (mousewheel)="handleScroll($event)">
 		
-		<ngx-md [path]="'/assets/tutorials/1.md'"></ngx-md>
+		<ngx-md [path]="tutoIdentifier ? '/assets/tutorials/' + tutoIdentifier + '.md' : undefined"></ngx-md>
 		
 		<i id="cursor" #cursor></i>
 	</figcaption>

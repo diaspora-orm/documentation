@@ -1,5 +1,166 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { NgxMdComponent } from 'ngx-md';
+import { ActivatedRoute } from '@angular/router';
+
+
+
+function scrollIt(target: HTMLElement | Window, destination: {
+	top?: number,
+	left?: number,
+}, duration = 500) {
+	const start = target instanceof HTMLElement ? {
+		top: target.scrollTop,
+		left: target.scrollLeft,
+	} : {
+		top: target.scrollY,
+		left: target.scrollX,
+	};
+
+	const destDefaulted = Object.assign({}, start, destination);
+	const easings = {
+		easeInOutExpo: function(pos: number) {
+			if (pos === 0) {
+				return 0;
+			}
+			if (pos === 1) {
+				return 1;
+			}
+			if ((pos /= 0.5) < 1) {
+				return 0.5 * Math.pow(2, 10 * (pos - 1));
+			}
+			return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
+		},
+	};
+
+	const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
+
+	const outSize = target instanceof HTMLElement ? {
+		height: Math.max(target.offsetHeight, target.clientHeight),
+		width: Math.max(target.offsetWidth, target.clientWidth),
+	} : {
+		height: target.innerHeight,
+		width: target.innerWidth,
+	};
+	const inSize = target instanceof HTMLElement ? {
+		height: target.scrollHeight,
+		width: target.scrollWidth,
+	} : {
+		height: target.document.body.scrollHeight,
+		width: target.document.body.scrollWidth,
+	};
+
+	const scrollableSize = {
+		height: inSize.height - outSize.height,
+		width: inSize.width - outSize.width,
+	};
+	const boundTarget = {
+		top: Math.min(scrollableSize.height, destDefaulted.top),
+		left: Math.min(scrollableSize.width, destDefaulted.left),
+	};
+
+	return new Promise(resolve => {
+		if ('requestAnimationFrame' in window === false) {
+			target.scroll(boundTarget);
+			return resolve(false);
+		}
+
+		function scroll() {
+			const now = 'now' in window.performance ? performance.now() : new Date().getTime();
+			const time = Math.min(1, ((now - startTime) / duration));
+			const timeFunction = easings.easeInOutExpo(time);
+			target.scroll({
+				left: Math.ceil((timeFunction * (boundTarget.left - start.left)) + start.left),
+				top: Math.ceil((timeFunction * (boundTarget.top - start.top)) + start.top),
+			});
+
+			if (timeFunction === 1) {
+				return resolve(true);
+			}
+
+			return requestAnimationFrame(scroll);
+		}
+
+		scroll();
+	});
+}
+
+const SCROLL_COOLDOWN = 500;
+
+type CustomSynthesisCallback = (finished: boolean) => void;
+class CustomSynthesis {
+	private static supportsSpeechSynthesis = typeof speechSynthesis !== 'undefined';
+	private currentUtter: SpeechSynthesisUtterance | null = null;
+	private callback?: CustomSynthesisCallback;
+	private hasResolved = false;
+	private resolveValue?: boolean;
+
+	constructor(element: HTMLElement | null) {
+		speechSynthesis.cancel();
+		this.currentUtter = null;
+		if ( CustomSynthesis.supportsSpeechSynthesis ) {
+			const text = CustomSynthesis.getTextFromDomElement( element );
+			if (text) {
+				this.currentUtter = new SpeechSynthesisUtterance( text );
+				this.currentUtter.voice = CustomSynthesis.getVoice( document.documentElement.lang );
+				speechSynthesis.speak( this.currentUtter );
+				this.currentUtter.addEventListener( 'end', () => {
+					this.currentUtter = null;
+					return this.resolve(true);
+				});
+			} else {
+				this.resolve(true);
+			}
+		} else {
+			this.resolve(false);
+		}
+	}
+
+	private static getTextFromDomElement(element: HTMLElement | null) {
+		if (!element) {
+			return element;
+		}
+		if (element.tagName.toUpperCase() === 'PRE' &&
+		element.childNodes.length === 1 &&
+		(element.childNodes[0] as HTMLElement).tagName.toUpperCase() === 'CODE' ) {
+			return (element.childNodes[0] as HTMLElement).getAttribute('title');
+		}
+		return element.textContent;
+	}
+
+	private static getVoice(lang?: string) {
+		const defaultedLang = lang || 'en';
+		const validVoices = speechSynthesis.getVoices().filter( voice => {
+			return voice.lang.startsWith( defaultedLang );
+		});
+		return validVoices[0];
+	}
+
+	public then(callback: CustomSynthesisCallback) {
+		this.callback = callback;
+		if (this.hasResolved && typeof this.resolveValue !== 'undefined') {
+			this.callback(this.resolveValue);
+		}
+		return this;
+	}
+
+	public cancel() {
+		this.resolve(false);
+		speechSynthesis.cancel();
+	}
+
+	private resolve(finished: boolean) {
+		if (!this.hasResolved) {
+			this.hasResolved = true;
+			this.resolveValue = finished;
+			if (this.callback) {
+				this.callback(finished);
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
 
 
 export enum SectionChange {
@@ -26,11 +187,7 @@ const MUTE_STORAGE_KEY = 'muted';
 	templateUrl: './tutorials.component.html',
 	styleUrls: ['./tutorials.component.scss']
 })
-export class TutorialsComponent implements OnInit {
-	private static supportsSpeechSynthesis = typeof speechSynthesis !== 'undefined';
-	private allowScroll = true;
-
-
+export class TutorialsComponent implements OnInit, AfterViewInit {
 	@ViewChild(NgxMdComponent) private tutoComponent?: NgxMdComponent;
 	@ViewChild('scroller') private scroller?: ElementRef<HTMLElement>;
 	@ViewChild('progress') private progress?: ElementRef<HTMLProgressElement>;
@@ -41,8 +198,9 @@ export class TutorialsComponent implements OnInit {
 	@ViewChild('muteButton') private muteButton?: ElementRef<HTMLButtonElement>;
 	@ViewChild('presentation') private presentation?: ElementRef<HTMLElement>;
 	private sections: HTMLElement[];
-	private currentUtter: SpeechSynthesisUtterance | null = null;
-
+	private tutoIdentifier: string | null = null;
+	private allowScroll = true;
+	private currentSpeechSynthesis: CustomSynthesis | null = null;
 
 
 	public get target() {
@@ -56,14 +214,16 @@ export class TutorialsComponent implements OnInit {
 	private _sectionIndex = -1;
 	public get sectionIndex() {return this._sectionIndex; }
 	public set sectionIndex(index: number) {
-		console.log('Change slide', index);
+		if (index >= this.sections.length) {
+			return;
+		}
 		if ( this.allowScroll ) {
-			window.scrollTo(0, document.body.scrollHeight);
+			scrollIt(window, { top: Infinity}, 500);
 			// Set a timeout before which we won't be able to trigger a second scroll
 			this.allowScroll = false;
 			setTimeout(() => {
 				this.allowScroll = true;
-			}, 250 );
+			}, SCROLL_COOLDOWN );
 
 			console.log( `Changing slide from ${ this.sectionIndex } to ${ index }` );
 
@@ -78,7 +238,7 @@ export class TutorialsComponent implements OnInit {
 
 			this.refreshScollAndCursor( this.target );
 			// Update progress infos
-			const frac = (( index + 1 ) / this.sections.length );
+			const frac = this.sections.length === 0 ? 0 : (( index + 1 ) / this.sections.length );
 			const percent = Math.round( frac * 1000 ) / 10;
 			if (this.progress) {
 				this.progress.nativeElement.value = percent;
@@ -115,13 +275,14 @@ export class TutorialsComponent implements OnInit {
 			}
 		}
 		this._autoPlay = autoPlay;
-		this.isPlaying = autoPlay;
+		if (this.autoPlay !== this.isPlaying || !this.autoPlay) {
+			this.isPlaying = this.autoPlay;
+		}
 	}
 
 	private _isPlaying = false;
 	public get isPlaying() {return this._isPlaying; }
 	public set isPlaying(isPlaying: boolean) {
-		console.log('Setting isPlaying', isPlaying);
 		if (this.playButton) {
 			const icon = this.playButton.nativeElement.querySelector('.fa');
 			if (icon) {
@@ -132,16 +293,23 @@ export class TutorialsComponent implements OnInit {
 		}
 		const wasPlaying = this._isPlaying;
 		this._isPlaying = isPlaying;
-		if ( this.currentUtter && wasPlaying && !this.isPlaying ) {
-			speechSynthesis.cancel();
+		if ( this.currentSpeechSynthesis && wasPlaying && !this.isPlaying ) {
+			this.currentSpeechSynthesis.cancel();
+			this.currentSpeechSynthesis = null;
 		} else if (this.isPlaying) {
 			// If this is our first trigger on index -1, delegate by setting the index @ 0, that will call play again
 			if (this.sectionIndex === -1) {
 				this.sectionIndex = 0;
-			} else {
+			} else if (!this.mute) {
 				// Start speech synthesis
-				this.speechForElement( this.target ).then(() => {
+				this.currentSpeechSynthesis = new CustomSynthesis( this.target ).then((finished: boolean) => {
+					this.currentSpeechSynthesis = null;
 					this.isPlaying = false;
+					setTimeout( () => {
+						if ( finished && this.autoPlay ) {
+							this.sectionIndex += SectionChange.Next;
+						}
+					}, 1000 );
 				});
 			}
 		}
@@ -182,31 +350,16 @@ export class TutorialsComponent implements OnInit {
 		} else {
 			localStorage.removeItem( MUTE_STORAGE_KEY );
 		}
-		if ( this.currentUtter && this.mute ) {
-			speechSynthesis.cancel();
+		if ( this.currentSpeechSynthesis && this.mute ) {
+			this.currentSpeechSynthesis.cancel();
 		}
 	}
 
-	constructor(private el: ElementRef) {
-		this.sections = [];
-	}
-
-	private static getTextFromDomElement(element: HTMLElement) {
-		if (element.tagName.toUpperCase() === 'PRE' &&
-			element.childNodes.length === 1 &&
-			(element.childNodes[0] as HTMLElement).tagName.toUpperCase() === 'CODE'
-		) {
-			return (element.childNodes[0] as HTMLElement).getAttribute('title');
-		}
-		return element.textContent;
-	}
-
-	private static getVoice(lang?: string) {
-		const defaultedLang = lang || 'en';
-		const validVoices = speechSynthesis.getVoices().filter( voice => {
-			return voice.lang.startsWith( defaultedLang );
+	constructor(private el: ElementRef, private activatedRoute: ActivatedRoute) {
+		this.activatedRoute.params.subscribe(data => {
+			this.tutoIdentifier = data.tutoName;
 		});
-		return validVoices[0];
+		this.sections = [];
 	}
 
 	private static getVMiddle(element: HTMLElement) {
@@ -215,24 +368,7 @@ export class TutorialsComponent implements OnInit {
 		(element.parentElement ? element.parentElement.scrollTop : 0)*/;
 	}
 
-	private static scrollToVPos(target: any, vpos: number, scrollDuration: number) {
-		const scrollHeight = window.scrollY;
-		const scrollStep = Math.PI / ( scrollDuration / 15 );
-		const cosParameter = scrollHeight / 2;
-		let scrollCount = 0;
-		let scrollMargin;
-		const scrollInterval = setInterval( () => {
-			if ( target.scrollY !== 0 ) {
-				scrollCount = scrollCount + 1;
-				scrollMargin = cosParameter - cosParameter * Math.cos( scrollCount * scrollStep );
-				window.scrollTo( 0, ( scrollHeight - scrollMargin ) );
-			} else {
-				clearInterval(scrollInterval);
-			}
-		}, 15 );
-	}
-
-	public async ngOnInit() {
+	private async getSections() {
 		if (this.tutoContent) {
 			let childNodes = this.tutoContent.nativeElement.childNodes;
 			while (childNodes.length === 0) {
@@ -243,9 +379,16 @@ export class TutorialsComponent implements OnInit {
 			.from(childNodes)
 			.filter(element => element instanceof HTMLElement) as HTMLElement[];
 		}
+	}
+
+	public async ngOnInit() {
 		this.mute = localStorage.getItem( MUTE_STORAGE_KEY ) === 'yes';
 		this.sectionIndex = -1;
 		this.autoPlay = false;
+	}
+
+	public async ngAfterViewInit() {
+		await this.getSections();
 	}
 
 	private refreshScollAndCursor(target: HTMLElement | null) {
@@ -261,7 +404,7 @@ export class TutorialsComponent implements OnInit {
 		}
 		if (this.scroller) {
 			const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
-			this.scroller.nativeElement.scrollTop = targetMiddle - tutoContentRect.height / 2;
+			scrollIt(this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500);
 		}
 	}
 
@@ -270,6 +413,7 @@ export class TutorialsComponent implements OnInit {
 		const delta = event.wheelDelta / 120;
 		if ( delta >= SectionChange.Next ) {
 			if ( this.sectionIndex > 0 ) {
+				this.autoPlay = false;
 				this.sectionIndex += SectionChange.Previous;
 				return true;
 			} else {
@@ -277,6 +421,7 @@ export class TutorialsComponent implements OnInit {
 			}
 		} else if ( delta <= SectionChange.Previous ) {
 			if ( this.sectionIndex < this.sections.length - 1 ) {
+				this.autoPlay = false;
 				this.sectionIndex += SectionChange.Next;
 				return true;
 			} else {
@@ -284,33 +429,5 @@ export class TutorialsComponent implements OnInit {
 			}
 		}
 		return false;
-	}
-
-	private speechForElement(element: HTMLElement | null) {
-		speechSynthesis.cancel();
-		this.currentUtter = null;
-		return new Promise(resolve => {
-			if (!element) {
-				return resolve();
-			}
-			if ( TutorialsComponent.supportsSpeechSynthesis && !this._mute ) {
-				const text = TutorialsComponent.getTextFromDomElement( element );
-				if (text) {
-					this.currentUtter = new SpeechSynthesisUtterance( text );
-					this.currentUtter.voice = TutorialsComponent.getVoice( document.documentElement.lang );
-					speechSynthesis.speak( this.currentUtter );
-					return this.currentUtter.addEventListener( 'end', () => {
-						this.currentUtter = null;
-						if ( this.autoPlay ) {
-							setTimeout( () => {
-								this.sectionIndex += SectionChange.Next;
-							}, 1000 );
-						}
-						return resolve(true);
-					});
-				}
-			}
-			return resolve(false);
-		});
 	}
 }
