@@ -14,17 +14,34 @@ nav{
 		flex: 0 0 50%;
 		padding: 0;
 		margin: 0;
+		display: flex;
 		transition: padding 0.5s, margin 0.5s, background-color 0.5s;
 		
 		&:first-child{
 			background-color: $c2dark;
 			padding-right: $normalHeaderHeight / 2;
 			margin-right: -$normalHeaderHeight / 2;
+			a {
+				color: $c1light;
+			}
 		}
 		&:last-child{
 			background-color: $c1light;
 			padding-left: $normalHeaderHeight / 2;
 			margin-left: -$normalHeaderHeight / 2;
+			a {
+				color: $c2dark;
+			}
+		}
+		menuitem{
+			&, a{
+				flex: 1 1 auto;
+				display: flex;
+			}
+			a{
+				justify-content: center;
+				align-items: center;
+			}
 		}
 	}
 	#logoLink {
@@ -42,8 +59,8 @@ nav{
 }
 
 :host:not(.attop){
-    padding-top: $reducedHeaderHeight;
-    
+	padding-top: $reducedHeaderHeight;
+	
 	nav{
 		height: $reducedHeaderHeight;
 		menu{
@@ -70,5 +87,5 @@ nav{
 	}
 }
 :host.attop ::ng-deep app-tutorials {
-    padding-top: 0;
+	padding-top: 0;
 }
