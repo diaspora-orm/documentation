@@ -5,7 +5,8 @@ $progress-color: $c1light;
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
-	padding-top: $reducedHeaderHeight;
+    padding-top: $reducedHeaderHeight;
+    transition: 0.5s padding-top;
 }
 
 #toggle-text{
