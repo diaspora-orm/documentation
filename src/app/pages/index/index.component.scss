@@ -1,0 +1,22 @@
+.install{
+	justify-content: center;
+	
+	& > .column{
+		flex: 0 1 0;
+	}
+}
+.cards{
+	.row{
+		justify-content: space-around;
+		align-items: stretch;
+	}
+	.column{
+		flex: 0 0 33%;
+		background-color: #eee;
+		margin-bottom: 5rem;
+		box-shadow: -1px 1px 5px 0px #bbb;
+	}
+}
+h3{
+	text-align: center;
+}

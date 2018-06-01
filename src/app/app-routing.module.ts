@@ -7,13 +7,13 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 
 
 const routes: Routes = [
-    { path: '', component: IndexComponent },
-    { path: 'api', component: ApiComponent },
-    { path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
-  ];
+	{ path: '', component: IndexComponent },
+	{ path: 'api', component: ApiComponent },
+	{ path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
+];
 
 @NgModule({
-    imports: [ RouterModule.forRoot(routes) ],
-    exports: [ RouterModule ]
-  })
+	imports: [ RouterModule.forRoot(routes) ],
+	exports: [ RouterModule ]
+})
 export class AppRoutingModule {}

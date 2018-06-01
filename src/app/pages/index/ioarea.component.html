@@ -1,0 +1,7 @@
+<section *ngFor="let codeResp of history">
+    <pre class="command">{{codeResp.command}}</pre>
+    <pre class="response">{{codeResp.response}}</pre>
+</section>
+<section *ngIf="liveCodingText !== null" class="currentCommand">
+    <pre class="command">{{liveCodingText}}</pre>
+</section>

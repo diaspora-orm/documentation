@@ -1,30 +1,41 @@
-<p>
-  index works!
-</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
-<p>Foo</p>
+<section class="container">
+	<h1>Diaspora</h1>
+	<div class="row">
+		<div class="column">
+			<app-ioarea></app-ioarea>
+		</div>
+		<div class="column">
+			<table #storeStatus>
+				<tr *ngFor="let item of this.storeContent">
+					<td>{{item.id}}</td>
+					<td>{{item.title}}</td>
+					<td>{{item.status}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="row install">
+		<section class="column">
+			<pre>npm install @diaspora/diaspora</pre>
+			<p>Latest version: <strong>0.3.0</strong></p>
+		</section>
+	</div>
+	<section class="cards">
+		<div class="row">
+			<article class="column">
+				<h3>Portable</h3>
+			</article>
+			<article class="column">
+				<h3>Adapter-based</h3>
+			</article>
+		</div>
+		<div class="row">
+			<article class="column">
+				<h3>Multi-source</h3>
+			</article>
+			<article class="column">
+				<h3>Qux</h3>
+			</article>
+		</div>
+	</section>
+</section>

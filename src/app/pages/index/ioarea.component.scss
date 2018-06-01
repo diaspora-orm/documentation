@@ -1,0 +1,27 @@
+@import '../../../scss/vars.scss';
+
+:host{
+	height: 20rem;
+	display: flex;
+	overflow: hidden;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+section pre{
+	margin: 0;
+	line-break: normal;
+	white-space: pre-line;
+}
+
+pre::before {
+	margin-right: 5px;
+	margin-left: 5px;
+}
+.command::before{
+	content: '>';
+	color: $c1light;
+}
+.response::before{
+	content: '<';
+	color: $c2dark;
+}

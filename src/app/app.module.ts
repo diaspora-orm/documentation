@@ -8,6 +8,7 @@ import { IndexComponent } from './pages/index/index.component';
 import { ApiComponent } from './pages/api/api.component';
 import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 import { AppRoutingModule } from './/app-routing.module';
+import { IOAreaComponent } from './pages/index/ioarea.component';
 
 @NgModule({
 	declarations: [
@@ -15,6 +16,7 @@ import { AppRoutingModule } from './/app-routing.module';
 		IndexComponent,
 		ApiComponent,
 		TutorialsComponent,
+		IOAreaComponent,
 	],
 	imports: [
 		BrowserModule,
