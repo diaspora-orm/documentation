@@ -1,0 +1,12 @@
+import { Diaspora } from '@diaspora/diaspora';
+
+// Later in your code
+Diaspora.createNamedDataSource( 'mySource', 'inMemory' );
+const ToDo = Diaspora.declareModel('ToDo', {sources: 'mySource', attributes: {title: 'string', status: 'boolean'}});
+const todos = await ToDo.insertMany([{title: 'Do Diaspora', status: true}, {title: 'Do the docs', status: false}, {title: 'Rule the world', status: false}]);
+const docsTodo = todos.entities[1];
+docsTodo.attributes.status = true;
+await docsTodo.persist();
+await ToDo.deleteMany({status: false});
+const doneTodos = await ToDo.findMany({status: true});
+// That's it!
