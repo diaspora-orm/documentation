@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs/index';
 
+import { Diaspora } from '@diaspora/diaspora';
+
 
 interface ICodeLine {
 	text: string;
@@ -43,8 +45,7 @@ export class IOAreaComponent implements OnInit {
 			});
 			this.playLoop();
 		});
-		// console.log(Diaspora);
-		// (window as any).Diaspora = D;
+		(window as any).Diaspora = Diaspora;
 	}
 	
 	

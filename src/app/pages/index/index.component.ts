@@ -1,12 +1,13 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import * as _ from 'lodash';
 
 /*declare function require(name: string): any;
 import { DiasporaStatic } from '@diaspora/diaspora';
 const Diaspora: DiasporaStatic = require('@diaspora/diaspora/dist/es5/diaspora.standalone.min.js');*/
-// import { Diaspora } from '@diaspora/diaspora';
-// const D = (require as any)('@diaspora/diaspora/dist/umd/diaspora.standalone.min.js');
 
-import { IOAreaComponent } from './ioarea.component';
+import { Diaspora } from '@diaspora/diaspora';
+
+import { IOAreaComponent } from './ioarea/ioarea.component';
 
 @Component({
 	selector: 'app-index',
@@ -16,19 +17,10 @@ import { IOAreaComponent } from './ioarea.component';
 export class IndexComponent implements OnInit {
 	@ViewChild(IOAreaComponent) private IOArea?: ElementRef<IOAreaComponent>;
 	@ViewChild('storeStatus') private store?: ElementRef<HTMLTableElement>;
-
-	private adapter = {
-		store: {
-			ToDo: {
-				items: [
-					{id: 1, title: 'Do the docs', status: true},
-				],
-			},
-		},
-	};
+	@ViewChild('installCmd') private installCmd?: ElementRef<HTMLPreElement>;
 
 	private get storeContent() {
-		return this.adapter.store.ToDo.items;
+		return _.get(Diaspora, 'dataSources.mySource.adapter.store.ToDo.items', false);
 	}
 
 	ngOnInit() {

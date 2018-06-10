@@ -4,7 +4,9 @@
 		<div class="column">
 			<app-ioarea></app-ioarea>
 		</div>
-		<div class="column">
+		<div class="column" *ngIf="this.storeContent !== false; then dataTable else noDataTable">
+		</div>
+		<ng-template #dataTable>
 			<table #storeStatus>
 				<tr *ngFor="let item of this.storeContent">
 					<td>{{item.id}}</td>
@@ -12,11 +14,16 @@
 					<td>{{item.status}}</td>
 				</tr>
 			</table>
-		</div>
+		</ng-template>
+		<ng-template #noDataTable>
+			Noop
+		</ng-template>
 	</div>
 	<div class="row install">
 		<section class="column">
-			<pre>npm install @diaspora/diaspora</pre>
+			<p>
+				<code #installCmd>npm install @diaspora/diaspora</code>
+			</p>
 			<p>Latest version: <strong>0.3.0</strong></p>
 		</section>
 	</div>
@@ -27,11 +34,13 @@
 			</article>
 			<article class="column">
 				<h3>Adapter-based</h3>
+				<p>One query language to rule them all. Easily switch between data stores.</p>
 			</article>
 		</div>
 		<div class="row">
 			<article class="column">
 				<h3>Multi-source</h3>
+				<p>Because data is everywhere, simplify your transfers.</p>
 			</article>
 			<article class="column">
 				<h3>Qux</h3>
