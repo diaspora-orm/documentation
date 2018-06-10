@@ -8,21 +8,21 @@
 		"experimentalDecorators": true,
 		"noImplicitAny": true,
 		"strict": true,
-        "skipLibCheck": true,
+		"skipLibCheck": true,
 		"target": "es6",
 		"typeRoots": [
 			"node_modules/@types"
 		],
 		"types": [ "node" ],
 		"lib": [
-            "es2015",
+			"es2015",
 			"dom"
 		],
-        "watch": true,
-        "downlevelIteration": true
+		"watch": true,
+		"downlevelIteration": true
 	},
 	"compileOnSave": false,
 	"angularCompilerOptions": {
 		"strictMetadataEmit" : true
-    }
+	}
 }
