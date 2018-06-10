@@ -2,13 +2,15 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { NgxMdModule } from 'ngx-md';
+import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
 import { ApiComponent } from './pages/api/api.component';
 import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 import { AppRoutingModule } from './/app-routing.module';
-import { IOAreaComponent } from './pages/index/ioarea.component';
+import { IOAreaComponent } from './pages/index/ioarea/ioarea.component';
+import { SymbolComponent } from './pages/api/symbol/symbol.component';
 
 @NgModule({
 	declarations: [
@@ -17,11 +19,13 @@ import { IOAreaComponent } from './pages/index/ioarea.component';
 		ApiComponent,
 		TutorialsComponent,
 		IOAreaComponent,
+		SymbolComponent,
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		NgxMdModule.forRoot(),
+		ClipboardModule,
 	],
 	providers: [Title],
 	bootstrap: [AppComponent]

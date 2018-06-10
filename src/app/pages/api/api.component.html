@@ -1,3 +1,40 @@
-<p>
-  api works!
-</p>
+<section class="container">
+	<div *ngIf="isInitialized; then dataTable; else noDataTable">
+	</div>
+	
+	
+	<ng-template #dataTable>
+		<div class="breadcrumb">
+			<span *ngFor="let breadcrumbItem of breadcrumbData; let i = index">
+				<a [routerLink]="['/api']" [queryParams]="{symbolId: breadcrumbItem.attributes.identifier > 0 ? breadcrumbItem.attributes.identifier : undefined}" >
+					<span *ngIf="i !== breadcrumbData.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
+				</a>
+				
+				
+				<ng-template #breadcrumbTailItem><b>{{breadcrumbItem.attributes.name}}</b></ng-template>
+				<ng-template #breadcrumbNormalItem>{{breadcrumbItem.attributes.name}}</ng-template>
+			</span>
+		</div>
+		<header>
+			<label for="symbolSearch">Symbol name</label>
+			<input type="text" placeholder="eg: Validator" id="symbolSearch">
+		</header>
+		<section>
+			<app-symbol *ngFor="let symbol of display" [symbol]="symbol">
+			</app-symbol>
+			<table>
+				<!--<tr>
+					<td>{{item.identifier}}</td>
+					<td></td>
+					<td>{{item.kind}}</td>
+					<td>{{item.exported}}</td>
+					<td>{{item.summary}}</td>
+					<td><span *ngIf="item.source">{{item.source.file}} L{{item.source.line}}</span></td>
+				</tr>-->
+			</table>
+		</section>
+	</ng-template>
+	<ng-template #noDataTable>
+		No data yet
+	</ng-template>
+</section>

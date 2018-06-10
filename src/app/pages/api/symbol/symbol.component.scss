@@ -1,0 +1,21 @@
+@import 'vendor/scss/mixins';
+@import 'vendor/scss/icons';
+
+article{
+	box-shadow: 0 2px 4px 0px;
+	margin: 10px 0;
+}
+
+h2 .tsd-kind-icon{
+	display: inline-block;
+	top: -5px;
+	
+	&:before{
+		background-image: url(/assets/images/typedoc/icons@2x.png);
+		background-size: 238px 204px;
+		width: 17px;
+		height: 17px;
+		transform: scale(2);
+		margin: 0px 10px;
+	}
+}
