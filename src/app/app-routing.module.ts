@@ -7,8 +7,8 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 
 
 const routes: Routes = [
-	{ path: '', component: IndexComponent },
-	{ path: 'api', component: ApiComponent },
+	{ path: '', component: IndexComponent, data: { title: 'Home' } },
+	{ path: 'api', component: ApiComponent, data: { title: 'API' } },
 	{ path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
 ];
 
