@@ -1,0 +1,3 @@
+[submodule "vendor/typedoc-default-themes"]
+	path = vendor/typedoc-default-themes
+	url = https://github.com/TypeStrong/typedoc-default-themes.git
