@@ -2,12 +2,14 @@
   "name": "documentation",
   "version": "0.0.0",
   "scripts": {
+    "postinstall": "node patch.js; git submodule update --init --recursive && npm run vendorSync",
     "ng": "ng",
     "start": "ng serve --port 2400",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "vendorSync": "sh vendorSync.sh"
   },
   "private": true,
   "dependencies": {
