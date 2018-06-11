@@ -121,12 +121,15 @@
 	"defaultProject": "documentation",
 	"schematics": {
 		"@schematics/angular:component": {
-			"inlineStyle": true,
-			"inlineTemplate": true,
-			"flat": true,
+			"inlineStyle": false,
+			"inlineTemplate": false,
+			"flat": false,
 			"spec": true,
-			"prefix": "pre",
+			"prefix": "app",
 			"styleext": "scss"
+		},
+		"@schematics/angular:service": {
+			"flat": false
 		},
 		"@schematics/angular:directive": {
 			"prefix": "pre"
