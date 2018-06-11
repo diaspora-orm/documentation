@@ -1,10 +1,12 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 import * as _ from 'lodash';
+import { Entities } from '@diaspora/diaspora';
+
 import { SymbolKind, SymbolDef } from './symbol/symbol.component';
-import { Diaspora, Model, Entities } from '@diaspora/diaspora';
-import { ActivatedRoute } from '@angular/router';
+import { ApiDocService } from '../../services/api-doc/api-doc.service';
 
 interface Tag {
 	tag: string;
@@ -56,8 +58,7 @@ const LinkRegexpG = new RegExp(LinkRegexp, 'g');
 })
 export class ApiComponent implements OnInit {
 	@ViewChild('breadcrumb') breadcrumb?: ElementRef<HTMLElement>;
-	
-	private ApiDoc: Model;
+
 	private currentItems?: Entities.Set;
 	private isInitialized = false;
 	private breadcrumbData: any[] = [];
@@ -69,39 +70,16 @@ export class ApiComponent implements OnInit {
 			return [];
 		}
 	}
-	
-	constructor(private http: HttpClient, private route: ActivatedRoute) {
-		(window as any).Diaspora = Diaspora;
-		Diaspora.createNamedDataSource('memory', 'inMemory');
-		this.ApiDoc = Diaspora.declareModel('ApiDoc', {
-			sources: 'memory',
-			attributes: {
-				exported: 'boolean',
-				kind: 'integer',
-				name: 'string',
-				identifier: 'integer',
-				summary: 'string',
-				source: {
-					type: 'object',
-					/*
-					attributes: {
-						file: 'string',
-						line: 'number',
-					},
-					*/
-				},
-				ancestor: 'number',
-				hasChildren: 'boolean',
-			},
-		});
-		
+
+	constructor(private http: HttpClient, private route: ActivatedRoute, private ApiDoc: ApiDocService) {
 		// Make the HTTP request:
 		this.http
 		.get<TypeDefinition>('/assets/content/api/0-3-0.json')
 		.toPromise()
 		.then(async (data) => {
+			_.assign(window, {rawData: data, _});
 			const items = ApiComponent.flattenTransformSymbols(data);
-			const insertedSet = await this.ApiDoc.insertMany(items);
+			const insertedSet = await this.ApiDoc.ApiDoc.insertMany(items);
 			console.log({rawJson: data, transformed: items, insertedSet: insertedSet});
 			this.isInitialized = true;
 			this.route
@@ -173,12 +151,12 @@ export class ApiComponent implements OnInit {
 	
 	private async setSearch(containerId: number | null) {
 		const [items, breadcrumb] = await Promise.all([
-			this.ApiDoc.findMany({ancestor: containerId}),
+			this.ApiDoc.ApiDoc.findMany({ancestor: containerId}),
 			new Promise<any>(async (resolve, reject) => {
 				const breadcrumbItems: Entities.Entity[] = [];
-				
+
 				while (containerId !== null) {
-					const container = await this.ApiDoc.find({identifier: containerId});
+					const container = await this.ApiDoc.ApiDoc.find({identifier: containerId});
 					if (container && container.attributes) {
 						breadcrumbItems.unshift(container);
 						containerId = container.attributes.ancestor;
