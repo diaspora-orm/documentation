@@ -5,23 +5,37 @@
 	
 	<ng-template #dataTable>
 		<div class="breadcrumb">
-			<span *ngFor="let breadcrumbItem of breadcrumbData; let i = index">
-				<a [routerLink]="['/api']" [queryParams]="{symbolId: breadcrumbItem.attributes.identifier > 0 ? breadcrumbItem.attributes.identifier : undefined}" >
-					<span *ngIf="i !== breadcrumbData.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
-				</a>
-				
-				
-				<ng-template #breadcrumbTailItem><b>{{breadcrumbItem.attributes.name}}</b></ng-template>
-				<ng-template #breadcrumbNormalItem>{{breadcrumbItem.attributes.name}}</ng-template>
-			</span>
+			<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
+			
+			<ng-template #searchBreadcrumb>
+				<span>{{breadcrumbData}}</span>
+			</ng-template>
+			<ng-template #symbolsBreadcrumb>
+				<span *ngFor="let breadcrumbItem of breadcrumbData; let i = index">
+					<a [routerLink]="['/api']" [queryParams]="{symbolId: breadcrumbItem.attributes.identifier > 0 ? breadcrumbItem.attributes.identifier : undefined}" >
+						<span *ngIf="i !== breadcrumbData.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
+					</a>
+					
+					
+					<ng-template #breadcrumbTailItem><b>{{breadcrumbItem.attributes.name}}</b></ng-template>
+					<ng-template #breadcrumbNormalItem>{{breadcrumbItem.attributes.name}}</ng-template>
+				</span>
+			</ng-template>
 		</div>
 		<header>
 			<label for="symbolSearch">Symbol name</label>
-			<input type="text" placeholder="eg: Validator" id="symbolSearch">
+			<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames">
+			<datalist id="symbolNames">
+				<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
+			</datalist>
 		</header>
 		<section>
-			<app-symbol *ngFor="let symbol of display" [symbol]="symbol">
-			</app-symbol>
+			<ng-container *ngFor="let symbol of display" [ngSwitch]="symbol.kind">
+				<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol"></app-function-symbol>
+				<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol"></app-function-symbol>
+				<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol"></app-function-symbol>
+				<app-symbol *ngSwitchDefault [symbol]="symbol"></app-symbol>
+			</ng-container>
 			<table>
 				<!--<tr>
 					<td>{{item.identifier}}</td>

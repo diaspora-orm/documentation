@@ -1,16 +1,18 @@
 import { Component, OnInit, Input, HostBinding } from '@angular/core';
+import { ApiDocService } from '../../../services/api-doc/api-doc.service';
 
 export enum SymbolKind {
-	Module      = 0x0,
-	Enum        = 0x4,
-	Variable    = 0x20,
-	Function    = 0x40,
-	Class       = 0x80,
-	Interface   = 0x100,
-	Constructor = 0x200,
-	Method      = 0x400,
-	Literal     = 0x200000,
-	TypeAlias   = 0x400000,
+	Module        = 0x0,
+	Enum          = 0x4,
+	Variable      = 0x20,
+	Function      = 0x40,
+	Class         = 0x80,
+	Interface     = 0x100,
+	Constructor   = 0x200,
+	Method        = 0x800,
+	CallSignature = 0x1000,
+	Literal       = 0x200000,
+	TypeAlias     = 0x400000,
 }
 export interface SymbolDef {
 	exported: boolean;
@@ -39,6 +41,7 @@ const symbolClass = {
 	[SymbolKind.Interface]: 'tsd-kind-interface',
 	[SymbolKind.Constructor]: 'tsd-kind-constructor',
 	[SymbolKind.Method]: 'tsd-kind-method',
+	[SymbolKind.CallSignature]: '',
 	[SymbolKind.Literal]: 'tsd-kind-object-literal',
 	[SymbolKind.TypeAlias]: 'tsd-kind-type-alias',
 };
@@ -52,6 +55,7 @@ const symbolLabel = {
 	[SymbolKind.Interface]: 'Interface',
 	[SymbolKind.Constructor]: 'Constructor',
 	[SymbolKind.Method]: 'Method',
+	[SymbolKind.CallSignature]: 'Call signature',
 	[SymbolKind.Literal]: 'Literal',
 	[SymbolKind.TypeAlias]: 'Type alias',
 };
@@ -66,15 +70,15 @@ const symbolLabel = {
 	styleUrls: ['./symbol.component.scss']
 })
 export class SymbolComponent implements OnInit {
-	@Input() private symbol: SymbolDef | undefined;
-	
+	@Input() protected symbol: SymbolDef | undefined;
+
 	@HostBinding('class')
 	get hostClasses(): string {
 		return [
 			this.kindClass
 		].join(' ');
 	}
-	
+
 	private get kindClass() {
 		if (!this.symbol) {
 			return '';
@@ -87,7 +91,7 @@ export class SymbolComponent implements OnInit {
 		}
 		return symbolLabel[this.symbol.kind] || this.symbol.kind;
 	}
-	
+
 	private get source() {
 		if (!this.symbol || !this.symbol.source) {
 			return '';
@@ -100,10 +104,10 @@ export class SymbolComponent implements OnInit {
 			return `<a href="${fullUrl}" target="_blank">${this.symbol.source.file} line ${this.symbol.source.line}</a>`;
 		}
 	}
-	
-	constructor() { }
-	
+
+	constructor(protected ApiDoc: ApiDocService) { }
+
 	ngOnInit() {
 	}
-	
+
 }

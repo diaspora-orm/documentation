@@ -1,0 +1,23 @@
+<pre>{{signature.name}}(<ng-container  *ngTemplateOutlet="callSignature"></ng-container>)</pre>
+<ngx-md [data]="signature.summary"></ngx-md>
+
+
+<ng-container *ngIf="parameters.length > 0; then withParams; else withoutParams"></ng-container>
+<ng-template #withParams>
+	<ul>
+		<li *ngFor="let parameter of parameters"><b>{{parameter.name}}</b> (<a></a>): <ngx-md [data]="parameter.summary"></ngx-md></li>
+	</ul>
+</ng-template>
+<ng-template #withoutParams>
+	<p>No parameters</p>
+</ng-template>
+
+<footer>
+	<span *ngIf="signature.source" [innerHTML]="source"></span>
+</footer>
+
+
+
+<ng-template #callSignature>
+	<span *ngFor="let parameter of parameters; let i = index">{{parameter.name}}<ng-container *ngIf="i < parameters.length - 1">, </ng-container></span>
+</ng-template>

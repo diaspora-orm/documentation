@@ -11,6 +11,8 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { IOAreaComponent } from './pages/index/ioarea/ioarea.component';
 import { SymbolComponent } from './pages/api/symbol/symbol.component';
+import { FunctionSymbolComponent } from './pages/api/symbol/functionSymbol/function-symbol.component';
+import { CallSignatureComponent } from './pages/api/symbol/functionSymbol/call-signature/call-signature.component';
 
 @NgModule({
 	declarations: [
@@ -20,6 +22,8 @@ import { SymbolComponent } from './pages/api/symbol/symbol.component';
 		TutorialsComponent,
 		IOAreaComponent,
 		SymbolComponent,
+		FunctionSymbolComponent,
+		CallSignatureComponent,
 	],
 	imports: [
 		BrowserModule,

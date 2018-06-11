@@ -41,6 +41,8 @@ interface TypeDefinition {
 		tags?: Tag[]
 	};
 	sources: Source[];
+	signatures?: TypeDefinition[];
+	parameters?: TypeDefinition[];
 	typeParameter: GenericTypeDefinition[];
 	extendedTypes: TypeReference[];
 	extendedBy: TypeReference[];
@@ -61,14 +63,20 @@ export class ApiComponent implements OnInit {
 
 	private currentItems?: Entities.Set;
 	private isInitialized = false;
-	private breadcrumbData: any[] = [];
-	
+	private breadcrumbData: Entities.Entity[] | string = [];
+
+	public SymbolKind = SymbolKind;
+
 	private get display() {
 		if (this.currentItems) {
 			return _.map(this.currentItems.entities, 'attributes');
 		} else {
 			return [];
 		}
+	}
+
+	private get isSearchMode() {
+		return typeof this.breadcrumbData === 'string';
 	}
 
 	constructor(private http: HttpClient, private route: ActivatedRoute, private ApiDoc: ApiDocService) {
@@ -92,13 +100,13 @@ export class ApiComponent implements OnInit {
 			});
 		});
 	}
-	
+
 	private static getSource(symbol: TypeDefinition) {
 		const source = _.get(symbol, 'sources[0]') as Source | undefined;
 		if (!source) {
 			return;
 		}
-		
+
 		const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
 		const isModule = source.fileName.match(moduleMatcher) ? true : false;
 		const sourceFile = isModule ? source.fileName.replace(moduleMatcher, '$1') : source.fileName;
@@ -108,9 +116,9 @@ export class ApiComponent implements OnInit {
 			module: isModule,
 		};
 	}
-	
+
 	private static getSummary(symbol: TypeDefinition) {
-		let summary = _.get(symbol, 'comment.shortText') as string | null;
+		let summary = _.get(symbol, 'comment.shortText') || _.get(symbol, 'comment.text') as string | null;
 		if (!summary) {
 			return;
 		}
@@ -128,7 +136,7 @@ export class ApiComponent implements OnInit {
 		});
 		return summary;
 	}
-	
+
 	private static transformSymbol(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef {
 		const ancestorId = _.get(ancestor, 'id');
 		return {
@@ -139,16 +147,31 @@ export class ApiComponent implements OnInit {
 			summary: this.getSummary(symbol),
 			source: this.getSource(symbol),
 			ancestor: ancestorId,
-			hasChildren: symbol.children && symbol.children.length > 0
+			hasChildren: symbol.children && symbol.children.length > 0,
 		};
 	}
-	
+
 	private static flattenTransformSymbols(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef[] {
-		return _.chain(symbol.children).reduce((acc, item) => {
+		if (!symbol) {
+			return [];
+		}
+		return _.chain(symbol.children)
+		.concat(symbol.signatures || [])
+		.concat(symbol.parameters || [])
+		.reduce((acc, item) => {
 			return acc.concat(this.flattenTransformSymbols(item, symbol));
 		}, [this.transformSymbol(symbol, ancestor)] as SymbolDef[]).orderBy('identifier').value();
 	}
-	
+
+	private async onSearchBarChange(event: KeyboardEvent) {
+		if (!event.target || !(event.target instanceof HTMLInputElement)) {
+			return;
+		}
+		const input = event.target.value;
+		this.breadcrumbData = `Searching for "${input}"`;
+		this.currentItems = await this.ApiDoc.ApiDoc.findMany({name: input});
+	}
+
 	private async setSearch(containerId: number | null) {
 		const [items, breadcrumb] = await Promise.all([
 			this.ApiDoc.ApiDoc.findMany({ancestor: containerId}),
@@ -171,7 +194,7 @@ export class ApiComponent implements OnInit {
 		this.currentItems = items;
 		this.breadcrumbData = breadcrumb;
 	}
-	
+
 	ngOnInit() {
 	}
 }

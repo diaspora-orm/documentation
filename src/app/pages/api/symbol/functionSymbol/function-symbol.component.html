@@ -8,11 +8,12 @@
 	</ng-template>
 	<ng-template #titleNoLink><ng-container *ngTemplateOutlet="symbolTitle"></ng-container></ng-template>
 	
-	
 	<section>
 		<ngx-md [data]="symbol.summary"></ngx-md>
-		<footer>
-			<span *ngIf="symbol.source" [innerHTML]="source"></span>
-		</footer>
+	</section>
+	
+	<section>
+		<h3>Signatures</h3>
+		<app-call-signature *ngFor="let signature of signatures" [signature]="signature"></app-call-signature>
 	</section>
 </article>
