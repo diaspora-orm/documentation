@@ -28,6 +28,12 @@
 			<datalist id="symbolNames">
 				<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
 			</datalist>
+			
+			<!--<div>
+				<span *ngFor="let label of SymbolLabel">
+					<label [for]="label"><input type="checkbox" checked="checked" [id]="label"> {{label}}</label>
+				</span>
+			</div>-->
 		</header>
 		<section>
 			<ng-container *ngFor="let symbol of display" [ngSwitch]="symbol.kind">

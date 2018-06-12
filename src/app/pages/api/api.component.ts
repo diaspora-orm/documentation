@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Entities } from '@diaspora/diaspora';
 
-import { SymbolKind, SymbolDef } from './symbol/symbol.component';
+import { SymbolKind, SymbolDef, symbolLabel } from './symbol/symbol.component';
 import { ApiDocService } from '../../services/api-doc/api-doc.service';
 
 interface Tag {
@@ -66,6 +66,16 @@ export class ApiComponent implements OnInit {
 	private breadcrumbData: Entities.Entity[] | string = [];
 
 	public SymbolKind = SymbolKind;
+	public SymbolLabel = _.values(symbolLabel);
+
+	private _currentSymbolId = 0;
+	private get currentSymbolId(){
+		return this._currentSymbolId;
+	}
+	private set currentSymbolId(value: number){
+		this._currentSymbolId = value;
+		this.setSearch(value);
+	}
 
 	private get display() {
 		if (this.currentItems) {
@@ -96,7 +106,7 @@ export class ApiComponent implements OnInit {
 				const symbolId = params.symbolId ? parseInt(params.symbolId, 10) : 0;
 				console.log({symbolId});
 				// this.setSearch(0);
-				this.setSearch(symbolId);
+				this.currentSymbolId = symbolId;
 			});
 		});
 	}
@@ -167,9 +177,13 @@ export class ApiComponent implements OnInit {
 		if (!event.target || !(event.target instanceof HTMLInputElement)) {
 			return;
 		}
-		const input = event.target.value;
-		this.breadcrumbData = `Searching for "${input}"`;
-		this.currentItems = await this.ApiDoc.ApiDoc.findMany({name: input});
+		const input = event.target.value.trim();
+		if (input === '') {
+			this.currentSymbolId = this.currentSymbolId;
+		} else {
+			this.breadcrumbData = `Searching for "${input}"`;
+			this.currentItems = await this.ApiDoc.ApiDoc.findMany({name: input});
+		}
 	}
 
 	private async setSearch(containerId: number | null) {

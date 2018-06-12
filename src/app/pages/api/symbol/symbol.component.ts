@@ -46,7 +46,7 @@ const symbolClass = {
 	[SymbolKind.TypeAlias]: 'tsd-kind-type-alias',
 };
 
-const symbolLabel = {
+export const symbolLabel = {
 	[SymbolKind.Module]: 'Module',
 	[SymbolKind.Enum]: 'Enumeration',
 	[SymbolKind.Variable]: 'Variable',
