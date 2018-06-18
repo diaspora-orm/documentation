@@ -1,73 +1,14 @@
 import { Component, OnInit, Input, HostBinding } from '@angular/core';
-import { ApiDocService } from '../../../services/api-doc/api-doc.service';
+import { ApiDocService, symbolClass, SymbolDef, symbolLabel } from '../../../services/api-doc/api-doc.service';
 
-export enum SymbolKind {
-	Module        = 0x0,
-	Enum          = 0x4,
-	Variable      = 0x20,
-	Function      = 0x40,
-	Class         = 0x80,
-	Interface     = 0x100,
-	Constructor   = 0x200,
-	Method        = 0x800,
-	CallSignature = 0x1000,
-	Literal       = 0x200000,
-	TypeAlias     = 0x400000,
-}
-export interface SymbolDef {
-	exported: boolean;
-	kind: SymbolKind;
-	name: string;
-	identifier: number;
-	summary?: string;
-	comment?: string;
-	source?: {
-		file: string;
-		line: number;
-		module: boolean;
-	};
-	ancestor?: number;
-	hasChildren: boolean;
-}
-
-
-
-const symbolClass = {
-	[SymbolKind.Module]: 'tsd-kind-module',
-	[SymbolKind.Enum]: 'tsd-kind-enum',
-	[SymbolKind.Variable]: 'tsd-kind-variable',
-	[SymbolKind.Function]: 'tsd-kind-function',
-	[SymbolKind.Class]: 'tsd-kind-class',
-	[SymbolKind.Interface]: 'tsd-kind-interface',
-	[SymbolKind.Constructor]: 'tsd-kind-constructor',
-	[SymbolKind.Method]: 'tsd-kind-method',
-	[SymbolKind.CallSignature]: '',
-	[SymbolKind.Literal]: 'tsd-kind-object-literal',
-	[SymbolKind.TypeAlias]: 'tsd-kind-type-alias',
-};
-
-export const symbolLabel = {
-	[SymbolKind.Module]: 'Module',
-	[SymbolKind.Enum]: 'Enumeration',
-	[SymbolKind.Variable]: 'Variable',
-	[SymbolKind.Function]: 'Function',
-	[SymbolKind.Class]: 'Class',
-	[SymbolKind.Interface]: 'Interface',
-	[SymbolKind.Constructor]: 'Constructor',
-	[SymbolKind.Method]: 'Method',
-	[SymbolKind.CallSignature]: 'Call signature',
-	[SymbolKind.Literal]: 'Literal',
-	[SymbolKind.TypeAlias]: 'Type alias',
-};
-
-
+import * as _ from 'lodash';
 
 
 
 @Component({
 	selector: 'app-symbol',
 	templateUrl: './symbol.component.html',
-	styleUrls: ['./symbol.component.scss']
+	styleUrls: ['./symbol.component.scss'],
 })
 export class SymbolComponent implements OnInit {
 	@Input() protected symbol: SymbolDef | undefined;
@@ -78,7 +19,7 @@ export class SymbolComponent implements OnInit {
 			this.kindClass
 		].join(' ');
 	}
-
+	
 	private get kindClass() {
 		if (!this.symbol) {
 			return '';

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { Diaspora, Model, Entities } from '@diaspora/diaspora';
 
-import { SymbolComponent, SymbolDef } from '../symbol.component';
-import { ApiDocService } from '../../../../services/api-doc/api-doc.service';
+import { ApiDocService, SymbolDef } from '../../../../services/api-doc/api-doc.service';
+import { SymbolComponent } from '../symbol.component';
 
 @Component({
 	selector: 'app-function-symbol',
