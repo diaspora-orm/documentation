@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { Diaspora, Model, Entities } from '@diaspora/diaspora';
-import { HttpClient } from '@angular/common/http';
 import * as _ from 'lodash';
 
 

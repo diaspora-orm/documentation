@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
+
+import * as _ from 'lodash';
+
 import { SymbolDef, ApiDocService, ParameterTypeDefinition } from '../../../../../../services/api-doc/api-doc.service';
-
-
 
 interface ITypeError{
 	type: 'error';

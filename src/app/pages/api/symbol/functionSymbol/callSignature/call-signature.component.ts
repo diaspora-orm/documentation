@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+
 import { ApiDocService, SymbolDef } from '../../../../../services/api-doc/api-doc.service';
 
 @Component({
