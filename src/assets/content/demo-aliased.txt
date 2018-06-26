@@ -1,7 +1,0 @@
-Diaspora
-
-(async () => {
-
-
-
-})()

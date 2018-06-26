@@ -7,8 +7,13 @@ import { Diaspora } from '@diaspora/diaspora';
 
 
 interface ICodeLine {
+	code?: string;
 	text: string;
-	code: string;
+	type: ECommandType;
+}
+
+enum ECommandType {
+
 }
 
 @Component({
@@ -18,44 +23,46 @@ interface ICodeLine {
 })
 export class IOAreaComponent implements OnInit {
 	private history: {command: string, response: string, errored: boolean}[] = [];
-	
+
 	private liveCodingText: string | null = null;
 	private lines: ICodeLine[] = [];
 	private currentLineIndex = 0;
-	
+	private playing = true;
+
+	private getPointClass(code: ICodeLine, index: number) {
+		return {
+			['type-' + code.type]: true,
+			active: index === this.currentLineIndex
+		};
+	}
+
 	constructor(private http: HttpClient) {
 		// Make the HTTP request:
-		forkJoin(
-			this.http.get('/assets/content/demo.txt', { responseType: 'text'}),
-			this.http.get('/assets/content/demo-aliased.txt', { responseType: 'text'}),
-		).subscribe(([raw, replaced]: [string, string]) => {
-			const rawSplitted = raw.split('\n');
-			const replacedSplitted = replaced.split('\n');
-			this.lines = [];
-			rawSplitted.forEach((line, index) => {
-				if (line.trim().length > 0) {
-					const code = replacedSplitted.length > index && replacedSplitted[index].trim().length > 0 ?
-					replacedSplitted[index].trim() :
-					line.trim();
-					this.lines.push({
-						text: line,
-						code,
-					});
-				}
-			});
+		this.http.get('/assets/content/demo.json')
+		.subscribe((cnt: any) => {
+			this.lines = cnt as ICodeLine[];
 			this.playLoop();
 		});
 		(window as any).Diaspora = Diaspora;
 	}
-	
-	
-	private stringifyOutput(content: any) {
+
+
+	private async stringifyOutput(content: any): Promise<string> {
+		if (content instanceof Promise) {
+			const promiseRes = await content;
+			return `Promise(${await this.stringifyOutput(promiseRes)})`;
+		}
 		return JSON.stringify(content, null, 4);
 	}
-	
+
 	ngOnInit() {
 	}
-	
+
+	private setFrame(frameNumber: number){
+		this.playing = false;
+		this.history = 
+	}
+
 	private eval(command: string) {
 		try {
 			return {
@@ -69,9 +76,9 @@ export class IOAreaComponent implements OnInit {
 			};
 		}
 	}
-	
+
 	private async playLoop() {
-		while (true) {
+		while (this.playing) {
 			const currentLine = this.lines[this.currentLineIndex];
 			if (!currentLine) {
 				return;
@@ -80,10 +87,11 @@ export class IOAreaComponent implements OnInit {
 			await this.writeTextToLive(currentLine.text);
 			await new Promise(resolve => setTimeout(resolve, 500));
 			this.liveCodingText = null;
-			const result = this.eval(currentLine.code);
+			const result = this.eval(currentLine.code || currentLine.text);
+			console.log(result);
 			this.history.push({
 				command: currentLine.text,
-				response: this.stringifyOutput(result.return),
+				response: await this.stringifyOutput(result.return),
 				errored: result.error,
 			});
 			this.history = this.history.slice(-4);
@@ -95,7 +103,7 @@ export class IOAreaComponent implements OnInit {
 			}
 		}
 	}
-	
+
 	private async writeTextToLive(text: string) {
 		this.liveCodingText = null;
 		const textLength = text.length;

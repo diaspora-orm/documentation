@@ -5,17 +5,17 @@
 	display: flex;
 	overflow: hidden;
 	flex-direction: column;
-    justify-content: flex-end;
-    box-shadow: 0px 0px 5px 0 #666 inset;
-    position: relative;
-    //z-index: 170;
-    background-color: #f4f5f6;
+	justify-content: flex-end;
+	box-shadow: 0px 0px 5px 0 #666 inset;
+	position: relative;
+	//z-index: 170;
+	background-color: #f4f5f6;
 }
 section pre{
 	margin: 0;
 	line-break: normal;
-    white-space: pre-line;
-    background:none;
+	white-space: pre-line;
+	background:none;
 }
 
 pre::before {
@@ -29,4 +29,28 @@ pre::before {
 .response::before{
 	content: '<';
 	color: $c2dark;
+}
+
+.point-list{
+	$pointSize: 15px;
+	display: flex;
+	flex-direction: row;
+	
+	i{
+		margin: $pointSize;
+		border: $pointSize solid transparent;
+		border-radius: 100%;
+		opacity: 0.5;
+		transition: 0.5s all;
+		
+		&.type-setup{
+			border-color: #666;
+		}
+		&.type-insert{
+			border-color: cadetblue;
+		}
+		&.active{
+			opacity: 1;
+		}
+	}
 }
