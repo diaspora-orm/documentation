@@ -17,10 +17,10 @@ interface Source {
 	character: number;
 }
 
-export interface TypeReference{
-	type: 'reference'
+export interface TypeReference {
+	type: 'reference';
 	name: string;
-	id: number
+	id: number;
 }
 export type ParameterTypeDefinition = {
 	type: 'intrinsic'
@@ -53,7 +53,7 @@ interface TypeDefinition {
 	sources: Source[];
 	signatures?: TypeDefinition[] | undefined;
 	parameters?: TypeDefinition[] | undefined;
-	typeParameter: TypeDefinition[] | undefined;
+	typeParameter: ParameterTypeDefinition[] | undefined;
 	extendedTypes: TypeReference[] | undefined;
 	extendedBy: TypeReference[] | undefined;
 	implementedTypes: TypeDefinition[] | undefined;
@@ -93,6 +93,7 @@ export interface SymbolDef {
 	ancestor?: number;
 	hasChildren: boolean;
 	type: ParameterTypeDefinition | undefined;
+	typeParameter: ParameterTypeDefinition[] | undefined;
 }
 
 export const symbolClass = {
@@ -136,11 +137,11 @@ const LinkRegexpG = new RegExp(LinkRegexp, 'g');
 })
 export class ApiDocService {
 	private readonly _ApiDoc: Model;
-	
+
 	public get ApiDoc() {
 		return this._ApiDoc;
 	}
-	
+
 	constructor(private http: HttpClient) {
 		(window as any).Diaspora = Diaspora;
 		Diaspora.createNamedDataSource('memory', 'inMemory');
@@ -164,31 +165,18 @@ export class ApiDocService {
 				ancestor: 'number',
 				hasChildren: 'boolean',
 				signature: 'object',
-				type:'object'
+				type: 'object',
+				typeParameter: 'array',
 			},
 		});
 	}
-	
-	public async loadJsonFile(fileUrl: string){
-		await this.ApiDoc.deleteMany({});
-		
-		// Make the HTTP request:
-		const data = await this.http
-		.get<TypeDefinition>(fileUrl)
-		.toPromise();
-		
-		_.assign(window, {rawData: data, _});
-		const items = ApiDocService.flattenTransformSymbols(data);
-		const insertedSet = await this.ApiDoc.insertMany(items);
-		console.log({rawJson: data, transformed: items, insertedSet: insertedSet});
-	}
-	
+
 	private static getSource(symbol: TypeDefinition) {
 		const source = _.get(symbol, 'sources[0]') as Source | undefined;
 		if (!source) {
 			return;
 		}
-		
+
 		const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
 		const isModule = source.fileName.match(moduleMatcher) ? true : false;
 		const sourceFile = isModule ? source.fileName.replace(moduleMatcher, '$1') : source.fileName;
@@ -198,7 +186,7 @@ export class ApiDocService {
 			module: isModule,
 		};
 	}
-	
+
 	private static getSummary(symbol: TypeDefinition) {
 		let summary = _.get(symbol, 'comment.shortText') || _.get(symbol, 'comment.text') as string | null;
 		if (!summary) {
@@ -218,7 +206,7 @@ export class ApiDocService {
 		});
 		return summary;
 	}
-	
+
 	private static transformSymbol(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef {
 		const ancestorId = _.get(ancestor, 'id');
 		const type = symbol.type;
@@ -231,10 +219,11 @@ export class ApiDocService {
 			source: this.getSource(symbol),
 			ancestor: ancestorId,
 			hasChildren: symbol.children && symbol.children.length > 0,
-			type: type
+			type: type,
+			typeParameter: symbol.typeParameter,
 		};
 	}
-	
+
 	private static flattenTransformSymbols(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef[] {
 		if (!symbol) {
 			return [];
@@ -245,5 +234,20 @@ export class ApiDocService {
 		.reduce((acc, item) => {
 			return acc.concat(this.flattenTransformSymbols(item, symbol));
 		}, [this.transformSymbol(symbol, ancestor)] as SymbolDef[]).orderBy('identifier').value();
+	}
+
+
+	public async loadJsonFile(fileUrl: string) {
+		await this.ApiDoc.deleteMany({});
+
+		// Make the HTTP request:
+		const data = await this.http
+		.get<TypeDefinition>(fileUrl)
+		.toPromise();
+
+		_.assign(window, {rawData: data, _});
+		const items = ApiDocService.flattenTransformSymbols(data);
+		const insertedSet = await this.ApiDoc.insertMany(items);
+		console.log({rawJson: data, transformed: items, insertedSet: insertedSet});
 	}
 }

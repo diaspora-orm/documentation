@@ -14,12 +14,15 @@ export class CallSignatureComponent implements OnInit {
 
 	constructor(protected ApiDoc: ApiDocService) { }
 
-	ngOnInit() {
+	async ngOnInit() {
 		if (!this.signature) {
 			return;
 		}
-		this.ApiDoc.ApiDoc.findMany({ancestor: this.signature.identifier}).then(parameters => {
-			this.parameters = parameters.toChainable.map('attributes').compact().value() as SymbolDef[];
-		});
+		console.log({signature: this.signature});
+		this.parameters = (await this.ApiDoc.ApiDoc.findMany({ancestor: this.signature.identifier}))
+		.toChainable
+		.map('attributes')
+		.compact()
+		.value() as SymbolDef[];
 	}
 }

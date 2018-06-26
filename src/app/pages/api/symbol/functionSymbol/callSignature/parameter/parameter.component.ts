@@ -4,31 +4,31 @@ import * as _ from 'lodash';
 
 import { SymbolDef, ApiDocService, ParameterTypeDefinition } from '../../../../../../services/api-doc/api-doc.service';
 
-interface ITypeError{
+interface ITypeError {
 	type: 'error';
 }
-interface ITypeSymbol{
+interface ITypeSymbol {
 	type: 'symbol';
 	value: SymbolDef;
 }
-interface ITypeOutSymbol{
+interface ITypeOutSymbol {
 	type: 'outSymbol';
 	value: string;
 }
-interface ITypeIntrinsic{
+interface ITypeIntrinsic {
 	type: 'intrinsic';
 	value: string;
 }
-interface ITypeTParam{
+interface ITypeTParam {
 	type: 'typeParameter';
 	value: string;
 }
 
-interface ITypeArray{
+interface ITypeArray {
 	type: 'array';
 	value: IType;
 }
-interface ITypeUnion{
+interface ITypeUnion {
 	type: 'union';
 	value: IType[];
 }
@@ -42,23 +42,26 @@ type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic | ITypeT
 	styleUrls: ['./parameter.component.scss']
 })
 export class ParameterComponent implements OnInit {
-	@Input() protected parameter: ParameterTypeDefinition | undefined;
-	
-	@Input() private parameterOut: IType | undefined;
-	
+	@Input() protected rawParameter: ParameterTypeDefinition | undefined;
+
+	@Input() private parameter: IType | undefined;
+
 	constructor(protected ApiDoc: ApiDocService) { }
-	
-	private async normalizeParameterType(parameter: ParameterTypeDefinition) : Promise<IType>{
-		switch(parameter.type){
-			case 'intrinsic':{
+
+	private async normalizeParameterType(parameter: ParameterTypeDefinition): Promise<IType> {
+		switch (parameter.type) {
+			case 'intrinsic': {
 				return {
 					type: 'intrinsic',
 					value: parameter.name
 				};
 			}
-			
+
 			case 'reference': {
 				const parameterType = await this.ApiDoc.ApiDoc.find({identifier: parameter.id});
+				if (!parameterType) {
+					console.log('outSymbol', parameter);
+				}
 				return parameterType ? {
 					type: 'symbol',
 					value: parameterType.attributes as SymbolDef
@@ -67,7 +70,7 @@ export class ParameterComponent implements OnInit {
 					value: parameter.name
 				};
 			}
-			
+
 			case 'array': {
 				const resolvedType = await this.normalizeParameterType(parameter.elementType);
 				return resolvedType ? {
@@ -79,7 +82,7 @@ export class ParameterComponent implements OnInit {
 			}
 
 			case 'union': {
-				const resolvedTypes = await Promise.all(_.map(parameter.types, type => this.normalizeParameterType(type)))
+				const resolvedTypes = await Promise.all(_.map(parameter.types, type => this.normalizeParameterType(type)));
 				return {
 					type: 'union',
 					value: resolvedTypes
@@ -92,21 +95,20 @@ export class ParameterComponent implements OnInit {
 					value: parameter.name,
 				};
 			}
-			
+
 			default: {
-				console.log(this.parameter)
+				console.log(this.rawParameter);
 				return {
 					type: 'error'
 				};
 			}
 		}
 	}
-	
+
 	async ngOnInit() {
-		if (!this.parameter) {
-			console.log('NO PARAMETER')
+		if (!this.rawParameter) {
 			return;
 		}
-		this.parameterOut = await this.normalizeParameterType(this.parameter);
+		this.parameter = await this.normalizeParameterType(this.rawParameter);
 	}
 }
