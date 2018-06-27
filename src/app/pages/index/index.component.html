@@ -6,8 +6,16 @@
 		</div>
 		<div class="column" *ngIf="this.storeContent !== false; then dataTable else noDataTable">
 		</div>
+		
 		<ng-template #dataTable>
-			<table #storeStatus>
+			<table class="column">
+				<thead>
+					<tr>
+						<th>ID <em>(<a>EntityUID</a>)</em></th>
+						<th>Title <em>(string)</em></th>
+						<th>Status <em>(boolean)</em></th>
+					</tr>
+				</thead>
 				<tr *ngFor="let item of this.storeContent">
 					<td>{{item.id}}</td>
 					<td>{{item.title}}</td>
@@ -16,7 +24,9 @@
 			</table>
 		</ng-template>
 		<ng-template #noDataTable>
-			Noop
+			<div class="column" #noDataTable>
+				Noop
+			</div>
 		</ng-template>
 	</div>
 	<div class="row install">

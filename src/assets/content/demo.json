@@ -10,30 +10,40 @@
     },
     {
         "text": "const ToDo = Diaspora.declareModel( 'ToDo', {\n\tsources: 'mySource', \n\tattributes: {\n\t\ttitle: 'string', \n\t\tstatus: 'boolean'\n\t}\n});",
+        "code": "this.ToDo = Diaspora.declareModel('ToDo',{sources:'mySource',attributes:{title:'string',status:'boolean'}});this.ToDo;",
         "type":"setup"
     },
     {
         "text":"const todos = await ToDo.insertMany([\n\t{ title: 'Do Diaspora', status: true },\n\t{ title: 'Do the docs', status: false },\n\t{ title: 'Rule the world', status: false }\n]);",
+        "code":"this.todos = this.ToDo.insertMany([{title:'Do Diaspora',status:true},{title:'Do the docs',status:false},{title:'Rule the world',status:false}]);this.todos;",
         "type": "insert"
     },
     {
         "text": "const docsTodo = todos.entities[1];",
+        "code": "this.docsTodo = this.todos.entities[1];",
         "type": "entity"
     },
     {
         "text": "docsTodo.attributes.status = true;",
+        "code": "this.docsTodo.attributes.status = true;",
         "type": "entity"
     },
     {
         "text":"await docsTodo.persist();",
+        "code":"this.docsTodo.persist();",
         "type":"update"
     },
     {
         "text":"await ToDo.deleteMany({status: false});",
+        "code":"this.ToDo.deleteMany({status: false});",
         "type":"delete"
     },
     {
         "text":"const doneTodos = await ToDo.findMany({status: true});",
+        "code":"this.doneTodos = await ToDo.findMany({status: true});this.doneTodos;",
         "type":"find"
+    },
+    {
+        "code": "for(const i in this){delete this[i];}delete Diaspora.models.ToDo; delete Diaspora.dataSources.mySource.adapter.store.ToDo; delete Diaspora.adapters.mySource"
     }
 ]

@@ -14,10 +14,24 @@
 		flex: 0 0 33%;
 		background-color: #eee;
 		margin-bottom: 5rem;
-        box-shadow: -1px 1px 5px 0px #bbb;
-        padding: 1rem 5rem;
+		box-shadow: -1px 1px 5px 0px #bbb;
+		padding: 1rem 5rem;
 	}
 }
 h3{
 	text-align: center;
+}
+
+.row{
+	> *{
+		width: auto;
+		$tableWidth: 35%;
+		
+		&:first-child{
+			width: 100% - $tableWidth;
+		}
+		&:last-child{
+			width: $tableWidth;
+		}
+	}
 }
