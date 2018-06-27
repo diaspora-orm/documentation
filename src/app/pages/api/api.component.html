@@ -8,7 +8,7 @@
 			<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
 			
 			<ng-template #searchBreadcrumb>
-				<span>{{breadcrumbData}}</span>
+				<span>Searching for <em>{{searchedString}}</em></span>
 			</ng-template>
 			<ng-template #symbolsBreadcrumb>
 				<span *ngFor="let breadcrumbItem of breadcrumbData; let i = index">
@@ -24,34 +24,38 @@
 		</div>
 		<header>
 			<label for="symbolSearch">Symbol name</label>
-			<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames">
+			<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames" #searchInput>
 			<datalist id="symbolNames">
 				<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
 			</datalist>
-			
-			<!--<div>
-				<span *ngFor="let label of SymbolLabel">
-					<label [for]="label"><input type="checkbox" checked="checked" [id]="label"> {{label}}</label>
-				</span>
-			</div>-->
 		</header>
 		<section>
-			<ng-container *ngFor="let symbol of display" [ngSwitch]="symbol.kind">
-				<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol"></app-function-symbol>
-				<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol"></app-function-symbol>
-				<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol"></app-function-symbol>
-				<app-symbol *ngSwitchDefault [symbol]="symbol"></app-symbol>
-			</ng-container>
-			<table>
-				<!--<tr>
-					<td>{{item.identifier}}</td>
-					<td></td>
-					<td>{{item.kind}}</td>
-					<td>{{item.exported}}</td>
-					<td>{{item.summary}}</td>
-					<td><span *ngIf="item.source">{{item.source.file}} L{{item.source.line}}</span></td>
-				</tr>-->
-			</table>
+			<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
+			
+			<ng-template #blockSearch>
+				<h2>Search results</h2>
+				<ng-container *ngFor="let symbol of searchedItems">
+					<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
+				</ng-container>
+			</ng-template>
+			<ng-template #blockContent>
+				<h2>Symbol definition</h2>
+				<section *ngFor="let pair of currentItems | pairs">
+					<h3>{{pair.key}}</h3>
+					<ng-container *ngFor="let symbol of pair.value">
+						<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
+					</ng-container>
+				</section>
+			</ng-template>
+			
+			<ng-template #symbolSwitch let-symbol="symbol">
+				<ng-container [ngSwitch]="symbol.kind">
+					<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol"></app-function-symbol>
+					<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol"></app-function-symbol>
+					<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol"></app-function-symbol>
+					<app-symbol *ngSwitchDefault [symbol]="symbol"></app-symbol>
+				</ng-container>
+			</ng-template>
 		</section>
 	</ng-template>
 	<ng-template #noDataTable>

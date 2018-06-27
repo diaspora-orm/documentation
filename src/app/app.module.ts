@@ -14,6 +14,9 @@ import { SymbolComponent } from './pages/api/symbol/symbol.component';
 import { FunctionSymbolComponent } from './pages/api/symbol/functionSymbol/function-symbol.component';
 import { CallSignatureComponent } from './pages/api/symbol/functionSymbol/callSignature/call-signature.component';
 import { ParameterComponent } from './pages/api/symbol/functionSymbol/callSignature/parameter/parameter.component';
+import { StringifyPipe } from './pipes/stringify/stringify.pipe';
+import { ParsePipe } from './pipes/parse/parse.pipe';
+import { PairsPipe } from './pipes/pairs/pairs.pipe';
 
 @NgModule({
 	declarations: [
@@ -26,6 +29,9 @@ import { ParameterComponent } from './pages/api/symbol/functionSymbol/callSignat
 		FunctionSymbolComponent,
 		CallSignatureComponent,
 		ParameterComponent,
+		StringifyPipe,
+		ParsePipe,
+		PairsPipe,
 	],
 	imports: [
 		BrowserModule,

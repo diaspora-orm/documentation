@@ -18,7 +18,6 @@ export class CallSignatureComponent implements OnInit {
 		if (!this.signature) {
 			return;
 		}
-		console.log({signature: this.signature});
 		this.parameters = (await this.ApiDoc.ApiDoc.findMany({ancestor: this.signature.identifier}))
 		.toChainable
 		.map('attributes')

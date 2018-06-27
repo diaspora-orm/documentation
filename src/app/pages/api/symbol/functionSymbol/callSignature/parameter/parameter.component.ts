@@ -59,9 +59,6 @@ export class ParameterComponent implements OnInit {
 
 			case 'reference': {
 				const parameterType = await this.ApiDoc.ApiDoc.find({identifier: parameter.id});
-				if (!parameterType) {
-					console.log('outSymbol', parameter);
-				}
 				return parameterType ? {
 					type: 'symbol',
 					value: parameterType.attributes as SymbolDef

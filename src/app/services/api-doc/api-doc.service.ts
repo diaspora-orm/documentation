@@ -67,7 +67,9 @@ interface TypeDefinition {
 // Diaspora TSDoc entities
 export enum SymbolKind {
 	Module        = 0x0,
+	Namespace     = 0x2,
 	Enum          = 0x4,
+	EnumMember    = 0x10,
 	Variable      = 0x20,
 	Function      = 0x40,
 	Class         = 0x80,
@@ -98,7 +100,9 @@ export interface SymbolDef {
 
 export const symbolClass = {
 	[SymbolKind.Module]: 'tsd-kind-module',
+	[SymbolKind.Namespace]: 'tsd-kind-module',
 	[SymbolKind.Enum]: 'tsd-kind-enum',
+	[SymbolKind.EnumMember]: 'tsd-kind-enum-member',
 	[SymbolKind.Variable]: 'tsd-kind-variable',
 	[SymbolKind.Function]: 'tsd-kind-function',
 	[SymbolKind.Class]: 'tsd-kind-class',
@@ -112,7 +116,9 @@ export const symbolClass = {
 
 export const symbolLabel = {
 	[SymbolKind.Module]: 'Module',
+	[SymbolKind.Namespace]: 'Namespace',
 	[SymbolKind.Enum]: 'Enumeration',
+	[SymbolKind.EnumMember]: 'Enumeration member',
 	[SymbolKind.Variable]: 'Variable',
 	[SymbolKind.Function]: 'Function',
 	[SymbolKind.Class]: 'Class',

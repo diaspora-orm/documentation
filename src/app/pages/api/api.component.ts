@@ -6,45 +6,58 @@ import * as _ from 'lodash';
 import { Entities } from '@diaspora/diaspora';
 
 import { ApiDocService, SymbolKind, symbolLabel } from '../../services/api-doc/api-doc.service';
+import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 
 
 @Component({
 	selector: 'app-api',
 	templateUrl: './api.component.html',
-	styleUrls: ['./api.component.scss']
+	styleUrls: ['./api.component.scss'],
+	providers: [PairsPipe],
 })
 export class ApiComponent implements OnInit {
 	@ViewChild('breadcrumb') breadcrumb?: ElementRef<HTMLElement>;
+	@ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
 
-	private currentItems?: Entities.Set;
+	private currentItems?: {[kind: string]: Symbol[]};
+	private searchedItems?: Symbol[];
+
 	private isInitialized = false;
 	private breadcrumbData: Entities.Entity[] | string = [];
 
 	public SymbolKind = SymbolKind;
 	public SymbolLabel = _.values(symbolLabel);
 
+	private _searchedString?: string;
+	private get searchedString() {
+		return this._searchedString;
+	}
+	private set seachedString(str: string) {
+		if (str === '') {
+			this._searchedString = undefined;
+			this.searchedItems = undefined;
+		} else {
+			this._searchedString = str;
+			this.ApiDoc.ApiDoc.findMany({name: str}).then(searchResults => {
+				this.searchedItems = searchResults.toChainable.map('attributes').compact().value() as any;
+			});
+		}
+	}
+
 	private _currentSymbolId = 0;
-	private get currentSymbolId(){
+	private get currentSymbolId() {
 		return this._currentSymbolId;
 	}
-	private set currentSymbolId(value: number){
+	private set currentSymbolId(value: number) {
 		this._currentSymbolId = value;
 		this.setSearch(value);
 	}
 
-	private get display() {
-		if (this.currentItems) {
-			return _.map(this.currentItems.entities, 'attributes');
-		} else {
-			return [];
-		}
-	}
-
 	private get isSearchMode() {
-		return typeof this.breadcrumbData === 'string';
+		return typeof this.searchedString !== 'undefined';
 	}
 
-	constructor(private route: ActivatedRoute, private ApiDoc: ApiDocService) {
+	constructor(private route: ActivatedRoute, private ApiDoc: ApiDocService, private pairs: PairsPipe) {
 		// Make the HTTP request:
 		this.ApiDoc.loadJsonFile('/assets/content/api/0-3-0.json')
 		.then(() => {
@@ -53,29 +66,28 @@ export class ApiComponent implements OnInit {
 			.queryParams
 			.subscribe((params: any) => {
 				const symbolId = params.symbolId ? parseInt(params.symbolId, 10) : 0;
-				console.log({symbolId});
-				// this.setSearch(0);
 				this.currentSymbolId = symbolId;
+				console.log('Reseting prompt');
+				if (this.searchInput) {
+					this.searchInput.nativeElement.value = '';
+				}
+				this.seachedString = '';
 			});
 		});
 	}
-	
+
 	private async onSearchBarChange(event: KeyboardEvent) {
 		if (!event.target || !(event.target instanceof HTMLInputElement)) {
 			return;
 		}
-		const input = event.target.value.trim();
-		if (input === '') {
-			this.currentSymbolId = this.currentSymbolId;
-		} else {
-			this.breadcrumbData = `Searching for "${input}"`;
-			this.currentItems = await this.ApiDoc.ApiDoc.findMany({name: input});
-		}
+		this.seachedString = event.target.value.trim();
 	}
 
 	private async setSearch(containerId: number | null) {
+		console.log('setting search', containerId);
 		const [items, breadcrumb] = await Promise.all([
 			this.ApiDoc.ApiDoc.findMany({ancestor: containerId}),
+
 			new Promise<any>(async (resolve, reject) => {
 				const breadcrumbItems: Entities.Entity[] = [];
 
@@ -91,8 +103,18 @@ export class ApiComponent implements OnInit {
 				return resolve(breadcrumbItems);
 			}),
 		]);
-		// console.log({items, breadcrumb})
-		this.currentItems = items;
+		this.currentItems = items.toChainable
+		.map('attributes')
+		.compact()
+		.groupBy('kind')
+		.reduce((acc, symbols: any[]) => {
+			const firstItem = _.first(symbols);
+			if (firstItem) {
+				const kindStr = SymbolKind[firstItem.kind];
+				acc[kindStr] = symbols;
+			}
+			return acc;
+		}, {} as {[kind: string]: Symbol[]}).value();
 		this.breadcrumbData = breadcrumb;
 	}
 
