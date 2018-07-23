@@ -5,9 +5,8 @@ import * as _ from 'lodash';
 import { DiasporaStatic } from '@diaspora/diaspora';
 const Diaspora: DiasporaStatic = require('@diaspora/diaspora/dist/es5/diaspora.standalone.min.js');*/
 
-import { Diaspora } from '@diaspora/diaspora';
-
 import { IOAreaComponent } from './ioarea/ioarea.component';
+import { Diaspora } from '@diaspora/diaspora';
 
 @Component({
 	selector: 'app-index',

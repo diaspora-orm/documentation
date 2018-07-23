@@ -17,6 +17,7 @@ import { ParameterComponent } from './pages/api/symbol/functionSymbol/callSignat
 import { StringifyPipe } from './pipes/stringify/stringify.pipe';
 import { ParsePipe } from './pipes/parse/parse.pipe';
 import { PairsPipe } from './pipes/pairs/pairs.pipe';
+import { KeysPipe } from './pipes/keys/keys.pipe';
 
 @NgModule({
 	declarations: [
@@ -32,6 +33,7 @@ import { PairsPipe } from './pipes/pairs/pairs.pipe';
 		StringifyPipe,
 		ParsePipe,
 		PairsPipe,
+		KeysPipe
 	],
 	imports: [
 		BrowserModule,

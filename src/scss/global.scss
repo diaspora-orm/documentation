@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import './vars.scss';
+@import './vars';
+@import './loader';
 
 pre{
     border-left-color: $c1dark;
@@ -15,4 +16,8 @@ a{
     &:visited{
         color: $c2dark;
     }
+}
+
+body{
+    background-color: $bodyColor;
 }

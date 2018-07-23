@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 import { ApiDocService, SymbolDef } from '../../../../../services/api-doc/api-doc.service';
+import { Set } from '@diaspora/diaspora';
 
 @Component({
 	selector: 'app-call-signature',
@@ -19,9 +20,7 @@ export class CallSignatureComponent implements OnInit {
 			return;
 		}
 		this.parameters = (await this.ApiDoc.ApiDoc.findMany({ancestor: this.signature.identifier}))
-		.toChainable
-		.map('attributes')
-		.compact()
+		.toChainable(Set.ETransformationMode.ATTRIBUTES)
 		.value() as SymbolDef[];
 	}
 }

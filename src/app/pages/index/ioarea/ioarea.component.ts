@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { forkJoin } from 'rxjs/index';
 import * as _ from 'lodash';
 
 import { Diaspora } from '@diaspora/diaspora';
@@ -53,6 +52,7 @@ export class IOAreaComponent implements OnInit {
 	 */
 	private static evalInContext(js: string) {
 		// Return the results of the in-line anonymous function we .call with the passed context
+		// tslint:disable-next-line:no-eval
 		return (function() { return eval(js); }).call(IOAreaComponent.context);
 	}
 

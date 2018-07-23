@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Diaspora, Model, Entities } from '@diaspora/diaspora';
+import { Set } from '@diaspora/diaspora';
 
 import { ApiDocService, SymbolDef } from '../../../../services/api-doc/api-doc.service';
 import { SymbolComponent } from '../symbol.component';
@@ -25,7 +25,7 @@ export class FunctionSymbolComponent extends SymbolComponent implements OnInit {
 			return;
 		}
 		this.ApiDoc.ApiDoc.findMany({ancestor: this.symbol.identifier}).then(signatures => {
-			this.signatures = signatures.toChainable.map('attributes').compact().value() as SymbolDef[];
+			this.signatures = signatures.toChainable(Set.ETransformationMode.ATTRIBUTES).compact().value() as SymbolDef[];
 		});
 	}
 }

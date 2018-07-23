@@ -22,7 +22,7 @@
     "@angular/platform-browser": "^6.0.3",
     "@angular/platform-browser-dynamic": "^6.0.3",
     "@angular/router": "^6.0.3",
-    "@diaspora/diaspora": "^0.3.0-alpha.7",
+    "@diaspora/diaspora": "^0.3.0-alpha.10",
     "core-js": "^2.5.6",
     "lodash": "^4.17.10",
     "ngx-clipboard": "^11.1.0",

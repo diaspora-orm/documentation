@@ -15,6 +15,19 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous"/>
 </head>
 <body>
-	<app-root></app-root>
+	<!-- Loader from https://codepen.io/ikoshowa/pen/qOMvpy -->
+	<div class="bookshelf_wrapper" id="loader" style="display: none;">
+		<ul class="books_list">
+		  <li class="book_item first"></li>
+		  <li class="book_item second"></li>
+		  <li class="book_item third"></li>
+		  <li class="book_item fourth"></li>
+		  <li class="book_item fifth"></li>
+		  <li class="book_item sixth"></li>
+		</ul>
+		<div class="shelf"></div>
+	  </div>
+	<app-root>
+	</app-root>
 </body>
 </html>

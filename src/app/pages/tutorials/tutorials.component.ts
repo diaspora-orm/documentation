@@ -378,6 +378,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 			this.sections = Array
 			.from(childNodes)
 			.filter(element => element instanceof HTMLElement) as HTMLElement[];
+			console.log('sections:', this.sections);
 		}
 	}
 
