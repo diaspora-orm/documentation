@@ -198,7 +198,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 	@ViewChild('muteButton') private muteButton?: ElementRef<HTMLButtonElement>;
 	@ViewChild('presentation') private presentation?: ElementRef<HTMLElement>;
 	private sections: HTMLElement[];
-	private tutoIdentifier: string | null = null;
+	public tutoIdentifier: string | null = null;
 	private allowScroll = true;
 	private currentSpeechSynthesis: CustomSynthesis | null = null;
 
@@ -409,7 +409,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	private handleScroll(event: MouseWheelEvent) {
+	public handleScroll(event: MouseWheelEvent) {
 		event.preventDefault();
 		const delta = event.wheelDelta / 120;
 		if ( delta >= SectionChange.Next ) {

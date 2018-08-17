@@ -18,7 +18,7 @@ export class IndexComponent implements OnInit {
 	@ViewChild('storeStatus') private store?: ElementRef<HTMLTableElement>;
 	@ViewChild('installCmd') private installCmd?: ElementRef<HTMLPreElement>;
 
-	private get storeContent() {
+	public get storeContent() {
 		return _.get(Diaspora, 'dataSources.mySource.adapter.store.ToDo.items', false);
 	}
 

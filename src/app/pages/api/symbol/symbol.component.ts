@@ -1,43 +1,42 @@
 import { Component, OnInit, Input, HostBinding } from '@angular/core';
-import { ApiDocService, symbolClass, SymbolDef, symbolLabel } from '../../../services/api-doc/api-doc.service';
+import { ApiDocService, symbolClass, ISymbolDef, symbolLabel } from '../../../services/api-doc/api-doc.service';
 
 import * as _ from 'lodash';
 
 
 
-@Component({
+@Component( {
 	selector: 'app-symbol',
 	templateUrl: './symbol.component.html',
 	styleUrls: ['./symbol.component.scss'],
-})
+} )
 export class SymbolComponent implements OnInit {
-	@Input() protected symbol: SymbolDef | undefined;
+	@Input() public symbol!: ISymbolDef;
 
-	@HostBinding('class')
-	get hostClasses(): string {
+	@HostBinding( 'class' )
+	public get hostClasses(): string {
 		return [
-			this.kindClass
-		].join(' ');
+			this.kindClass,
+		].join( ' ' );
 	}
-	
 	private get kindClass() {
-		if (!this.symbol) {
+		if ( !this.symbol ) {
 			return '';
 		}
 		return symbolClass[this.symbol.kind] || this.symbol.kind;
 	}
 	private get typeName() {
-		if (!this.symbol) {
+		if ( !this.symbol ) {
 			return '';
 		}
 		return symbolLabel[this.symbol.kind] || this.symbol.kind;
 	}
 
 	private get source() {
-		if (!this.symbol || !this.symbol.source) {
+		if ( !this.symbol || !this.symbol.source ) {
 			return '';
 		}
-		if (this.symbol.source.module) {
+		if ( this.symbol.source.module ) {
 			return this.symbol.source.file;
 		} else {
 			const baseUrl = 'https://github.com/diaspora-orm/diaspora/blob/master/src/';
@@ -46,9 +45,9 @@ export class SymbolComponent implements OnInit {
 		}
 	}
 
-	constructor(protected ApiDoc: ApiDocService) { }
+	public constructor( protected ApiDoc: ApiDocService ) { }
 
-	ngOnInit() {
+	public ngOnInit() {
 	}
 
 }

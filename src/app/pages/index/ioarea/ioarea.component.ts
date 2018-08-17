@@ -6,18 +6,22 @@ import * as _ from 'lodash';
 import { Diaspora } from '@diaspora/diaspora';
 
 
-interface ICodeLineDisplayed {
+export interface ICodeLineDisplayed {
 	code?: string;
 	text: string;
 	type: ECommandType;
 }
-interface ICodeLineExecuted {
+export interface ICodeLineExecuted {
 	code: string;
 }
-type ICodeLine = ICodeLineDisplayed | ICodeLineExecuted;
+export type ICodeLine = ICodeLineDisplayed | ICodeLineExecuted;
 
-enum ECommandType {
-
+export enum ECommandType {
+	SETUP = 'setup',
+	ENTITY = 'entity',
+	UPDATE = 'update',
+	DELETE = 'delete',
+	FIND = 'find',
 }
 
 
@@ -34,10 +38,10 @@ const isCodeLineExecuted = (item: ICodeLine): item is ICodeLineExecuted => {
 export class IOAreaComponent implements OnInit {
 	private static context = {};
 
-	private history: {command: string, response: string, errored: boolean}[] = [];
+	public history: {command: string, response: string, errored: boolean}[] = [];
 
-	private liveCodingText: string | null = null;
-	private lines: ICodeLine[] = [];
+	public liveCodingText: string | null = null;
+	public lines: ICodeLine[] = [];
 	private resetInstruction: ICodeLineExecuted = {
 		code: '',
 	};

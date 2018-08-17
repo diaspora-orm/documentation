@@ -18,6 +18,7 @@ import { StringifyPipe } from './pipes/stringify/stringify.pipe';
 import { ParsePipe } from './pipes/parse/parse.pipe';
 import { PairsPipe } from './pipes/pairs/pairs.pipe';
 import { KeysPipe } from './pipes/keys/keys.pipe';
+import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 
 @NgModule({
 	declarations: [
@@ -33,7 +34,8 @@ import { KeysPipe } from './pipes/keys/keys.pipe';
 		StringifyPipe,
 		ParsePipe,
 		PairsPipe,
-		KeysPipe
+		KeysPipe,
+		SidebarComponent
 	],
 	imports: [
 		BrowserModule,

@@ -2,87 +2,87 @@ import { Component, OnInit, Input } from '@angular/core';
 
 import * as _ from 'lodash';
 
-import { SymbolDef, ApiDocService, ParameterTypeDefinition } from '../../../../../../services/api-doc/api-doc.service';
+import { ISymbolDef, ApiDocService, ParameterTypeDefinition } from '../../../../../../services/api-doc/api-doc.service';
 
-interface ITypeError {
+export interface ITypeError {
 	type: 'error';
 }
-interface ITypeSymbol {
+export interface ITypeSymbol {
 	type: 'symbol';
-	value: SymbolDef;
+	value: ISymbolDef;
 }
-interface ITypeOutSymbol {
+export interface ITypeOutSymbol {
 	type: 'outSymbol';
 	value: string;
 }
-interface ITypeIntrinsic {
+export interface ITypeIntrinsic {
 	type: 'intrinsic';
 	value: string;
 }
-interface ITypeTParam {
+export interface ITypeTParam {
 	type: 'typeParameter';
 	value: string;
 }
 
-interface ITypeArray {
+export interface ITypeArray {
 	type: 'array';
 	value: IType;
 }
-interface ITypeUnion {
+export interface ITypeUnion {
 	type: 'union';
 	value: IType[];
 }
-type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic | ITypeTParam | ITypeArray | ITypeUnion;
+export type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic | ITypeTParam | ITypeArray | ITypeUnion;
 
 
 
-@Component({
+@Component( {
 	selector: 'app-parameter',
 	templateUrl: './parameter.component.html',
-	styleUrls: ['./parameter.component.scss']
-})
+	styleUrls: ['./parameter.component.scss'],
+} )
 export class ParameterComponent implements OnInit {
 	@Input() protected rawParameter: ParameterTypeDefinition | undefined;
 
-	@Input() private parameter: IType | undefined;
+	@Input() public parameter: IType | undefined;
 
-	constructor(protected ApiDoc: ApiDocService) { }
+	public constructor( protected ApiDoc: ApiDocService ) { }
 
-	private async normalizeParameterType(parameter: ParameterTypeDefinition): Promise<IType> {
-		switch (parameter.type) {
+	private async normalizeParameterType( parameter: ParameterTypeDefinition ): Promise<IType> {
+		switch ( parameter.type ) {
 			case 'intrinsic': {
 				return {
 					type: 'intrinsic',
-					value: parameter.name
+					value: parameter.name,
 				};
 			}
 
 			case 'reference': {
-				const parameterType = await this.ApiDoc.ApiDoc.find({identifier: parameter.id});
+				const parameterType = await this.ApiDoc.ApiDoc.find( {identifier: parameter.id} );
 				return parameterType ? {
 					type: 'symbol',
-					value: parameterType.attributes as SymbolDef
+					value: parameterType.attributes as ISymbolDef,
 				} : {
 					type: 'outSymbol',
-					value: parameter.name
+					value: parameter.name,
 				};
 			}
 
 			case 'array': {
-				const resolvedType = await this.normalizeParameterType(parameter.elementType);
+				const resolvedType = await this.normalizeParameterType( parameter.elementType );
 				return resolvedType ? {
 					type: 'array',
-					value: resolvedType
+					value: resolvedType,
 				} : {
-					type: 'error'
+					type: 'error',
 				};
 			}
 
 			case 'union': {
-				const resolvedTypes = await Promise.all(_.map(parameter.types, type => this.normalizeParameterType(type)));
+				const resolvedTypes = await Promise.all( _.map( parameter.types, type => this.normalizeParameterType( type ) ) );
 				return {
 					type: 'union',
-					value: resolvedTypes
+					value: resolvedTypes,
 				};
 			}
 
@@ -94,18 +94,18 @@ export class ParameterComponent implements OnInit {
 			}
 
 			default: {
-				console.log(this.rawParameter);
+				console.log( this.rawParameter );
 				return {
-					type: 'error'
+					type: 'error',
 				};
 			}
 		}
 	}
 
-	async ngOnInit() {
-		if (!this.rawParameter) {
+	public async ngOnInit() {
+		if ( !this.rawParameter ) {
 			return;
 		}
-		this.parameter = await this.normalizeParameterType(this.rawParameter);
+		this.parameter = await this.normalizeParameterType( this.rawParameter );
 	}
 }

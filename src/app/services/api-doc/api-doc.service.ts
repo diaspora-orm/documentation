@@ -1,29 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Diaspora, Model, Entity } from '@diaspora/diaspora';
+import { Diaspora, Model, Entity, EFieldType } from '@diaspora/diaspora';
 import * as _ from 'lodash';
 
 
 
 // Raw TSDoc json file
-interface Tag {
+interface ITag {
 	tag: string;
 	text: string;
 }
-interface Source {
+interface ISource {
 	fileName: string;
 	line: number;
 	character: number;
 }
 
-export interface TypeReference {
+export interface ITypeReference {
 	type: 'reference';
 	name: string;
 	id: number;
 }
 export type ParameterTypeDefinition = {
-	type: 'intrinsic'
+	type: 'intrinsic';
 	name: string;
 } | {
 	type: 'array';
@@ -35,30 +35,30 @@ export type ParameterTypeDefinition = {
 	type: 'typeParameter';
 	name: string;
 	constraint?: ParameterTypeDefinition;
-} | TypeReference;
+} | ITypeReference;
 
-interface TypeDefinition {
+interface ITypeDefinition {
 	flags: {
-		isExported?: boolean,
+		isExported?: boolean;
 	};
 	kind: SymbolKind;
 	kindString: string;
 	name: string;
 	id: number;
-	children: TypeDefinition[];
+	children: ITypeDefinition[];
 	comment?: {
-		shortText?: string,
-		tags?: Tag[]
+		shortText?: string;
+		tags?: ITag[];
 	};
-	sources: Source[];
-	signatures?: TypeDefinition[] | undefined;
-	parameters?: TypeDefinition[] | undefined;
+	sources: ISource[];
+	signatures?: ITypeDefinition[] | undefined;
+	parameters?: ITypeDefinition[] | undefined;
 	typeParameter: ParameterTypeDefinition[] | undefined;
-	extendedTypes: TypeReference[] | undefined;
-	extendedBy: TypeReference[] | undefined;
-	implementedTypes: TypeDefinition[] | undefined;
+	extendedTypes: ITypeReference[] | undefined;
+	extendedBy: ITypeReference[] | undefined;
+	implementedTypes: ITypeDefinition[] | undefined;
 	type: ParameterTypeDefinition | undefined;
-	typeArguments?: TypeReference[];
+	typeArguments?: ITypeReference[];
 }
 
 
@@ -80,7 +80,7 @@ export enum SymbolKind {
 	Literal       = 0x200000,
 	TypeAlias     = 0x400000,
 }
-export interface SymbolDef {
+export interface ISymbolDef {
 	exported: boolean;
 	kind: SymbolKind;
 	name: string;
@@ -96,6 +96,7 @@ export interface SymbolDef {
 	hasChildren: boolean;
 	type: ParameterTypeDefinition | undefined;
 	typeParameter: ParameterTypeDefinition[] | undefined;
+	canonicalPath: string;
 }
 
 export const symbolClass = {
@@ -135,57 +136,59 @@ export const symbolLabel = {
 
 // Utility regex
 const LinkRegexp = /{@link\s+(\S+)(?:\s+(.+?))?}/;
-const LinkRegexpG = new RegExp(LinkRegexp, 'g');
+const LinkRegexpG = new RegExp( LinkRegexp, 'g' );
 
 
-@Injectable({
-	providedIn: 'root'
-})
+@Injectable( {
+	providedIn: 'root',
+} )
 export class ApiDocService {
-	private readonly _ApiDoc: Model;
+	private readonly _ApiDoc: Model<ISymbolDef>;
 
 	public get ApiDoc() {
 		return this._ApiDoc;
 	}
 
-	constructor(private http: HttpClient) {
-		(window as any).Diaspora = Diaspora;
-		Diaspora.createNamedDataSource('memory', 'inMemory');
-		this._ApiDoc = Diaspora.declareModel('ApiDoc', {
+	public constructor( private http: HttpClient ) {
+		( window as any ).Diaspora = Diaspora;
+		Diaspora.createNamedDataSource( 'memory', 'inMemory' );
+		this._ApiDoc = Diaspora.declareModel( 'ApiDoc', {
 			sources: 'memory',
 			attributes: {
-				exported: 'boolean',
-				kind: 'integer',
-				name: 'string',
-				identifier: 'integer',
-				summary: 'string',
+				exported: EFieldType.BOOLEAN,
+				kind: EFieldType.INTEGER,
+				name: EFieldType.STRING,
+				identifier: EFieldType.INTEGER,
+				summary: EFieldType.STRING,
 				source: {
-					type: 'object',
-					/*
+					type: EFieldType.OBJECT,
 					attributes: {
-						file: 'string',
-						line: 'number',
+						file: EFieldType.STRING,
+						line: EFieldType.INTEGER,
 					},
-					*/
 				},
-				ancestor: 'number',
-				hasChildren: 'boolean',
-				signature: 'object',
-				type: 'object',
-				typeParameter: 'array',
+				ancestor: EFieldType.INTEGER,
+				hasChildren: EFieldType.BOOLEAN,
+				signature: EFieldType.OBJECT,
+				type: EFieldType.OBJECT,
+				typeParameter: EFieldType.ARRAY,
+				canonicalPath: {
+					type: EFieldType.STRING,
+					required: true,
+				},
 			},
-		});
+		} );
 	}
 
-	private static getSource(symbol: TypeDefinition) {
-		const source = _.get(symbol, 'sources[0]') as Source | undefined;
-		if (!source) {
+	private static getSource( symbol: ITypeDefinition ) {
+		const source = _.get( symbol, 'sources[0]' ) as ISource | undefined;
+		if ( !source ) {
 			return;
 		}
 
 		const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
-		const isModule = source.fileName.match(moduleMatcher) ? true : false;
-		const sourceFile = isModule ? source.fileName.replace(moduleMatcher, '$1') : source.fileName;
+		const isModule = source.fileName.match( moduleMatcher ) ? true : false;
+		const sourceFile = isModule ? source.fileName.replace( moduleMatcher, '$1' ) : source.fileName;
 		return {
 			file: sourceFile,
 			line: source.line,
@@ -193,67 +196,69 @@ export class ApiDocService {
 		};
 	}
 
-	private static getSummary(symbol: TypeDefinition) {
-		let summary = _.get(symbol, 'comment.shortText') || _.get(symbol, 'comment.text') as string | null;
-		if (!summary) {
+	private static getSummary( symbol: ITypeDefinition ) {
+		let summary = _.get( symbol, 'comment.shortText' ) || _.get( symbol, 'comment.text' ) as string | null;
+		if ( !summary ) {
 			return;
 		}
-		const matches = summary.match(LinkRegexpG);
-		if (!matches) {
+		const matches = summary.match( LinkRegexpG );
+		if ( !matches ) {
 			return summary;
 		}
-		_.forEach(matches, match => {
-			const subMatch = match.match(LinkRegexp);
-			if (subMatch) {
+		_.forEach( matches, match => {
+			const subMatch = match.match( LinkRegexp );
+			if ( subMatch ) {
 				const linkedSymbol = subMatch[1];
 				const linkText = subMatch[2] || linkedSymbol;
-				summary = (summary as string).replace(match, `[${linkText}](${linkedSymbol})`);
+				summary = ( summary as string ).replace( match, `[${linkText}](${linkedSymbol})` );
 			}
-		});
+		} );
 		return summary;
 	}
 
-	private static transformSymbol(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef {
-		const ancestorId = _.get(ancestor, 'id');
+	private static transformSymbol( symbol: ITypeDefinition, ancestor?: ISymbolDef ): ISymbolDef {
+		const ancestorId = ancestor ? ancestor.identifier : undefined;
 		const type = symbol.type;
 		return {
 			exported: symbol.flags.isExported || false,
 			kind: symbol.kind,
 			name: symbol.name,
 			identifier: symbol.id,
-			summary: this.getSummary(symbol),
-			source: this.getSource(symbol),
+			summary: this.getSummary( symbol ),
+			source: this.getSource( symbol ),
 			ancestor: ancestorId,
 			hasChildren: symbol.children && symbol.children.length > 0,
 			type: type,
 			typeParameter: symbol.typeParameter,
+			canonicalPath: ( ancestor ? ancestor.canonicalPath + '/' : '' ) + symbol.name,
 		};
 	}
 
-	private static flattenTransformSymbols(symbol: TypeDefinition, ancestor?: TypeDefinition): SymbolDef[] {
-		if (!symbol) {
+	private static flattenTransformSymbols( symbol: ITypeDefinition, ancestor?: ISymbolDef ): ISymbolDef[] {
+		if ( !symbol ) {
 			return [];
 		}
-		return _.chain(symbol.children)
-		.concat(symbol.signatures || [])
-		.concat(symbol.parameters || [])
-		.reduce((acc, item) => {
-			return acc.concat(this.flattenTransformSymbols(item, symbol));
-		}, [this.transformSymbol(symbol, ancestor)] as SymbolDef[]).orderBy('identifier').value();
+		return _.chain( symbol.children )
+		.concat( symbol.signatures || [] )
+		.concat( symbol.parameters || [] )
+		.reduce(
+			( acc, item ) => acc.concat( this.flattenTransformSymbols( item, acc[0] ) ),
+			[this.transformSymbol( symbol, ancestor )] 
+		).orderBy( 'identifier' ).value();
 	}
 
 
-	public async loadJsonFile(fileUrl: string) {
-		await this.ApiDoc.deleteMany({});
+	public async loadJsonFile( fileUrl: string ) {
+		await this.ApiDoc.deleteMany( {} );
 
 		// Make the HTTP request:
 		const data = await this.http
-		.get<TypeDefinition>(fileUrl)
+		.get<ITypeDefinition>( fileUrl )
 		.toPromise();
 
-		_.assign(window, {rawData: data, _});
-		const items = ApiDocService.flattenTransformSymbols(data);
-		const insertedSet = await this.ApiDoc.insertMany(items);
-		console.log({rawJson: data, transformed: items, insertedSet: insertedSet});
+		_.assign( window, {rawData: data, _} );
+		const items = ApiDocService.flattenTransformSymbols( data );
+		const insertedSet = await this.ApiDoc.insertMany( items );
+		console.log( {rawJson: data, transformed: items, insertedSet: insertedSet} );
 	}
 }

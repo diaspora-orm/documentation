@@ -18,9 +18,11 @@
 </article>
 
 <ng-template #callSignatureParameters>
-	<ng-container *ngIf="parameters.length > 0">
-		<span *ngFor="let parameter of parameters; let i = index">{{parameter.name}}: <app-parameter [rawParameter]="parameter.type"></app-parameter><ng-container *ngIf="i < parameters.length - 1">, </ng-container></span>
-	</ng-container>
+	<ng-template *ngIf="parameters">
+		<ng-container *ngIf="parameters.length > 0">
+			<span *ngFor="let parameter of parameters; let i = index">{{parameter.name}}: <app-parameter [rawParameter]="parameter.type"></app-parameter><ng-container *ngIf="i < parameters.length - 1">, </ng-container></span>
+		</ng-container>
+	</ng-template>
 </ng-template>
 
 
