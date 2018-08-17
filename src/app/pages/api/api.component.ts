@@ -66,7 +66,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 
 	private async getChildren( id: number ){
 		this.currentSymbolId = id;
-		const subItems = await this.ApiDoc.ApiDoc.findMany( {ancestor: id} );
+		const subItems = await this.ApiDoc.ApiDoc.findMany( {ancestor: id, exported: true} );
 		return subItems.toChainable( Set.ETransformationMode.ATTRIBUTES )
 		.groupBy( 'kind' )
 		.reduce(
@@ -84,17 +84,15 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	private async setSearch( searchData: string | number ) {
 		console.log( 'setting search', searchData );
 
-		const thisItem = await this.ApiDoc.ApiDoc.find( _.isString( searchData ) ?
-			{ canonicalPath: searchData} :
-			{ identifier: searchData}
-		);
+		const idSearchCriterionKey = _.isString( searchData ) ? 'canonicalPath' : 'identifier';
+		const idSearchCriterion = {[idSearchCriterionKey]: searchData};
+		const thisItem = await this.ApiDoc.ApiDoc.find( idSearchCriterion );
 		if ( thisItem && thisItem.attributes ){
 			this.breadcrumbPath = thisItem.attributes.canonicalPath.split( '/' );
 			this.currentDocPage = {item:thisItem.attributes, children: await this.getChildren( thisItem.attributes.identifier )};
 		} else {
 			this.currentDocPage = null;
 		}
-		console.log(this)
 	}
 
 	public ngOnInit() {

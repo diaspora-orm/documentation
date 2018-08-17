@@ -1,4 +1,16 @@
+:host{
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+}
+app-sidebar{
+  flex: 0 1 300px;
+}
+
 .breadcrumb > span:not(:last-child)::after{
 	content: '>';
 	margin: 0 5px;
+}
+.container{
+  padding-top: 30px;
 }

@@ -4,20 +4,27 @@
 @import './loader';
 
 pre{
-    border-left-color: $c1dark;
+  border-left-color: $c1dark;
 }
 a{
-    color: $c1light;
-    transition: 0.33s color;
+  color: $c1light;
+  transition: 0.33s color;
 
-    &:hover{
-        color: $c1dark;
-    }
-    &:visited{
-        color: $c2dark;
-    }
+  &:hover{
+    color: $c1dark;
+  }
+  &:visited{
+    color: $c2dark;
+  }
 }
 
+
+html{
+  height: 100%;
+}
 body{
-    background-color: $bodyColor;
+  background-color: $bodyColor;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }

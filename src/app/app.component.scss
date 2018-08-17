@@ -1,7 +1,5 @@
 @import '../scss/vars.scss';
 
-$collapseTime: 0.5s;
-
 nav{
 	display: flex;
 	height: $normalHeaderHeight;
@@ -10,26 +8,26 @@ nav{
 	left:0;
 	right: 0;
 	z-index: 1;
-	transition: height $collapseTime;
-	
+	transition: height $headerCollapseTime;
+
 	menu {
 		flex: 1 1 100%;
 		padding: 0;
 		margin: 0;
 		display: flex;
-		transition: padding $collapseTime, margin $collapseTime, background-color $collapseTime;
+		transition: padding $headerCollapseTime, margin $headerCollapseTime, background-color $headerCollapseTime;
 		font-weight: 800;
 		font-size: 1.5em;
 
 		a {
 			color: $bodyColor;
 		}
-		
+
 		menuitem{
 			flex: 1 1 auto;
 
 			background-color: $c1light;
-			
+
 			&:first-child{
 				background-color: $c2dark;
 			}
@@ -40,7 +38,7 @@ nav{
 				img{
 					width: $normalHeaderHeight;
 					height: $normalHeaderHeight;
-					transition: width $collapseTime, height $collapseTime;
+					transition: width $headerCollapseTime, height $headerCollapseTime;
 				}
 			}
 
@@ -59,12 +57,15 @@ nav{
 :host{
 	display: block;
 	padding-top: $normalHeaderHeight;
-	transition: padding-top $collapseTime;
+	transition: padding-top $headerCollapseTime;
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 :host:not(.attop){
 	padding-top: $reducedHeaderHeight;
-	
+
 	nav{
 		height: $reducedHeaderHeight;
 		#logoLink img {
