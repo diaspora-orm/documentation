@@ -94,7 +94,7 @@ export class ApiDocService {
 
 	public constructor( private http: HttpClient, private versionManager: VersionManagerService ) {
 		( window as any ).Diaspora = Diaspora;
-		Diaspora.createNamedDataSource( API_DATA_SOURCE_NAME, versionManager.allowUseLocalStorage ? 'webStorage' : 'inMemory' );
+		Diaspora.createNamedDataSource( API_DATA_SOURCE_NAME, versionManager.cookieAccepted ? 'webStorage' : 'inMemory' );
 		this._ApiDoc = Diaspora.declareModel<ISymbolDef>( this.ApiDocVersionName(), {
 			sources: API_DATA_SOURCE_NAME,
 			attributes: {
@@ -247,7 +247,7 @@ export class ApiDocService {
 
 	public async loadData(){
 		const indexItem = localStorage.getItem( this.ApiDocVersionName() );
-		if ( this.versionManager.allowUseLocalStorage && indexItem !== null && indexItem.indexOf( ',' ) > -1 ){
+		if ( this.versionManager.cookieAccepted && indexItem !== null && indexItem.indexOf( ',' ) > -1 ){
 			console.info( `Using localStorage data for v${this.versionManager.version}` );
 			return this.ApiDoc;
 		} else {

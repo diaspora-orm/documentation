@@ -1,3 +1,4 @@
+import { environment } from './../../../environments/environment';
 import { ICookieDependentService } from './../../ICookieDependentService';
 import { Injectable } from '@angular/core';
 
@@ -7,7 +8,7 @@ const AUTHORIZE_KEY = 'authorizeUsage';
 	providedIn: 'root',
 } )
 export class VersionManagerService implements ICookieDependentService {
-	public version = '0.3.0-alpha.13';
+	public version = environment.docsVersions[0];
 	public get cookieAccepted() {
 		return localStorage.getItem( AUTHORIZE_KEY ) === '1';
 	}
