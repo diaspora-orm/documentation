@@ -31,6 +31,14 @@ body{
 
 
 
+// Miligram overrides
+button, .button{
+  color: $bodyColor;
+  background-color: $c1dark;
+  border-color: $c1light;
+}
+
+
 
 
 

@@ -14,7 +14,7 @@ import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 	selector: 'app-api',
 	templateUrl: './api.component.html',
 	styleUrls: ['./api.component.scss'],
-	providers: [PairsPipe, VersionManagerService],
+	providers: [PairsPipe],
 } )
 export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	@ViewChild( 'breadcrumb' ) public breadcrumb?: ElementRef<HTMLElement>;
@@ -110,7 +110,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		this.seachedString = '';
 
 		// Make the HTTP request:
-		this.ApiDoc.loadJsonFile( `/assets/content/api/${this.versionManager.version}.json` )
+		this.ApiDoc.loadData()
 		.then( () => {
 			this.isInitialized = true;
 			if ( window.location.pathname === '/api' ){

@@ -1,0 +1,29 @@
+<div class="cookie-law-wrapper"
+[ngStyle]="currentStyles"
+[@transition]="transition"
+(@transition.done)="afterDismissAnimation($event)">
+
+<div class="copy">
+	<span #ref>
+		This website use browser's storage.
+		<a (click)="showDetails = true">Read more</a>
+	</span>
+	
+	<div class="button-group">
+		<button role="button" (click)="applyPreferences()" [innerHTML]="acceptLabel"></button>
+		<button role="button" class="dismiss" (click)="dismiss($event)">Dismiss</button>
+	</div>
+</div>
+
+<div id="details" [ngStyle]="{'margin-bottom': detailsMargin}" #details>
+	<section>
+		<p class="title">ApiDoc caching</p>
+		<input type="checkbox" [(ngModel)]="consentMatrice.apiDoc"/>
+		<p class="desc">This greatly improves API load time by storing it after download. Since API doc files are about 1Mb, reloading it may slow down your navigation. It does not store any personal informations.</p>
+	</section>
+	<section>
+		<p class="title">Tracking</p>
+		<input type="checkbox" [(ngModel)]="consentMatrice.tracking"/>
+		<p class="desc">Use a tracker to analyze your navigation. It may help us to know which part of the doc to work on in priority.</p>
+	</section>
+</div>

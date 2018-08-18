@@ -1,9 +1,12 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 
 import { NgxMdModule } from 'ngx-md';
 import { ClipboardModule } from 'ngx-clipboard';
 import { LazyRenderModule } from 'angular-lazy-render';
+import { CookieLawModule } from 'angular2-cookie-law';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
@@ -20,6 +23,7 @@ import { PairsPipe } from './pipes/pairs/pairs.pipe';
 import { KeysPipe } from './pipes/keys/keys.pipe';
 import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 import { TypeComponent } from './pages/api/symbol/type/type.component';
+import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 
 @NgModule( {
 	declarations: [
@@ -37,6 +41,7 @@ import { TypeComponent } from './pages/api/symbol/type/type.component';
 		KeysPipe,
 		SidebarComponent,
 		TypeComponent,
+		CookieConsentComponent,
 	],
 	imports: [
 		BrowserModule,
@@ -44,6 +49,8 @@ import { TypeComponent } from './pages/api/symbol/type/type.component';
 		NgxMdModule.forRoot(),
 		ClipboardModule,
 		LazyRenderModule,
+		BrowserAnimationsModule,
+		FormsModule,
 	],
 	providers: [Title],
 	bootstrap: [AppComponent],

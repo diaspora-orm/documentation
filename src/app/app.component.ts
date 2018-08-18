@@ -1,3 +1,4 @@
+import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 

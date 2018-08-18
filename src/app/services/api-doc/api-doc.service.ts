@@ -1,3 +1,4 @@
+import { VersionManagerService } from './../version-manager/version-manager.service';
 import { Definition } from './../../types/typedoc/typedoc';
 import { ParameterTypeDefinition, SymbolKind, ISymbolDefinition, IFunctionDefinition, IModuleDefinition, IDefinition, IRootDefinition } from './../../types/typedoc/typedoc';
 import { Injectable } from '@angular/core';
@@ -75,6 +76,7 @@ export const symbolLabel = {
 // Utility regex
 const LinkRegexp = /{@link\s+(\S+)(?:\s+(.+?))?}/;
 const LinkRegexpG = new RegExp( LinkRegexp, 'g' );
+const API_DATA_SOURCE_NAME = 'apiStore';
 
 
 @Injectable( {
@@ -86,12 +88,15 @@ export class ApiDocService {
 	public get ApiDoc() {
 		return this._ApiDoc;
 	}
+	public ApiDocVersionName(){
+		return 'ApiDoc-' + this.versionManager.version;
+	}
 
-	public constructor( private http: HttpClient ) {
+	public constructor( private http: HttpClient, private versionManager: VersionManagerService ) {
 		( window as any ).Diaspora = Diaspora;
-		Diaspora.createNamedDataSource( 'memory', 'inMemory' );
-		this._ApiDoc = Diaspora.declareModel<ISymbolDef>( 'ApiDoc', {
-			sources: 'memory',
+		Diaspora.createNamedDataSource( API_DATA_SOURCE_NAME, versionManager.allowUseLocalStorage ? 'webStorage' : 'inMemory' );
+		this._ApiDoc = Diaspora.declareModel<ISymbolDef>( this.ApiDocVersionName(), {
+			sources: API_DATA_SOURCE_NAME,
 			attributes: {
 				exported: EFieldType.BOOLEAN,
 				kind: EFieldType.INTEGER,
@@ -225,7 +230,7 @@ export class ApiDocService {
 	}
 
 
-	public async loadJsonFile( fileUrl: string ) {
+	private async loadJsonFile( fileUrl: string ) {
 		await this.ApiDoc.deleteMany( {} );
 
 		// Make the HTTP request:
@@ -237,5 +242,17 @@ export class ApiDocService {
 		const items = ApiDocService.flattenTransformSymbols( data );
 		const insertedSet = await this.ApiDoc.insertMany( items );
 		console.log( {rawJson: data, transformed: items, insertedSet: insertedSet} );
+		return this.ApiDoc;
+	}
+
+	public async loadData(){
+		const indexItem = localStorage.getItem( this.ApiDocVersionName() );
+		if ( this.versionManager.allowUseLocalStorage && indexItem !== null && indexItem.indexOf( ',' ) > -1 ){
+			console.info( `Using localStorage data for v${this.versionManager.version}` );
+			return this.ApiDoc;
+		} else {
+			console.info( `Downloading API's JSON for v${this.versionManager.version}` );
+			return this.loadJsonFile( `/assets/content/api/${this.versionManager.version}.json` );
+		}
 	}
 }

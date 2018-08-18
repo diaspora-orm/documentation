@@ -27,9 +27,9 @@
 		<header>
 			<label for="symbolSearch">Symbol name</label>
 			<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames" #searchInput>
-			<datalist id="symbolNames">
+			<!--<datalist id="symbolNames">
 				<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
-			</datalist>
+			</datalist>-->
 		</header>
 		<section>
 			<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
