@@ -1,5 +1,5 @@
 VENDOR_DIR="vendor/typedoc-default-themes/src/default/assets"
-COMPONENT_VENDOR_DIR="src/app/pages/api/symbol/vendor/"
+COMPONENT_VENDOR_DIR="src/scss/vendor/"
 
 rm -r $COMPONENT_VENDOR_DIR
 mkdir -p $COMPONENT_VENDOR_DIR

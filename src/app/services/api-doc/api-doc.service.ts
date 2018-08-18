@@ -1,3 +1,5 @@
+import { Definition } from './../../types/typedoc/typedoc';
+import { ParameterTypeDefinition, SymbolKind, ISymbolDefinition, IFunctionDefinition, IModuleDefinition, IDefinition, IRootDefinition } from './../../types/typedoc/typedoc';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -6,84 +8,14 @@ import * as _ from 'lodash';
 
 
 
-// Raw TSDoc json file
-interface ITag {
-	tag: string;
-	text: string;
-}
-interface ISource {
-	fileName: string;
-	line: number;
-	character: number;
-}
-
-export interface ITypeReference {
-	type: 'reference';
-	name: string;
-	id: number;
-}
-export type ParameterTypeDefinition = {
-	type: 'intrinsic';
-	name: string;
-} | {
-	type: 'array';
-	elementType: ParameterTypeDefinition;
-} | {
-	type: 'union';
-	types: ParameterTypeDefinition[];
-} | {
-	type: 'typeParameter';
-	name: string;
-	constraint?: ParameterTypeDefinition;
-} | ITypeReference;
-
-interface ITypeDefinition {
-	flags: {
-		isExported?: boolean;
-	};
-	kind: SymbolKind;
-	kindString: string;
-	name: string;
-	id: number;
-	children: ITypeDefinition[];
-	comment?: {
-		shortText?: string;
-		tags?: ITag[];
-	};
-	sources: ISource[];
-	signatures?: ITypeDefinition[] | undefined;
-	parameters?: ITypeDefinition[] | undefined;
-	typeParameter: ParameterTypeDefinition[] | undefined;
-	extendedTypes: ITypeReference[] | undefined;
-	extendedBy: ITypeReference[] | undefined;
-	implementedTypes: ITypeDefinition[] | undefined;
-	type: ParameterTypeDefinition | undefined;
-	typeArguments?: ITypeReference[];
-}
 
 
-
-
-// Diaspora TSDoc entities
-export enum SymbolKind {
-	Module        = 0x0,
-	Namespace     = 0x2,
-	Enum          = 0x4,
-	EnumMember    = 0x10,
-	Variable      = 0x20,
-	Function      = 0x40,
-	Class         = 0x80,
-	Interface     = 0x100,
-	Constructor   = 0x200,
-	Method        = 0x800,
-	CallSignature = 0x1000,
-	Literal       = 0x200000,
-	TypeAlias     = 0x400000,
-}
 export interface ISymbolDef {
 	exported: boolean;
+	visibility: 'private' | 'protected' | 'public';
 	kind: SymbolKind;
 	name: string;
+	generic: boolean;
 	identifier: number;
 	summary?: string;
 	comment?: string;
@@ -92,9 +24,11 @@ export interface ISymbolDef {
 		line: number;
 		module: boolean;
 	};
+	isClassMember?: boolean;
 	ancestor?: number;
 	hasChildren: boolean;
-	type: ParameterTypeDefinition | undefined;
+	inheritedFrom?: Object;
+	type?: ParameterTypeDefinition;
 	typeParameter: ParameterTypeDefinition[] | undefined;
 	canonicalPath: string;
 }
@@ -109,8 +43,10 @@ export const symbolClass = {
 	[SymbolKind.Class]: 'tsd-kind-class',
 	[SymbolKind.Interface]: 'tsd-kind-interface',
 	[SymbolKind.Constructor]: 'tsd-kind-constructor',
+	[SymbolKind.Property]: 'tsd-kind-property',
 	[SymbolKind.Method]: 'tsd-kind-method',
 	[SymbolKind.CallSignature]: '',
+	[SymbolKind.GetSignature]: 'tsd-kind-get-signature',
 	[SymbolKind.Literal]: 'tsd-kind-object-literal',
 	[SymbolKind.TypeAlias]: 'tsd-kind-type-alias',
 };
@@ -125,8 +61,10 @@ export const symbolLabel = {
 	[SymbolKind.Class]: 'Class',
 	[SymbolKind.Interface]: 'Interface',
 	[SymbolKind.Constructor]: 'Constructor',
+	[SymbolKind.Property]: 'Property',
 	[SymbolKind.Method]: 'Method',
 	[SymbolKind.CallSignature]: 'Call signature',
+	[SymbolKind.GetSignature]: 'Accessor',
 	[SymbolKind.Literal]: 'Literal',
 	[SymbolKind.TypeAlias]: 'Type alias',
 };
@@ -152,14 +90,21 @@ export class ApiDocService {
 	public constructor( private http: HttpClient ) {
 		( window as any ).Diaspora = Diaspora;
 		Diaspora.createNamedDataSource( 'memory', 'inMemory' );
-		this._ApiDoc = Diaspora.declareModel( 'ApiDoc', {
+		this._ApiDoc = Diaspora.declareModel<ISymbolDef>( 'ApiDoc', {
 			sources: 'memory',
 			attributes: {
 				exported: EFieldType.BOOLEAN,
 				kind: EFieldType.INTEGER,
 				name: EFieldType.STRING,
+				generic: EFieldType.BOOLEAN,
 				identifier: EFieldType.INTEGER,
+				visibility:{
+					type: EFieldType.STRING,
+					enum: ['private', 'protected', 'public'],
+					required: true,
+				},
 				summary: EFieldType.STRING,
+				comment: EFieldType.STRING,
 				source: {
 					type: EFieldType.OBJECT,
 					attributes: {
@@ -167,6 +112,8 @@ export class ApiDocService {
 						line: EFieldType.INTEGER,
 					},
 				},
+				isClassMember: EFieldType.BOOLEAN,
+				inheritedFrom: EFieldType.OBJECT,
 				ancestor: EFieldType.INTEGER,
 				hasChildren: EFieldType.BOOLEAN,
 				signature: EFieldType.OBJECT,
@@ -180,11 +127,11 @@ export class ApiDocService {
 		} );
 	}
 
-	private static getSource( symbol: ITypeDefinition ) {
-		const source = _.get( symbol, 'sources[0]' ) as ISource | undefined;
-		if ( !source ) {
+	private static getSource( symbol: Definition ) {
+		if ( symbol.kind === SymbolKind.Root || symbol.kind === SymbolKind.Function || !symbol.sources || symbol.sources.length === 0 ) {
 			return;
 		}
+		const source = symbol.sources[0];
 
 		const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
 		const isModule = source.fileName.match( moduleMatcher ) ? true : false;
@@ -196,54 +143,84 @@ export class ApiDocService {
 		};
 	}
 
-	private static getSummary( symbol: ITypeDefinition ) {
-		let summary = _.get( symbol, 'comment.shortText' ) || _.get( symbol, 'comment.text' ) as string | null;
-		if ( !summary ) {
-			return;
+	private static getSummary( symbol: Definition ) {
+		if ( symbol.comment ){
+			if ( symbol.comment.shortText ){
+				return symbol.comment.shortText;
+			} else if ( symbol.comment.text ){
+				return symbol.comment.text;
+			}
 		}
-		const matches = summary.match( LinkRegexpG );
+		return undefined;
+	}
+	private static getComment( symbol: Definition ) {
+		if ( symbol.comment ){
+			return symbol.comment.text || symbol.comment.shortText;
+		}
+		return undefined;
+	}
+	private static getVisibility( symbol: Definition ) {
+		if ( symbol.flags.isPrivate ){
+			return 'private';
+		} else if ( symbol.flags.isProtected ){
+			return 'protected';
+		} else{
+			return 'public';
+		}
+	}
+
+	private static filterMarkdownLink( text?: string ){
+		if ( !text ){
+			return undefined;
+		}
+		const matches = text.match( LinkRegexpG );
 		if ( !matches ) {
-			return summary;
+			return text;
 		}
 		_.forEach( matches, match => {
 			const subMatch = match.match( LinkRegexp );
 			if ( subMatch ) {
 				const linkedSymbol = subMatch[1];
 				const linkText = subMatch[2] || linkedSymbol;
-				summary = ( summary as string ).replace( match, `[${linkText}](${linkedSymbol})` );
+				text = ( text as string ).replace( match, `[${linkText}](${linkedSymbol})` );
 			}
 		} );
-		return summary;
+		return text;
 	}
 
-	private static transformSymbol( symbol: ITypeDefinition, ancestor?: ISymbolDef ): ISymbolDef {
+	private static transformSymbol( symbol: Definition, ancestor?: ISymbolDef ): ISymbolDef {
 		const ancestorId = ancestor ? ancestor.identifier : undefined;
-		const type = symbol.type;
+
 		return {
 			exported: symbol.flags.isExported || false,
 			kind: symbol.kind,
 			name: symbol.name,
 			identifier: symbol.id,
-			summary: this.getSummary( symbol ),
-			source: this.getSource( symbol ),
+			visibility: this.getVisibility( symbol ),
+			inheritedFrom: ( symbol as any ).inheritedFrom,
+			generic: 'typeParameter' in symbol,
+			summary: this.filterMarkdownLink( this.getSummary( symbol ) ),
+			comment: this.filterMarkdownLink( this.getComment( symbol ) ),
+			source: this.getSource( symbol as any ),
 			ancestor: ancestorId,
+			isClassMember: ancestor && ancestor.kind === SymbolKind.Class,
 			hasChildren: symbol.children && symbol.children.length > 0,
-			type: type,
-			typeParameter: symbol.typeParameter,
+			type: ( symbol as any ).type,
+			typeParameter: ( symbol as any ).typeParameter,
 			canonicalPath: ( ancestor ? ancestor.canonicalPath + '/' : '' ) + symbol.name,
-		};
+		} as ISymbolDef;
 	}
 
-	private static flattenTransformSymbols( symbol: ITypeDefinition, ancestor?: ISymbolDef ): ISymbolDef[] {
+	private static flattenTransformSymbols( symbol: IDefinition, ancestor?: ISymbolDef ): ISymbolDef[] {
 		if ( !symbol ) {
 			return [];
 		}
-		return _.chain( symbol.children )
-		.concat( symbol.signatures || [] )
-		.concat( symbol.parameters || [] )
+		return _.chain( symbol.children || [] )
+		.concat( ( symbol as any ).signatures || [] )
+		.concat( ( symbol as any ).parameters || [] )
 		.reduce(
 			( acc, item ) => acc.concat( this.flattenTransformSymbols( item, acc[0] ) ),
-			[this.transformSymbol( symbol, ancestor )] 
+			[this.transformSymbol( symbol as any, ancestor )]
 		).orderBy( 'identifier' ).value();
 	}
 
@@ -253,7 +230,7 @@ export class ApiDocService {
 
 		// Make the HTTP request:
 		const data = await this.http
-		.get<ITypeDefinition>( fileUrl )
+		.get<IRootDefinition>( fileUrl )
 		.toPromise();
 
 		_.assign( window, {rawData: data, _} );

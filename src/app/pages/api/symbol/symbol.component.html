@@ -10,7 +10,8 @@
 
 
 	<section>
-		<ngx-md [data]="symbol.summary"></ngx-md>
+    <ngx-md *ngIf="symbol.summary; else noContent;" [data]="currentDef ? symbol.comment : symbol.summary"></ngx-md>
+    <ng-template #noContent><p><em>No description...</em></p></ng-template>
 		<footer>
 			<span *ngIf="symbol.source" [innerHTML]="source"></span>
 		</footer>

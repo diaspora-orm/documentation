@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { NgxMdModule } from 'ngx-md';
 import { ClipboardModule } from 'ngx-clipboard';
+import { LazyRenderModule } from 'angular-lazy-render';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
@@ -20,7 +21,7 @@ import { PairsPipe } from './pipes/pairs/pairs.pipe';
 import { KeysPipe } from './pipes/keys/keys.pipe';
 import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 
-@NgModule({
+@NgModule( {
 	declarations: [
 		AppComponent,
 		IndexComponent,
@@ -35,15 +36,16 @@ import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 		ParsePipe,
 		PairsPipe,
 		KeysPipe,
-		SidebarComponent
+		SidebarComponent,
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		NgxMdModule.forRoot(),
 		ClipboardModule,
+		LazyRenderModule,
 	],
 	providers: [Title],
-	bootstrap: [AppComponent]
-})
+	bootstrap: [AppComponent],
+} )
 export class AppModule { }

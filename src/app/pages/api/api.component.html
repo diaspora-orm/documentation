@@ -5,6 +5,7 @@
 
 
 	<ng-template #dataTable>
+      <lazy-page>
 		<div class="breadcrumb">
 			<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
 
@@ -33,40 +34,45 @@
 		<section>
 			<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
 
+      <!-- Search results-->
 			<ng-template #blockSearch>
 				<h2>Search results</h2>
 				<ng-container *ngFor="let symbol of searchedItems">
 					<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
 				</ng-container>
-			</ng-template>
+      </ng-template>
+
+      <!-- Symbol -->
 			<ng-template #blockContent>
 				<div *ngIf="currentDocPage; else notFound">
-					<h2>Symbol definition</h2>
-					<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:currentDocPage.item}"></ng-container>
+            <ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:currentDocPage.item, current: true}"></ng-container>
 					<h2>Children</h2>
-					<section *ngFor="let pair of currentDocPage.children | pairs">
+					<lazy-block *ngFor="let pair of currentDocPage.children | pairs">
 						<h3>{{pair.key}}</h3>
 						<ng-container *ngFor="let symbol of pair.value">
 							<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
 						</ng-container>
-					</section>
+					</lazy-block>
 				</div>
-			</ng-template>
+      </ng-template>
+
+      <!-- Not found -->
 			<ng-template #notFound>
 				<div>
 					Not found
 				</div>
 			</ng-template>
 
-			<ng-template #symbolSwitch let-symbol="symbol">
+			<ng-template #symbolSwitch let-symbol="symbol" let-current="current">
 				<ng-container [ngSwitch]="symbol.kind">
-					<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol"></app-function-symbol>
-					<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol"></app-function-symbol>
-					<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol"></app-function-symbol>
-					<app-symbol *ngSwitchDefault [symbol]="symbol"></app-symbol>
+					<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+					<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+					<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+					<app-symbol *ngSwitchDefault [symbol]="symbol" [currentDef]="current"></app-symbol>
 				</ng-container>
 			</ng-template>
-		</section>
+    </section>
+    </lazy-page>
 	</ng-template>
 
 	<ng-template #noDataTable>

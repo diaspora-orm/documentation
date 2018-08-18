@@ -1,3 +1,4 @@
+import { SymbolKind } from './../../types/typedoc/typedoc';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
@@ -5,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Entity, Set } from '@diaspora/diaspora';
 
-import { ApiDocService, SymbolKind, symbolLabel, ISymbolDef } from '../../services/api-doc/api-doc.service';
+import { ApiDocService, symbolLabel, ISymbolDef } from '../../services/api-doc/api-doc.service';
 import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 
 @Component( {

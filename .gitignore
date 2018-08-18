@@ -41,3 +41,5 @@ Thumbs.db
 src/app/pages/api/symbol/vendor/
 
 src/assets/images/typedoc/
+
+src/scss/vendor/

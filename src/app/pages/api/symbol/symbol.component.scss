@@ -1,11 +1,7 @@
 @import '../../../../scss/vars.scss';
 
-@import 'vendor/scss/mixins';
-@import 'vendor/scss/icons';
-
 $exportedMargin: 5px;
 
-$titlePadding: 5px;
 $contentVPadding: 5px;
 $contentHPadding: 20px;
 
@@ -16,10 +12,6 @@ article{
 	&.exported{
 		border: 5px solid $c3light;
 
-		h2{
-			padding: $titlePadding - $exportedMargin $titlePadding - $exportedMargin $titlePadding;
-		}
-
 		section{
 			padding: $contentVPadding $contentHPadding - $exportedMargin $contentVPadding - $exportedMargin;
 		}
@@ -28,23 +20,22 @@ article{
 
 h2{
 	background-color: #eee;
-	padding: $titlePadding;
-	
-	.tsd-kind-icon{
-		display: inline-block;
-		top: -5px;
-		
-		&:before{
-			background-image: url(/assets/images/typedoc/icons@2x.png);
-			background-size: 238px 204px;
-			width: 17px;
-			height: 17px;
-			transform: scale(2);
-			margin: 0px 10px;
-		}
-	}
+  padding: 5px 10px;
+  i{
+    margin-right: 5px;
+  }
 }
 
 section{
 	padding: $contentVPadding $contentHPadding;
+}
+
+:host(.current){
+  article{
+    box-shadow: none;
+    border: none;
+  }
+  h2{
+    background-color: transparent;
+  }
 }

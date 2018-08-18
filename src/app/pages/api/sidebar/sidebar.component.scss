@@ -26,6 +26,11 @@ article{
 }
 footer{
   flex: 0 0 auto;
+
+  button{
+    background-color: $c1light;
+    border: 0.1rem solid $c1light;
+  }
 }
 
 
