@@ -1,5 +1,11 @@
 <article [ngClass]="{exported: symbol.exported}">
-	<ng-template #symbolTitle><h2 [class]="kindClass"><i class="tsd-kind-icon" [title]="typeName"></i>{{symbol.name}}</h2></ng-template>
+	<ng-template #symbolTitle>
+		<h2 [class]="kindClass">
+			<i class="tsd-kind-icon" [title]="typeName"></i>
+			{{symbol.name}}:
+			<app-type [rawType]="symbol.type"></app-type>
+		</h2>
+	</ng-template>
 	<div *ngIf="symbol.hasChildren; then titleLink; else titleNoLink"></div>
 	<ng-template #titleLink>
 		<a [href]="'/api/' + symbol.canonicalPath">
@@ -10,8 +16,8 @@
 
 
 	<section>
-    <ngx-md *ngIf="symbol.summary; else noContent;" [data]="currentDef ? symbol.comment : symbol.summary"></ngx-md>
-    <ng-template #noContent><p><em>No description...</em></p></ng-template>
+		<ngx-md *ngIf="symbol.summary; else noContent;" [data]="currentDef ? symbol.comment : symbol.summary"></ngx-md>
+		<ng-template #noContent><p><em>No description...</em></p></ng-template>
 		<footer>
 			<span *ngIf="symbol.source" [innerHTML]="source"></span>
 		</footer>

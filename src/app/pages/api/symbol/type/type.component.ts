@@ -1,8 +1,8 @@
+import { ApiDocService, ISymbolDef } from './../../../../services/api-doc/api-doc.service';
+import { ParameterTypeDefinition } from './../../../../types/typedoc/typedoc';
 import { Component, OnInit, Input } from '@angular/core';
 
 import * as _ from 'lodash';
-
-import { ISymbolDef, ApiDocService, ParameterTypeDefinition } from '../../../../../../services/api-doc/api-doc.service';
 
 export interface ITypeError {
 	type: 'error';
@@ -37,14 +37,14 @@ export type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic |
 
 
 @Component( {
-	selector: 'app-parameter',
-	templateUrl: './parameter.component.html',
-	styleUrls: ['./parameter.component.scss'],
+	selector: 'app-type',
+	templateUrl: './type.component.html',
+	styleUrls: ['./type.component.scss'],
 } )
-export class ParameterComponent implements OnInit {
-	@Input() protected rawParameter: ParameterTypeDefinition | undefined;
+export class TypeComponent implements OnInit {
+	@Input() public rawType: ParameterTypeDefinition | undefined;
 
-	@Input() public parameter: IType | undefined;
+	@Input() protected type: IType | undefined;
 
 	public constructor( protected ApiDoc: ApiDocService ) { }
 
@@ -94,7 +94,7 @@ export class ParameterComponent implements OnInit {
 			}
 
 			default: {
-				console.log( this.rawParameter );
+				console.log( this.rawType );
 				return {
 					type: 'error',
 				};
@@ -103,9 +103,9 @@ export class ParameterComponent implements OnInit {
 	}
 
 	public async ngOnInit() {
-		if ( !this.rawParameter ) {
+		if ( !this.rawType ) {
 			return;
-		}
-		this.parameter = await this.normalizeParameterType( this.rawParameter );
+    }
+		this.type = this.type || await this.normalizeParameterType( this.rawType );
 	}
 }

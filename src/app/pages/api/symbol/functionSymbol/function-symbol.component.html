@@ -1,5 +1,11 @@
 <article [ngClass]="{exported: symbol.exported}">
-	<ng-template #symbolTitle><h2 [class]="kindClass"><i class="tsd-kind-icon" [title]="typeName"></i>{{symbol.name}}</h2></ng-template>
+	<ng-template #symbolTitle>
+		<h2 [class]="kindClass">
+			<i class="tsd-kind-icon" [title]="typeName"></i>
+			{{symbol.name}}:
+			<app-type [rawType]="symbol.type"></app-type>
+		</h2>
+	</ng-template>
 	<div *ngIf="symbol.hasChildren; then titleLink; else titleNoLink"></div>
 	<ng-template #titleLink>
 		<a [href]="'/api/' + symbol.canonicalPath">
@@ -14,8 +20,8 @@
 
 	<section>
 		<h3>Signatures</h3>
-		<ng-template *ngIf="signatures">
+		<ng-container *ngIf="signatures">
 			<app-call-signature *ngFor="let signature of signatures" [signature]="signature"></app-call-signature>
-		</ng-template>
+		</ng-container>
 	</section>
 </article>

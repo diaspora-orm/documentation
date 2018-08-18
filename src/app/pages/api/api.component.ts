@@ -1,3 +1,4 @@
+import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { SymbolKind } from './../../types/typedoc/typedoc';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -13,7 +14,7 @@ import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 	selector: 'app-api',
 	templateUrl: './api.component.html',
 	styleUrls: ['./api.component.scss'],
-	providers: [PairsPipe],
+	providers: [PairsPipe, VersionManagerService],
 } )
 export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	@ViewChild( 'breadcrumb' ) public breadcrumb?: ElementRef<HTMLElement>;
@@ -53,7 +54,12 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		return typeof this.searchedString !== 'undefined';
 	}
 
-	public constructor( private route: ActivatedRoute, private ApiDoc: ApiDocService, private pairs: PairsPipe ) {}
+	public constructor(
+		private route: ActivatedRoute,
+		private ApiDoc: ApiDocService,
+		private pairs: PairsPipe,
+		private versionManager: VersionManagerService
+	) {}
 
 	private async onSearchBarChange( event: KeyboardEvent ) {
 		if ( !event.target || !( event.target instanceof HTMLInputElement ) ) {
@@ -104,7 +110,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		this.seachedString = '';
 
 		// Make the HTTP request:
-		this.ApiDoc.loadJsonFile( '/assets/content/api/0-3-0.json' )
+		this.ApiDoc.loadJsonFile( `/assets/content/api/${this.versionManager.version}.json` )
 		.then( () => {
 			this.isInitialized = true;
 			if ( window.location.pathname === '/api' ){

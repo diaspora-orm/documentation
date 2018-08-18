@@ -1,3 +1,4 @@
+import { VersionManagerService } from './../../../../services/version-manager/version-manager.service';
 import { Component, OnInit } from '@angular/core';
 
 import { Set } from '@diaspora/diaspora';
@@ -14,8 +15,8 @@ import { SymbolComponent } from '../symbol.component';
 	],
 } )
 export class FunctionSymbolComponent extends SymbolComponent implements OnInit {
-	public constructor( ApiDoc: ApiDocService ) {
-		super( ApiDoc );
+	public constructor( ApiDoc: ApiDocService, VersionService: VersionManagerService ) {
+		super( ApiDoc, VersionService );
 	}
 
 	public signatures: ISymbolDef[] = [];

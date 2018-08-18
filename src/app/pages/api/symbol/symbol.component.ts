@@ -1,14 +1,15 @@
-import { SymbolKind } from './../../../services/api-doc/api-doc.service';
 import { Component, OnInit, Input, HostBinding } from '@angular/core';
 import { ApiDocService, symbolClass, ISymbolDef, symbolLabel } from '../../../services/api-doc/api-doc.service';
 
 import * as _ from 'lodash';
+import { VersionManagerService } from '../../../services/version-manager/version-manager.service';
 
 
 @Component( {
 	selector: 'app-symbol',
 	templateUrl: './symbol.component.html',
-	styleUrls: ['./symbol.component.scss'],
+  styleUrls: ['./symbol.component.scss'],
+  providers: [VersionManagerService],
 } )
 export class SymbolComponent implements OnInit {
 	@Input() public symbol!: ISymbolDef;
@@ -46,13 +47,13 @@ export class SymbolComponent implements OnInit {
 		if ( this.symbol.source.module ) {
 			return this.symbol.source.file;
 		} else {
-			const baseUrl = 'https://github.com/diaspora-orm/diaspora/blob/master/src/';
+			const baseUrl = `https://github.com/diaspora-orm/diaspora/blob/v${this.VersionService.version}/src/`;
 			const fullUrl = `${baseUrl}${this.symbol.source.file}#L${this.symbol.source.line}`;
 			return `<a href="${fullUrl}" target="_blank">${this.symbol.source.file} line ${this.symbol.source.line}</a>`;
 		}
 	}
 
-	public constructor( protected ApiDoc: ApiDocService ) { }
+	public constructor( protected ApiDoc: ApiDocService, protected VersionService: VersionManagerService ) { }
 
 	public ngOnInit() {
 	}
