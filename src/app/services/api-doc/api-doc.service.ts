@@ -1,5 +1,7 @@
+import { ISymbolDef } from './api-doc.service';
+import { apiDocAttributes } from './../../types/models';
 import { VersionManagerService } from './../version-manager/version-manager.service';
-import { Definition } from './../../types/typedoc/typedoc';
+import { Definition, ISource } from './../../types/typedoc/typedoc';
 import { ParameterTypeDefinition, SymbolKind, ISymbolDefinition, IFunctionDefinition, IModuleDefinition, IDefinition, IRootDefinition } from './../../types/typedoc/typedoc';
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -20,11 +22,7 @@ export interface ISymbolDef {
 	identifier: number;
 	summary?: string;
 	comment?: string;
-	sources: Array<{
-		file: string;
-		line: number;
-		module: boolean;
-	}>;
+	sources: ISymbolDef.ISource[];
 	isClassMember?: boolean;
 	ancestor?: number;
 	hasChildren: boolean;
@@ -32,6 +30,13 @@ export interface ISymbolDef {
 	type?: ParameterTypeDefinition;
 	typeParameter: ParameterTypeDefinition[] | undefined;
 	canonicalPath: string;
+}
+export namespace ISymbolDef{
+	export interface ISource{
+		file: string;
+		line: number;
+		module: boolean;
+	}
 }
 
 export const symbolClass = {
@@ -110,52 +115,21 @@ export class ApiDocService {
 
 	public constructor( private http: HttpClient, private versionManager: VersionManagerService ) {
 		( window as any ).Diaspora = Diaspora;
-		Diaspora.createNamedDataSource( API_DATA_SOURCE_NAME, versionManager.cookieAccepted ? 'webStorage' : 'inMemory' );
-		this._ApiDoc = Diaspora.declareModel<ISymbolDef>( this.ApiDocVersionName(), {
-			sources: API_DATA_SOURCE_NAME,
-			attributes: {
-				exported: EFieldType.BOOLEAN,
-				kind: EFieldType.INTEGER,
-				name: EFieldType.STRING,
-				generic: EFieldType.BOOLEAN,
-				identifier: EFieldType.INTEGER,
-				visibility:{
-					type: EFieldType.STRING,
-					enum: ['private', 'protected', 'public'],
-					required: true,
-				},
-				summary: EFieldType.STRING,
-				comment: EFieldType.STRING,
-				sources: {
-					type: EFieldType.ARRAY,
-					of: {
-						type: EFieldType.OBJECT,
-						attributes: {
-							file: EFieldType.STRING,
-							line: EFieldType.INTEGER,
-						},
-					},
-					required: true,
-				},
-				isClassMember: EFieldType.BOOLEAN,
-				inheritedFrom: EFieldType.OBJECT,
-				ancestor: EFieldType.INTEGER,
-				hasChildren: EFieldType.BOOLEAN,
-				signature: EFieldType.OBJECT,
-				type: EFieldType.OBJECT,
-				typeParameter: EFieldType.ARRAY,
-				canonicalPath: {
-					type: EFieldType.STRING,
-					required: true,
-				},
-			},
-		} );
+		if ( !Diaspora.dataSources[API_DATA_SOURCE_NAME] ){
+			Diaspora.createNamedDataSource( API_DATA_SOURCE_NAME, versionManager.cookieAccepted ? 'webStorage' : 'inMemory' );
+		}
+		this._ApiDoc = Diaspora.models[this.ApiDocVersionName()] ?
+			Diaspora.models[this.ApiDocVersionName()] as Model<ISymbolDef> :
+			Diaspora.declareModel<ISymbolDef>( this.ApiDocVersionName(), {
+				sources: API_DATA_SOURCE_NAME,
+				attributes: apiDocAttributes,
+			} );
 		this.modelInitialized.subscribe( () => {
 			console.log( 'Api Doc ready' );
 		} );
 	}
 
-	private static getSources( symbol: Definition & {sources: } ) {
+	private static getSources( symbol: Definition & {sources?: ISource[]} ) {
 		if ( !symbol.sources ){
 			return undefined;
 		}

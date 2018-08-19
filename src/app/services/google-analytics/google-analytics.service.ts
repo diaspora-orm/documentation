@@ -1,6 +1,7 @@
+/// <reference types="@types/google.analytics"/>
+
 import { ICookieDependentService } from './../../ICookieDependentService';
 import { environment } from './../../../environments/environment';
-/// <reference types="@types/google.analytics"/>
 
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
