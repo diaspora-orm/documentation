@@ -80,8 +80,8 @@ $delay : $duration/6;
 			left: 0;
 			width: 100%;
 			height: $thickness*3.5;
-			border-top: $thickness solid $bodyColor;
-			border-bottom: $thickness solid $bodyColor;
+			border-top: $thickness solid $c2dark;
+			border-bottom: $thickness solid $c1light;
 		}
 		
 		&:after {
@@ -101,7 +101,7 @@ $delay : $duration/6;
 			width: 12px;
 			height: 12px;
 			border-radius: 50%;
-			border: $thickness solid $bodyColor;
+			border: $thickness solid $c1dark;
 		}
 		
 		&:after {
@@ -122,8 +122,8 @@ $delay : $duration/6;
 			left: 0;
 			width: 100%;
 			height: $thickness*3.5;
-			border-top: $thickness solid $bodyColor;
-			border-bottom: $thickness solid $bodyColor;
+			border-top: $thickness solid $c1dark;
+			border-bottom: $thickness solid $c1light;
 		}
 	}
 	
@@ -144,7 +144,7 @@ $delay : $duration/6;
 			left: 0px;
 			width: 100%;
 			height: $thickness;
-			background-color: $bodyColor;
+			background-color: $c1dark;
 		}
 		
 		&:after {
@@ -156,7 +156,7 @@ $delay : $duration/6;
 			width: 12px;
 			height: 12px;
 			border-radius: 50%;
-			border: $thickness solid $bodyColor;
+			border: $thickness solid $c2dark;
 		}
 	}
 	

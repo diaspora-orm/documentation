@@ -3,39 +3,49 @@
 @import './vars';
 @import './loader';
 
+$color-primary: $c1light;
+$color-secondary: $c1dark;
+@import '../../node_modules/milligram/src/milligram.sass';
+
 pre{
-  border-left-color: $c1dark;
+	border-left-color: $c1dark;
 }
 a{
-  color: $c1light;
-  transition: 0.33s color;
-
-  &:hover{
-    color: $c1dark;
-  }
-  &:visited{
-    color: $c2dark;
-  }
+	color: $c1light;
+	transition: 0.33s color;
+	
+	&:hover{
+		color: $c1dark;
+	}
+	&:visited{
+		color: $c2dark;
+	}
 }
 
 
 html{
-  height: 100%;
+	height: 100%;
 }
 body{
-  background-color: $bodyColor;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
+	background-color: $bodyColor;
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 
 
 // Miligram overrides
 button, .button{
-  color: $bodyColor;
-  background-color: $c1dark;
-  border-color: $c1light;
+	transition: 0.3s background-color;
+	
+	&.pressed{
+		background-color: $c1dark;
+
+		&:hover{
+			background-color: $c1light;
+		}
+	}
 }
 
 
@@ -47,18 +57,18 @@ button, .button{
 @import 'vendor/scss/mixins';
 @import 'vendor/scss/icons';
 .tsd-kind-icon{
-  display: inline-block;
-  top: -3px;
-
-  &:before{
-    background-image: url(/assets/images/typedoc/icons@2x.png);
-    margin: 0px 10px;
-    background-size: 238px 204px;
-    width: 17px;
-    height: 17px;
-    transform: scale(2.5);
-  }
-  &.tiny:before{
-    transform: scale(1.5);
-  }
+	display: inline-block;
+	top: -3px;
+	
+	&:before{
+		background-image: url(/assets/images/typedoc/icons@2x.png);
+		margin: 0px 10px;
+		background-size: 238px 204px;
+		width: 17px;
+		height: 17px;
+		transform: scale(2.5);
+	}
+	&.tiny:before{
+		transform: scale(1.5);
+	}
 }

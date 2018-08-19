@@ -24,6 +24,7 @@ import { KeysPipe } from './pipes/keys/keys.pipe';
 import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 import { TypeComponent } from './pages/api/symbol/type/type.component';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
+import { SectionComponent } from './pages/api/sidebar/section/section.component';
 
 @NgModule( {
 	declarations: [
@@ -42,6 +43,7 @@ import { CookieConsentComponent } from './cookie-consent/cookie-consent.componen
 		SidebarComponent,
 		TypeComponent,
 		CookieConsentComponent,
+		SectionComponent,
 	],
 	imports: [
 		BrowserModule,

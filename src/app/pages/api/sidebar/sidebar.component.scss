@@ -1,44 +1,47 @@
 @import '../../../../scss/vars.scss';
 
 :host{
-  background-color: $dark;
-  color: $bodyColor;
-
+	background-color: $dark;
+	color: $bodyColor;
+	transition: 0.5s flex-basis;
 }
 aside{
-  position: fixed;
-  top: $reducedHeaderHeight;
-  left: 0;
+	position: fixed;
+	top: $reducedHeaderHeight;
+	left: 0;
 	transition: top $headerCollapseTime;
-  width: 300px;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
+	width: 300px;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
 }
 :root .attop :host aside{
-  top: $normalHeaderHeight;
+	top: $normalHeaderHeight;
 }
 article{
-  flex: 1 1 auto;
-  & > ul{
-    padding: 0;
-  }
+	flex: 1 1 auto;
+	overflow: auto;
+
+	& > ul{
+		padding: 0;
+	}
 }
 footer{
-  flex: 0 0 auto;
-
-  button{
-    background-color: $c1light;
-    border: 0.1rem solid $c1light;
-  }
+	flex: 0 0 auto;
+	
+	button{
+	}
 }
 
 
-ul{
-  list-style-type: none;
-  padding-left: 15px;
-  margin: 0;
+:host ::ng-deep {
+	ul{
+		list-style-type: none;
+		padding-left: 15px;
+		margin: 0;
+	}
+	li{
+		margin: 0;
+	}
 }
-li{
-  margin: 0;
-}
+	

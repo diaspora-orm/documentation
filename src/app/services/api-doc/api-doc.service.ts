@@ -1,7 +1,7 @@
 import { VersionManagerService } from './../version-manager/version-manager.service';
 import { Definition } from './../../types/typedoc/typedoc';
 import { ParameterTypeDefinition, SymbolKind, ISymbolDefinition, IFunctionDefinition, IModuleDefinition, IDefinition, IRootDefinition } from './../../types/typedoc/typedoc';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Diaspora, Model, Entity, EFieldType } from '@diaspora/diaspora';
@@ -20,11 +20,11 @@ export interface ISymbolDef {
 	identifier: number;
 	summary?: string;
 	comment?: string;
-	source?: {
+	source?: Array<{
 		file: string;
 		line: number;
 		module: boolean;
-	};
+	}>;
 	isClassMember?: boolean;
 	ancestor?: number;
 	hasChildren: boolean;
@@ -35,6 +35,7 @@ export interface ISymbolDef {
 }
 
 export const symbolClass = {
+	[SymbolKind.Root]: 'tsd-kind-module',
 	[SymbolKind.Module]: 'tsd-kind-module',
 	[SymbolKind.Namespace]: 'tsd-kind-module',
 	[SymbolKind.Enum]: 'tsd-kind-enum',
@@ -53,6 +54,7 @@ export const symbolClass = {
 };
 
 export const symbolLabel = {
+	[SymbolKind.Module]: 'Root',
 	[SymbolKind.Module]: 'Module',
 	[SymbolKind.Namespace]: 'Namespace',
 	[SymbolKind.Enum]: 'Enumeration',
@@ -85,11 +87,25 @@ const API_DATA_SOURCE_NAME = 'apiStore';
 export class ApiDocService {
 	private readonly _ApiDoc: Model<ISymbolDef>;
 
+	public modelInitialized = new EventEmitter<this>();
+	public hasModelInitialized = false;
+
 	public get ApiDoc() {
 		return this._ApiDoc;
 	}
 	public ApiDocVersionName(){
 		return 'ApiDoc-' + this.versionManager.version;
+	}
+	public kindClass( symbol?: ISymbolDef ): string {
+		if ( !symbol ) {
+			return '';
+		}
+		return _.compact( [
+			( ( symbolClass as any )[symbol.kind] || symbol.kind ) as string,
+			symbol.visibility !== 'public' ? `tsd-is-${symbol.visibility}` : undefined,
+			_.isNil( symbol.inheritedFrom ) ? undefined : 'tsd-is-inherited',
+			symbol.isClassMember ? 'tsd-parent-kind-class' : undefined,
+		] ).join( ' ' );
 	}
 
 	public constructor( private http: HttpClient, private versionManager: VersionManagerService ) {
@@ -130,9 +146,12 @@ export class ApiDocService {
 				},
 			},
 		} );
+		this.modelInitialized.subscribe( () => {
+			console.log( 'Api Doc ready' );
+		} );
 	}
 
-	private static getSource( symbol: Definition ) {
+	private static getSources( symbol: Definition ) {
 		if ( symbol.kind === SymbolKind.Root || symbol.kind === SymbolKind.Function || !symbol.sources || symbol.sources.length === 0 ) {
 			return;
 		}
@@ -206,7 +225,7 @@ export class ApiDocService {
 			generic: 'typeParameter' in symbol,
 			summary: this.filterMarkdownLink( this.getSummary( symbol ) ),
 			comment: this.filterMarkdownLink( this.getComment( symbol ) ),
-			source: this.getSource( symbol as any ),
+			source: this.getSources( symbol ),
 			ancestor: ancestorId,
 			isClassMember: ancestor && ancestor.kind === SymbolKind.Class,
 			hasChildren: symbol.children && symbol.children.length > 0,
@@ -241,7 +260,8 @@ export class ApiDocService {
 		_.assign( window, {rawData: data, _} );
 		const items = ApiDocService.flattenTransformSymbols( data );
 		const insertedSet = await this.ApiDoc.insertMany( items );
-		console.log( {rawJson: data, transformed: items, insertedSet: insertedSet} );
+		this.hasModelInitialized = true;
+		this.modelInitialized.emit( this );
 		return this.ApiDoc;
 	}
 
@@ -249,6 +269,8 @@ export class ApiDocService {
 		const indexItem = localStorage.getItem( this.ApiDocVersionName() );
 		if ( this.versionManager.cookieAccepted && indexItem !== null && indexItem.indexOf( ',' ) > -1 ){
 			console.info( `Using localStorage data for v${this.versionManager.version}` );
+			this.hasModelInitialized = true;
+			this.modelInitialized.emit( this );
 			return this.ApiDoc;
 		} else {
 			console.info( `Downloading API's JSON for v${this.versionManager.version}` );

@@ -2,79 +2,79 @@
 <section class="container">
 	<div *ngIf="isInitialized; then dataTable; else noDataTable">
 	</div>
-
-
+	
+	
 	<ng-template #dataTable>
-      <lazy-page>
-		<div class="breadcrumb">
-			<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
-
-			<ng-template #searchBreadcrumb>
-				<span>Searching for <em>{{searchedString}}</em></span>
-			</ng-template>
-			<ng-template #symbolsBreadcrumb>
-				<span *ngFor="let breadcrumbItem of breadcrumbPath; let i = index">
-					<a [href]="'/api/' + breadcrumbPath.slice(0, i + 1).join('/')">
-						<span *ngIf="i !== breadcrumbPath.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
-					</a>
-
-
-					<ng-template #breadcrumbTailItem><b>{{breadcrumbItem}}</b></ng-template>
-					<ng-template #breadcrumbNormalItem>{{breadcrumbItem}}</ng-template>
-				</span>
-			</ng-template>
-		</div>
-		<header>
-			<label for="symbolSearch">Symbol name</label>
-			<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames" #searchInput>
-			<!--<datalist id="symbolNames">
-				<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
-			</datalist>-->
-		</header>
-		<section>
-			<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
-
-      <!-- Search results-->
-			<ng-template #blockSearch>
-				<h2>Search results</h2>
-				<ng-container *ngFor="let symbol of searchedItems">
-					<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
-				</ng-container>
-      </ng-template>
-
-      <!-- Symbol -->
-			<ng-template #blockContent>
-				<div *ngIf="currentDocPage; else notFound">
-            <ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:currentDocPage.item, current: true}"></ng-container>
-					<h2>Children</h2>
-					<lazy-block *ngFor="let pair of currentDocPage.children | pairs">
-						<h3>{{pair.key}}</h3>
-						<ng-container *ngFor="let symbol of pair.value">
-							<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
-						</ng-container>
-					</lazy-block>
-				</div>
-      </ng-template>
-
-      <!-- Not found -->
-			<ng-template #notFound>
-				<div>
-					Not found
-				</div>
-			</ng-template>
-
-			<ng-template #symbolSwitch let-symbol="symbol" let-current="current">
-				<ng-container [ngSwitch]="symbol.kind">
-					<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
-					<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
-					<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
-					<app-symbol *ngSwitchDefault [symbol]="symbol" [currentDef]="current"></app-symbol>
-				</ng-container>
-			</ng-template>
-    </section>
-    </lazy-page>
+		<lazy-page>
+			<div class="breadcrumb">
+				<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
+				
+				<ng-template #searchBreadcrumb>
+					<span>Searching for <em>{{searchedString}}</em></span>
+				</ng-template>
+				<ng-template #symbolsBreadcrumb>
+					<span *ngFor="let breadcrumbItem of breadcrumbPath; let i = index">
+						<a [href]="'/api/' + breadcrumbPath.slice(0, i + 1).join('/')">
+							<span *ngIf="i !== breadcrumbPath.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
+						</a>
+						
+						
+						<ng-template #breadcrumbTailItem><b>{{breadcrumbItem}}</b></ng-template>
+						<ng-template #breadcrumbNormalItem>{{breadcrumbItem}}</ng-template>
+					</span>
+				</ng-template>
+			</div>
+			<header>
+				<label for="symbolSearch">Symbol name</label>
+				<input type="text" placeholder="eg: Validator" id="symbolSearch" (keyup)="onSearchBarChange($event)" list="symbolNames" #searchInput>
+				<!--<datalist id="symbolNames">
+					<option *ngFor="let item of ApiDoc.ApiDoc.dataSources.memory.adapter.store.ApiDoc.items" [value]="item.name"></option>
+				</datalist>-->
+			</header>
+			<section>
+				<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
+				
+				<!-- Search results-->
+				<ng-template #blockSearch>
+					<h2>Search results</h2>
+					<ng-container *ngFor="let symbol of searchedItems">
+						<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
+					</ng-container>
+				</ng-template>
+				
+				<!-- Symbol -->
+				<ng-template #blockContent>
+					<div *ngIf="currentDocPage; else notFound">
+						<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:currentDocPage.item, current: true}"></ng-container>
+						<h2>Children</h2>
+						<lazy-block *ngFor="let pair of currentDocPage?.children | pairs">
+							<h3>{{pair.key}}</h3>
+							<ng-container *ngFor="let symbol of pair.value">
+								<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
+							</ng-container>
+						</lazy-block>
+					</div>
+				</ng-template>
+				
+				<!-- Not found -->
+				<ng-template #notFound>
+					<div>
+						Not found
+					</div>
+				</ng-template>
+				
+				<ng-template #symbolSwitch let-symbol="symbol" let-current="current">
+					<ng-container [ngSwitch]="symbol.kind">
+						<app-function-symbol *ngSwitchCase="SymbolKind.Function" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+						<app-function-symbol *ngSwitchCase="SymbolKind.Method" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+						<app-function-symbol *ngSwitchCase="SymbolKind.Constructor" [symbol]="symbol" [currentDef]="current"></app-function-symbol>
+						<app-symbol *ngSwitchDefault [symbol]="symbol" [currentDef]="current"></app-symbol>
+					</ng-container>
+				</ng-template>
+			</section>
+		</lazy-page>
 	</ng-template>
-
+	
 	<ng-template #noDataTable>
 		<!-- Loader from https://codepen.io/ikoshowa/pen/qOMvpy -->
 		<div class="bookshelf_wrapper" id="loader">

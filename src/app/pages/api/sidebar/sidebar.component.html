@@ -1,63 +1,10 @@
-<aside>
-  <article>
-    <ul>
-      <li>
-        <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>@diaspora/diaspora</b>
-        <ul>
-          <li>
-            <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>QueryLanguage</b>
-            <ul>
-              <li>
-                <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>Raw</b>
-                <ul>
-                  <li>
-                    <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>IQueryOptions</b>
-                  </li>
-                  <li>
-                    <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>ISelectCondition</b>
-                  </li>
-                  <li>
-                    <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>ISelectQuery</b>
-                  </li>
-                  <li>
-                    <b class="tsd-kind-type-alias"><i class="tsd-kind-icon tiny"></i>SelectQueryOrCondition</b>
-                  </li>
-                  <li>
-                    <b class="tsd-kind-type-alias"><i class="tsd-kind-icon tiny"></i>SearchQuery</b>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>IQueryOptions</b>
-              </li>
-              <li>
-                <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>ISelectCondition</b>
-              </li>
-              <li>
-                <b class="tsd-kind-interface"><i class="tsd-kind-icon tiny"></i>ISelectQuery</b>
-              </li>
-              <li>
-                <b class="tsd-kind-type-alias"><i class="tsd-kind-icon tiny"></i>SelectQueryOrCondition</b>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>Raw</b>
-          </li>
-          <li>
-            <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>FieldDescriptor</b>
-          </li>
-          <li>
-            <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>Errors</b>
-          </li>
-          <li>
-            <b class="tsd-kind-module "><i class="tsd-kind-icon tiny"></i>Utils</b>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </article>
-  <footer>
-    <button>Only exported</button>
-  </footer>
+<aside [ngStyle]="{width: width}">
+	<article>
+		<ul>
+			<app-section [symbolPath]="'@diaspora/diaspora'"></app-section>
+		</ul>
+	</article>
+	<footer>
+		<button [ngClass]="{pressed: searchOnlyExported}" (click)="searchOnlyExported = !searchOnlyExported">Only exported</button>
+	</footer>
 </aside>

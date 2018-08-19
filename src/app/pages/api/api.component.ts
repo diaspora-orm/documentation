@@ -24,7 +24,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		item?: ISymbolDef;
 		children: {[kind: string]: ISymbolDef[]};
 	} | null;// Undefined means no search, null means not found
-	private searchedItems?: ISymbolDef[];
+	public searchedItems?: ISymbolDef[];
 
 	public isInitialized = false;
 	public breadcrumbPath: string[] = [];
@@ -33,7 +33,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	public SymbolLabel = _.values( symbolLabel );
 
 	private _searchedString?: string;
-	private get searchedString() {
+	public get searchedString() {
 		return this._searchedString;
 	}
 	private set seachedString( str: string ) {
@@ -50,7 +50,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 
 	private currentSymbolId = 0;
 
-	private get isSearchMode() {
+	public get isSearchMode() {
 		return typeof this.searchedString !== 'undefined';
 	}
 
@@ -88,6 +88,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 			{} as {[kind: string]: ISymbolDef[]}
 		).value();
 	}
+
 	private async setSearch( searchData: string | number ) {
 		console.log( 'setting search', searchData );
 
@@ -109,7 +110,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		}
 		this.seachedString = '';
 
-		// Make the HTTP request:
+		// Initialize the data store. On the end of the promise, the data is inserted in the data store.
 		this.ApiDoc.loadData()
 		.then( () => {
 			this.isInitialized = true;

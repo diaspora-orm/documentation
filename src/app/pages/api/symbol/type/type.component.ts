@@ -43,11 +43,11 @@ export type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic |
 } )
 export class TypeComponent implements OnInit {
 	@Input() public rawType: ParameterTypeDefinition | undefined;
-
+	
 	@Input() protected type: IType | undefined;
-
+	
 	public constructor( protected ApiDoc: ApiDocService ) { }
-
+	
 	private async normalizeParameterType( parameter: ParameterTypeDefinition ): Promise<IType> {
 		switch ( parameter.type ) {
 			case 'intrinsic': {
@@ -56,7 +56,7 @@ export class TypeComponent implements OnInit {
 					value: parameter.name,
 				};
 			}
-
+			
 			case 'reference': {
 				const parameterType = await this.ApiDoc.ApiDoc.find( {identifier: parameter.id} );
 				return parameterType ? {
@@ -67,7 +67,7 @@ export class TypeComponent implements OnInit {
 					value: parameter.name,
 				};
 			}
-
+			
 			case 'array': {
 				const resolvedType = await this.normalizeParameterType( parameter.elementType );
 				return resolvedType ? {
@@ -77,7 +77,7 @@ export class TypeComponent implements OnInit {
 					type: 'error',
 				};
 			}
-
+			
 			case 'union': {
 				const resolvedTypes = await Promise.all( _.map( parameter.types, type => this.normalizeParameterType( type ) ) );
 				return {
@@ -85,27 +85,27 @@ export class TypeComponent implements OnInit {
 					value: resolvedTypes,
 				};
 			}
-
+			
 			case 'typeParameter': {
 				return {
 					type: 'typeParameter',
 					value: parameter.name,
 				};
 			}
-
+			
 			default: {
-				console.log( this.rawType );
+				//console.log( this.rawType );
 				return {
 					type: 'error',
 				};
 			}
 		}
 	}
-
+	
 	public async ngOnInit() {
 		if ( !this.rawType ) {
 			return;
-    }
+		}
 		this.type = this.type || await this.normalizeParameterType( this.rawType );
 	}
 }

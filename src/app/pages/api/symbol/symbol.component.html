@@ -2,8 +2,10 @@
 	<ng-template #symbolTitle>
 		<h2 [class]="kindClass">
 			<i class="tsd-kind-icon" [title]="typeName"></i>
-			{{symbol.name}}:
-			<app-type [rawType]="symbol.type"></app-type>
+			{{symbol.name}}
+			<ng-container *ngIf="isTyped">:
+				<app-type [rawType]="symbol.type"></app-type>
+			</ng-container>
 		</h2>
 	</ng-template>
 	<div *ngIf="symbol.hasChildren; then titleLink; else titleNoLink"></div>
