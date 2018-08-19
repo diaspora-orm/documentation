@@ -20,7 +20,7 @@ export interface ISymbolDef {
 	identifier: number;
 	summary?: string;
 	comment?: string;
-	source?: Array<{
+	sources: Array<{
 		file: string;
 		line: number;
 		module: boolean;
@@ -126,12 +126,16 @@ export class ApiDocService {
 				},
 				summary: EFieldType.STRING,
 				comment: EFieldType.STRING,
-				source: {
-					type: EFieldType.OBJECT,
-					attributes: {
-						file: EFieldType.STRING,
-						line: EFieldType.INTEGER,
+				sources: {
+					type: EFieldType.ARRAY,
+					of: {
+						type: EFieldType.OBJECT,
+						attributes: {
+							file: EFieldType.STRING,
+							line: EFieldType.INTEGER,
+						},
 					},
+					required: true,
 				},
 				isClassMember: EFieldType.BOOLEAN,
 				inheritedFrom: EFieldType.OBJECT,
@@ -151,20 +155,20 @@ export class ApiDocService {
 		} );
 	}
 
-	private static getSources( symbol: Definition ) {
-		if ( symbol.kind === SymbolKind.Root || symbol.kind === SymbolKind.Function || !symbol.sources || symbol.sources.length === 0 ) {
-			return;
+	private static getSources( symbol: Definition & {sources: } ) {
+		if ( !symbol.sources ){
+			return undefined;
 		}
-		const source = symbol.sources[0];
-
-		const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
-		const isModule = source.fileName.match( moduleMatcher ) ? true : false;
-		const sourceFile = isModule ? source.fileName.replace( moduleMatcher, '$1' ) : source.fileName;
-		return {
-			file: sourceFile,
-			line: source.line,
-			module: isModule,
-		};
+		return _.map( symbol.sources, source => {
+			const moduleMatcher = /^.+\/node_modules\/([^\/]+).*$/;
+			const isModule = source.fileName.match( moduleMatcher ) ? true : false;
+			const sourceFile = isModule ? source.fileName.replace( moduleMatcher, '$1' ) : source.fileName;
+			return {
+				file: sourceFile,
+				line: source.line,
+				module: isModule,
+			};
+		} );
 	}
 
 	private static getSummary( symbol: Definition ) {
@@ -225,7 +229,7 @@ export class ApiDocService {
 			generic: 'typeParameter' in symbol,
 			summary: this.filterMarkdownLink( this.getSummary( symbol ) ),
 			comment: this.filterMarkdownLink( this.getComment( symbol ) ),
-			source: this.getSources( symbol ),
+			sources: this.getSources( symbol ),
 			ancestor: ancestorId,
 			isClassMember: ancestor && ancestor.kind === SymbolKind.Class,
 			hasChildren: symbol.children && symbol.children.length > 0,

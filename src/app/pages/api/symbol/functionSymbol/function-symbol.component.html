@@ -2,20 +2,20 @@
 	<ng-template #symbolTitle>
 		<h2 [class]="kindClass">
 			<i class="tsd-kind-icon" [title]="typeName"></i>
-			{{symbol.name}}:
-			<app-type [rawType]="symbol.type"></app-type>
+			{{symbol?.name}}:
+			<app-type [rawType]="symbol?.type"></app-type>
 		</h2>
 	</ng-template>
-	<div *ngIf="symbol.hasChildren; then titleLink; else titleNoLink"></div>
+	<div *ngIf="symbol?.hasChildren; then titleLink; else titleNoLink"></div>
 	<ng-template #titleLink>
-		<a [href]="'/api/' + symbol.canonicalPath">
+		<a [href]="'/api/' + symbol?.canonicalPath">
 			<ng-container *ngTemplateOutlet="symbolTitle"></ng-container>
 		</a>
 	</ng-template>
 	<ng-template #titleNoLink><ng-container *ngTemplateOutlet="symbolTitle"></ng-container></ng-template>
 
 	<section>
-		<ngx-md [data]="symbol.summary"></ngx-md>
+		<ngx-md [data]="symbol?.summary"></ngx-md>
 	</section>
 
 	<section>
@@ -24,4 +24,8 @@
 			<app-call-signature *ngFor="let signature of signatures" [signature]="signature"></app-call-signature>
 		</ng-container>
 	</section>
+	
+	<footer>
+		<span *ngIf="symbol?.sources?.length > 0" [innerHTML]="sources"></span>
+	</footer>
 </article>

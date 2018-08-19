@@ -82,6 +82,7 @@ export interface IDefinition{
 	children?: IDefinition[];
 	comment?: IComment;
 	groups?: IGroup[];
+	sources?: ISource[];
 }
 export interface IRootDefinition extends IDefinition{
 	kind: SymbolKind.Root;
@@ -92,7 +93,6 @@ export interface IModuleDefinition extends IDefinition{
 	kindString: string;
 	originalName: string;
 	children: Array<( IFunctionDefinition | ISymbolDefinition ) & IDecoratorDef>;
-	sources: ISource[];
 }
 export interface IFunctionDefinition extends IDefinition{
 	kind: SymbolKind.Function;
@@ -112,7 +112,6 @@ export interface ISymbolDefinition extends IDefinition {
 	extendedBy?: ITypeReference[];
 	implementedTypes?: ISymbolDefinition[];
 	typeArguments?: ITypeReference[];
-	sources: ISource[];
 }
 export interface ICallSignatureDefinition extends IDefinition{
 	type?: ParameterTypeDefinition;

@@ -13,8 +13,8 @@ import { SymbolKind } from '../../../types/typedoc/typedoc';
 	providers: [VersionManagerService],
 } )
 export class SymbolComponent implements OnInit {
-	@Input() public symbol!: ISymbolDef;
-	@Input() public currentDef!: boolean;
+	@Input() public symbol?: ISymbolDef;
+	@Input() public currentDef: boolean = false;
 	
 	@HostBinding( 'class' )
 	public get hostClasses(): string {
@@ -33,17 +33,19 @@ export class SymbolComponent implements OnInit {
 		return ( symbolLabel as any )[this.symbol.kind] || this.symbol.kind;
 	}
 	
-	public get source() {
-		if ( !this.symbol || !this.symbol.source ) {
+	public get sources() {
+		if ( !this.symbol ) {
 			return '';
 		}
-		if ( this.symbol.source.module ) {
-			return this.symbol.source.file;
-		} else {
-			const baseUrl = `https://github.com/diaspora-orm/diaspora/blob/v${this.VersionService.version}/src/`;
-			const fullUrl = `${baseUrl}${this.symbol.source.file}#L${this.symbol.source.line}`;
-			return `<a href="${fullUrl}" target="_blank">${this.symbol.source.file} line ${this.symbol.source.line}</a>`;
-		}
+		return this.symbol.sources.map( source => {
+			if ( source.module ) {
+				return source.file;
+			} else {
+				const baseUrl = `https://github.com/diaspora-orm/diaspora/blob/v${this.VersionService.version}/src/`;
+				const fullUrl = `${baseUrl}${source.file}#L${source.line}`;
+				return `<a href="${fullUrl}" target="_blank">${source.file} line ${source.line}</a>`;
+			}
+		} ).join( '<br/>' );
 	}
 	public get isTyped(){
 		return this.symbol && (

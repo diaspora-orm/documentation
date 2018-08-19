@@ -1,6 +1,6 @@
 <article>
-	<pre>{{signature.name}}<ng-container *ngTemplateOutlet="typeParameters"></ng-container>(<ng-container *ngTemplateOutlet="callSignatureParameters"></ng-container>): <app-type [rawType]="signature.type"></app-type></pre>
-	<ngx-md [data]="signature.summary"></ngx-md>
+	<pre>{{signature?.name}}<ng-container *ngTemplateOutlet="typeParameters"></ng-container>(<ng-container *ngTemplateOutlet="callSignatureParameters"></ng-container>): <app-type [rawType]="signature?.type"></app-type></pre>
+	<ngx-md [data]="signature?.summary"></ngx-md>
 	
 	<section>
 		<h4>Parameters</h4>
@@ -8,13 +8,9 @@
 	</section>
 	
 	<section>
-		<h4>Return value(<app-type [rawType]="signature.type"></app-type>)</h4>
+		<h4>Return value(<app-type [rawType]="signature?.type"></app-type>)</h4>
 		
 	</section>
-	
-	<footer>
-		<span *ngIf="signature.source" [innerHTML]="source"></span>
-	</footer>
 </article>
 
 <ng-template #callSignatureParameters>
@@ -27,7 +23,7 @@
 
 
 <ng-template #typeParameters>
-	<ng-container *ngIf="signature && signature.typeParameter && signature.typeParameter.length > 0">&lt;<span *ngFor="let parameter of signature.typeParameter; let i = index">{{parameter.name}}<ng-container *ngIf="i < signature.typeParameter.length - 1">, </ng-container></span>&gt;</ng-container>
+	<ng-container *ngIf="signature?.typeParameter?.length > 0">&lt;<span *ngFor="let parameter of signature?.typeParameter; let i = index">{{parameter.name}}<ng-container *ngIf="i < signature?.typeParameter?.length - 1">, </ng-container></span>&gt;</ng-container>
 </ng-template>
 
 
