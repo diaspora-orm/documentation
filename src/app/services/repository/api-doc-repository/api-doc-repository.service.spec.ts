@@ -5,6 +5,7 @@ import { TestBed, inject, async } from '@angular/core/testing';
 
 import { ApiDocRepositoryService } from './api-doc-repository.service';
 import { Diaspora, Model } from '@diaspora/diaspora';
+import { SymbolKind } from '../../../types/typedoc/typedoc';
 
 function *UidGen(){
 	let i = 0;
@@ -117,37 +118,69 @@ describe( 'ApiDocRepositoryService', () => {
 		expect( service ).toBeTruthy();
 		console.log( {apiDocService, service, model: service.ApiDoc} );
 	} ) );
-	describe( 'getCurrentSymbolAndChildren', () => {
-		beforeEach( () => {
-			apiDocService = TestBed.get( ApiDocService );
+	describe( 'Only exported', () => {
+		describe( 'getCurrentSymbolAndChildren', () => {
+			it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				expect( await service.getCurrentSymbolAndChildren( 'foo' ) ).toEqual( {
+					currentSymbol: items.item,
+					children: [
+						items.children[0].item,
+						items.children[1].item,
+					],
+				} );
+			} ) ) );
+			it( 'Child element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				expect( await service.getCurrentSymbolAndChildren( 'foo/bar' ) ).toEqual( {
+					currentSymbol: items.children[0].item,
+					children: [
+						items.children[0].children[1].item,
+					],
+				} );
+			} ) ) );
+			it( 'Reject on not found', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				try {
+					await service.getCurrentSymbolAndChildren( 'not/found' );
+				} catch ( err ) {
+					expect( err instanceof Error ).toBeTruthy();
+					return;
+				}
+				throw new Error( 'Promise should not be resolved' );
+			} ) ) );
 		} );
-		it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
-			expect( await service.getCurrentSymbolAndChildren( 'foo' ) ).toEqual( {
-				currentSymbol: items.item,
-				children: [
-					items.children[0].item,
-					items.children[1].item,
-				],
-			} );
-		} ) ) );
-		it( 'Child element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
-			expect( await service.getCurrentSymbolAndChildren( 'foo/bar' ) ).toEqual( {
-				currentSymbol: items.children[0].item,
-				children: [
-					items.children[0].children[1].item,
-				],
-			} );
-		} ) ) );
-		it( 'Reject on not found', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
-
-			try {
-				await service.getCurrentSymbolAndChildren( 'not/found' );
-			} catch ( err ) {
-				expect( err instanceof Error ).toBeTruthy();
-				return;
-			}
-		
-			throw new Error( 'Promise should not be resolved' );
-		} ) ) );
+} );
+	describe( 'Exported & non exported', () => {
+		describe( 'getCurrentSymbolAndChildren', () => {
+			it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				service.onlyExported = false;
+				expect( await service.getCurrentSymbolAndChildren( 'foo' ) ).toEqual( {
+					currentSymbol: items.item,
+					children: [
+						items.children[0].item,
+						items.children[1].item,
+						items.children[2].item,
+					],
+				} );
+			} ) ) );
+			it( 'Child element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				service.onlyExported = false;
+				expect( await service.getCurrentSymbolAndChildren( 'foo/bar' ) ).toEqual( {
+					currentSymbol: items.children[0].item,
+					children: [
+						items.children[0].children[0].item,
+						items.children[0].children[1].item,
+					],
+				} );
+			} ) ) );
+			it( 'Reject on not found', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				service.onlyExported = false;
+				try {
+					await service.getCurrentSymbolAndChildren( 'not/found' );
+				} catch ( err ) {
+					expect( err instanceof Error ).toBeTruthy();
+					return;
+				}
+				throw new Error( 'Promise should not be resolved' );
+			} ) ) );
+		} );
 	} );
 } );
