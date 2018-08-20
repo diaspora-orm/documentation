@@ -6,6 +6,7 @@ import { TestBed, inject, async } from '@angular/core/testing';
 import { ApiDocRepositoryService } from './api-doc-repository.service';
 import { Diaspora, Model } from '@diaspora/diaspora';
 import { SymbolKind } from '../../../types/typedoc/typedoc';
+import * as _ from 'lodash';
 
 function *UidGen(){
 	let i = 0;
@@ -14,38 +15,78 @@ function *UidGen(){
 	}
 }
 
-const items: any = {
+interface ISmbl{
+	name: string;
+	canonicalPath: string;
+	ancestor?: number;
+	identifier?: number;
+	exported?: boolean;
+}
+interface IChildNode{
+	item: ISmbl;
+	children?: IChildNode[];
+}
+const mapItems = ( node: IChildNode ) => {
+	node.item.identifier = _.isNumber( node.item.identifier ) ? node.item.identifier : entityIdGen.next().value;
+	node.item.exported = node.item.exported || false;
+	if ( node.children ){
+		node.children = node.children.map( child => {
+			child.item.ancestor = node.item.identifier;
+			return mapItems( child );
+		} );
+	}
+	return node;
+};
+
+const entityIdGen = UidGen();
+const items: any = mapItems( {
 	item: {
-		name: 'foo',
-		canonicalPath: 'foo',
-		identifier: 0,
+		name: '@diaspora/diaspora',
+		canonicalPath: '@diaspora/diaspora',
 		exported: true,
 	},
 	children: [
 		{
 			item: {
-				name: 'bar',
-				canonicalPath: 'foo/bar',
-				identifier: 1,
-				ancestor: 0,
+				name: 'QueryLanguage',
+				canonicalPath: '@diaspora/diaspora:QueryLanguage',
 				exported: true,
 			},
 			children: [
 				{
 					item: {
-						name: 'qwe',
-						canonicalPath: 'foo/bar/qwe',
-						identifier: 2,
-						ancestor: 1,
-						exported: false,
+						name: 'Raw',
+						canonicalPath: '@diaspora/diaspora:QueryLanguage:Raw',
+						exported: true,
+					},
+					children: [
+						{
+							item: {
+								name: 'IQueryOptions',
+								canonicalPath: '@diaspora/diaspora:QueryLanguage:Raw#IQueryOptions',
+								exported: true,
+							},
+						},
+						{
+							item: {
+								name: 'SearchQuery',
+								canonicalPath: '@diaspora/diaspora:QueryLanguage:Raw#SearchQuery',
+								exported: true,
+							},
+						},
+					],
+				},
+				{
+					item: {
+						name: 'IQueryOptions',
+						canonicalPath: '@diaspora/diaspora:QueryLanguage#IQueryOptions',
+						exported: true,
 					},
 				},
 				{
 					item: {
-						name: 'aze',
-						canonicalPath: 'foo/bar/aze',
-						identifier: 3,
-						ancestor: 1,
+						name: 'SelectQueryOrCondition',
+						canonicalPath: '@diaspora/diaspora:QueryLanguage#SelectQueryOrCondition',
 						exported: true,
 					},
 				},
@@ -53,31 +94,50 @@ const items: any = {
 		},
 		{
 			item: {
-				name: 'qux',
-				canonicalPath: 'foo/qux',
-				identifier: 4,
-				ancestor: 0,
+				name: 'FieldDescriptor',
+				canonicalPath: '@diaspora/diaspora:FieldDescriptor',
 				exported: true,
+			},
+			children: [
+				{
+					item: {
+						name: 'IBaseFieldDescriptor',
+						canonicalPath: '@diaspora/diaspora:FieldDescriptor#IBaseFieldDescriptor',
+						exported: true,
+					},
+				},
+				{
+					item: {
+						name: 'IPrimitiveFieldDescriptor',
+						canonicalPath: '@diaspora/diaspora:FieldDescriptor#IPrimitiveFieldDescriptor',
+						exported: false,
+					},
+				},
+			],
+		},
+		{
+			item: {
+				name: 'messageRequired',
+				canonicalPath: '@diaspora/diaspora.messageRequired',
+				exported: false,
 			},
 		},
 		{
 			item: {
-				name: 'baaz',
-				canonicalPath: 'foo/baaz',
-				identifier: 5,
-				ancestor: 0,
-				exported: false,
+				name: 'foo',
+				canonicalPath: '@diaspora/diaspora.foo',
+				exported: true,
 			},
 		},
 	],
-};
+} );
 
 
-const uidGen = UidGen();
+const modelIdGen = UidGen();
 class MockApiDocService{
 	public readonly ApiDoc: Model<ISymbolDef>;
 	public constructor(){
-		const idAdapter = uidGen.next().value;
+		const idAdapter = modelIdGen.next().value;
 		Diaspora.createNamedDataSource( 'test' + idAdapter, 'inMemory' );
 		this.ApiDoc = Diaspora.declareModel( 'test' + idAdapter, {
 			sources: 'test' + idAdapter,
@@ -86,14 +146,19 @@ class MockApiDocService{
 	}
 	
 	public async initTestData(){
-		return this.ApiDoc.insertMany( [
-			items.item,
-			items.children[0].item,
-			items.children[0].children[0].item,
-			items.children[0].children[1].item,
-			items.children[1].item,
-			items.children[2].item,
-		] );
+		return this.ApiDoc.insertMany( this.flattenSymbols( items, [] ) );
+	}
+
+	private flattenSymbols( node: IChildNode, previousList: ISmbl[] ){
+		previousList.push( node.item );
+		if ( node.children ){
+			previousList.push( ..._.reduce(
+				node.children,
+				( acc, child ) => this.flattenSymbols( child, acc ),
+				[] as ISmbl[]
+			) );
+		}
+		return previousList;
 	}
 }
 
@@ -119,27 +184,30 @@ describe( 'ApiDocRepositoryService', () => {
 		console.log( {apiDocService, service, model: service.ApiDoc} );
 	} ) );
 	describe( 'Only exported', () => {
-		describe( 'getCurrentSymbolAndChildren', () => {
+		describe( 'getSymbolAndChildren', () => {
 			it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
-				expect( await service.getCurrentSymbolAndChildren( 'foo' ) ).toEqual( {
+				expect( await service.getSymbolAndChildren( '@diaspora/diaspora' ) ).toEqual( {
 					currentSymbol: items.item,
 					children: [
 						items.children[0].item,
 						items.children[1].item,
+						items.children[3].item,
 					],
 				} );
 			} ) ) );
 			it( 'Child element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
-				expect( await service.getCurrentSymbolAndChildren( 'foo/bar' ) ).toEqual( {
+				expect( await service.getSymbolAndChildren( '@diaspora/diaspora:QueryLanguage' ) ).toEqual( {
 					currentSymbol: items.children[0].item,
 					children: [
+						items.children[0].children[0].item,
 						items.children[0].children[1].item,
+						items.children[0].children[2].item,
 					],
 				} );
 			} ) ) );
 			it( 'Reject on not found', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
 				try {
-					await service.getCurrentSymbolAndChildren( 'not/found' );
+					await service.getSymbolAndChildren( 'not/found' );
 				} catch ( err ) {
 					expect( err instanceof Error ).toBeTruthy();
 					return;
@@ -147,34 +215,69 @@ describe( 'ApiDocRepositoryService', () => {
 				throw new Error( 'Promise should not be resolved' );
 			} ) ) );
 		} );
-} );
+		describe( 'getTreeData', () => {
+			it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				expect( await service.getTreeData( [ '@diaspora/diaspora' ] ) ).toEqual( {
+					item: items.item,
+					children: [
+						{ item: items.children[1].item },
+						{ item: items.children[3].item },
+						{ item: items.children[0].item },
+					],
+				} );
+			} ) ) );
+			const tree1 = {
+				item: items.item,
+				children: [
+					{ item: items.children[1].item },
+					{ item: items.children[3].item },
+					{ item: items.children[0].item, children: [
+						{ item: items.children[0].children[1].item },
+						{ item: items.children[0].children[0].item, children:[
+							{ item: items.children[0].children[0].children[0].item },
+							{ item: items.children[0].children[0].children[1].item },
+						] },
+						{ item: items.children[0].children[2].item },
+					] },
+				],
+			};
+			it( 'Children', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				expect( await service.getTreeData( [ '@diaspora/diaspora:QueryLanguage:Raw' ] ) ).toEqual( tree1 );
+			} ) ) );
+			it( 'Root element and children (Same as only children)', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
+				expect( await service.getTreeData( [ '@diaspora/diaspora', '@diaspora/diaspora:QueryLanguage:Raw' ] ) ).toEqual( tree1 );
+			} ) ) );
+		} );
+	} );
 	describe( 'Exported & non exported', () => {
-		describe( 'getCurrentSymbolAndChildren', () => {
+		describe( 'getSymbolAndChildren', () => {
 			it( 'Root element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
 				service.onlyExported = false;
-				expect( await service.getCurrentSymbolAndChildren( 'foo' ) ).toEqual( {
+				expect( await service.getSymbolAndChildren( '@diaspora/diaspora' ) ).toEqual( {
 					currentSymbol: items.item,
 					children: [
 						items.children[0].item,
 						items.children[1].item,
 						items.children[2].item,
+						items.children[3].item,
 					],
 				} );
 			} ) ) );
 			it( 'Child element', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
 				service.onlyExported = false;
-				expect( await service.getCurrentSymbolAndChildren( 'foo/bar' ) ).toEqual( {
+				expect( await service.getSymbolAndChildren( '@diaspora/diaspora:QueryLanguage' ) ).toEqual( {
 					currentSymbol: items.children[0].item,
 					children: [
 						items.children[0].children[0].item,
 						items.children[0].children[1].item,
+						items.children[0].children[2].item,
 					],
 				} );
 			} ) ) );
 			it( 'Reject on not found', async( inject( [ApiDocRepositoryService], async ( service: ApiDocRepositoryService ) => {
 				service.onlyExported = false;
 				try {
-					await service.getCurrentSymbolAndChildren( 'not/found' );
+					await service.getSymbolAndChildren( 'not/found' );
 				} catch ( err ) {
 					expect( err instanceof Error ).toBeTruthy();
 					return;
