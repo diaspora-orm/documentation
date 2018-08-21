@@ -39,11 +39,6 @@ export interface ISource {
 	character: number;
 }
 
-export interface ITypeReference {
-	type: 'reference';
-	name: string;
-	id?: number;
-}
 export type ParameterTypeDefinition = {
 	type: 'intrinsic';
 	name: string;
@@ -57,7 +52,12 @@ export type ParameterTypeDefinition = {
 	type: 'typeParameter';
 	name: string;
 	constraint?: ParameterTypeDefinition;
-} | ITypeReference;
+} | {
+	type: 'reference';
+	name: string;
+	id?: number;
+	typeArguments?: ParameterTypeDefinition[];
+};
 
 export interface IFlags{
 	isExported?: true;
@@ -108,10 +108,10 @@ export interface ISymbolDefinition extends IDefinition {
 	signatures?: ICallSignatureDefinition[];
 	parameters?: ISymbolDefinition[];
 	typeParameter?: ParameterTypeDefinition[];
-	extendedTypes?: ITypeReference[];
-	extendedBy?: ITypeReference[];
+	extendedTypes?: ParameterTypeDefinition[];
+	extendedBy?: ParameterTypeDefinition[];
 	implementedTypes?: ISymbolDefinition[];
-	typeArguments?: ITypeReference[];
+	typeArguments?: ParameterTypeDefinition[];
 }
 export interface ICallSignatureDefinition extends IDefinition{
 	type?: ParameterTypeDefinition;

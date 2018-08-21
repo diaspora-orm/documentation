@@ -1,7 +1,7 @@
 <aside [ngStyle]="{width: width}">
 	<article>
-		<ul>
-			<app-section [symbolPath]="'@diaspora/diaspora'"></app-section>
+		<ul *ngIf="treeData">
+			<app-section [item]="treeData?.item" [children]="treeData?.children"></app-section>
 		</ul>
 	</article>
 	<footer>

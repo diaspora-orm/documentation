@@ -1,15 +1,13 @@
-<ng-container *ngIf="type" [ngSwitch]="type.type">
-  <span *ngSwitchCase="'intrinsic'" class="intrinsic">{{type.value}}</span>
-	<a *ngSwitchCase="'symbol'" class="symbol" [routerLink]="['/api']" [queryParams]="{symbolId: type.value.identifier}" >{{type.value.name}}</a>
-	<span *ngSwitchCase="'outSymbol'" class="outSymbol">{{type.value}}</span>
-	<span *ngSwitchCase="'array'" class="array">Array&lt;<app-type [type]="type.value"></app-type>&gt;</span>
+<ng-container *ngIf="type" [ngSwitch]="type?.type">
+  <span *ngSwitchCase="'intrinsic'" class="intrinsic">{{type?.value}}</span>
+	<a *ngSwitchCase="'symbol'" class="symbol" [routerLink]="[]" [queryParams]="{symbolPath: type?.value.canonicalPath}">{{type?.value.name}}<ng-container *ngIf="type?.typeArguments">&lt;<ng-container *ngFor="let typeArg of type?.typeArguments; let i = index;"><span *ngIf="i > 0">, </span><app-type [rawType]="typeArg"></app-type></ng-container>&gt;</ng-container></a>
+	<span *ngSwitchCase="'outSymbol'" class="outSymbol">{{type?.value}}<ng-container *ngIf="type?.typeArguments">&lt;<ng-container *ngFor="let typeArg of type?.typeArguments; let i = index;"><span *ngIf="i > 0">, </span><app-type [rawType]="typeArg"></app-type></ng-container>&gt;</ng-container></span>
+	<span *ngSwitchCase="'array'" class="array">Array&lt;<app-type [type]="type?.value"></app-type>&gt;</span>
 	<span *ngSwitchCase="'union'" class="union">
-    <span *ngFor="let subtype of type.value; let i = index">
+    <span *ngFor="let subtype of type?.value; let i = index">
       <app-type [type]="subtype"></app-type>
-      <ng-container *ngIf="i < type.value.length - 1"> | </ng-container>
+      <ng-container *ngIf="i < type?.value.length - 1"> | </ng-container>
     </span>
   </span>
-	<span *ngSwitchCase="'typeParameter'" class="typeParameter">{{type.value}}</span>
-	<span *ngSwitchCase="'error'" class="error" title="Unhandled type">&#x2717;</span>
 	<span *ngSwitchDefault class="unhandled">other...</span>
 </ng-container>

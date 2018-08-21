@@ -1,4 +1,4 @@
-<app-sidebar></app-sidebar>
+<app-sidebar [treeData]="navigation"></app-sidebar>
 <section class="container">
 	<div *ngIf="isInitialized; then dataTable; else noDataTable">
 	</div>
@@ -14,7 +14,7 @@
 				</ng-template>
 				<ng-template #symbolsBreadcrumb>
 					<span *ngFor="let breadcrumbItem of breadcrumbPath; let i = index">
-						<a [href]="'/api/' + breadcrumbPath.slice(0, i + 1).join('/')">
+						<a [routerLink]="[]" [queryParams]="{symbolPath: breadcrumbPath.slice(0, i + 1).join('/')}">
 							<span *ngIf="i !== breadcrumbPath.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
 						</a>
 						
@@ -47,12 +47,12 @@
 					<div *ngIf="currentDocPage; else notFound">
 						<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:currentDocPage.item, current: true}"></ng-container>
 						<h2>Children</h2>
-						<lazy-block *ngFor="let pair of currentDocPage?.children | pairs">
+						<div *ngFor="let pair of currentDocPage?.children | pairs">
 							<h3>{{pair.key}}</h3>
 							<ng-container *ngFor="let symbol of pair.value">
 								<ng-container *ngTemplateOutlet="symbolSwitch;context:{symbol:symbol}"></ng-container>
 							</ng-container>
-						</lazy-block>
+						</div>
 					</div>
 				</ng-template>
 				

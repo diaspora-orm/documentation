@@ -1,3 +1,4 @@
+import { ITreeData } from './../../../../services/repository/api-doc-repository/api-doc-repository.service';
 import { ApiDocService, ISymbolDef } from './../../../../services/api-doc/api-doc.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { Set } from '@diaspora/diaspora/dist/types';
@@ -10,18 +11,38 @@ import * as _ from 'lodash';
 	templateUrl: './section.component.html',
 	styleUrls: ['./section.component.scss'],
 } )
-export class SectionComponent implements OnInit {
-	@Input()
-	public symbolPath?: string;
-	
-	@Input()
-	public current?: ISymbolDef;
-	public children: ISymbolDef[] = [];
+export class SectionComponent implements OnInit {	
+	@Input() public children?: ITreeData[];	
+	@Input() public item?: ISymbolDef;
+	@Input() public parent?: ISymbolDef;
+
+	public get linkTarget(){
+		if ( !this.item ){
+			return;
+		}
+		const kind = this.item.kind;
+
+		const isCategory = kind === SymbolKind.Root ||
+			kind === SymbolKind.Module ||
+			kind === SymbolKind.Namespace ||
+			kind === SymbolKind.Class ||
+			kind === SymbolKind.Interface;
+		if ( isCategory ){
+			return {symbolPath: this.item.canonicalPath};
+		} else if ( this.parent ){
+			return {
+				symbolPath: this.parent.canonicalPath,
+				see: this.item.name,
+			};
+		} else {
+			throw new Error( 'No displayable item' );
+		}
+	}
 	
 	public constructor( private apiDoc: ApiDocService ) {}
 	
 	public get kindClass(): string {
-		return this.apiDoc.kindClass( this.current );
+		return this.apiDoc.kindClass( this.item );
 	}
 	private static isDisplayable( symbol: ISymbolDef ){
 		return symbol.kind === SymbolKind.Root ||
@@ -30,37 +51,6 @@ export class SectionComponent implements OnInit {
 			symbol.kind === SymbolKind.Class;
 	}
 
-	public async queryData(){
-		console.log( 'Section component initializing' );
-		if ( !this.current ){
-			const currentSymbol = await this.apiDoc.ApiDoc.find( {canonicalPath: this.symbolPath} );
-			if ( !currentSymbol || !currentSymbol.attributes ){
-				return;
-			}
-			this.current = currentSymbol.attributes;
-		}
-		if ( !SectionComponent.isDisplayable( this.current ) ) {
-			return;
-		}
-		const symbolChildren = await this.apiDoc.ApiDoc.findMany( {ancestor: this.current.identifier} );
-		this.children = symbolChildren.toChainable( Set.ETransformationMode.ATTRIBUTES )
-			.filter( SectionComponent.isDisplayable )
-			.sortBy( 'name' )
-			.value();
-		console.log( {
-			path: this.current.canonicalPath,
-			displayed: this.children.length,
-			children: symbolChildren.length,
-		} );
-	}
-
 	public ngOnInit() {
-		if ( !this.apiDoc.hasModelInitialized ){
-			this.apiDoc.modelInitialized.subscribe( () => {
-				this.queryData();
-			} );
-		} else {
-			this.queryData();
-		}
 	}
 }

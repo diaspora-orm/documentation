@@ -8,9 +8,8 @@ import { TutorialsComponent } from './pages/tutorials/tutorials.component';
 
 export const routes: Routes = [
 	{ path: '', component: IndexComponent, data: { title: 'Home' } },
-	{ path: 'api', component: ApiComponent, data: { title: 'API' }, children: [
-		{path: '**', component: ApiComponent, data: { title: 'API' }},
-	] },
+	{ path: 'api', component: ApiComponent, data: { title: 'API' }  },
+	{ path: 'api/*path', component: ApiComponent, data: { title: 'API' }  },
 	{ path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
 ];
 

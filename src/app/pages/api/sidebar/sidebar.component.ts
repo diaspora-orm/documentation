@@ -1,4 +1,5 @@
-import { Component, OnInit, HostListener, HostBinding } from '@angular/core';
+import { ITreeData } from './../../../services/repository/api-doc-repository/api-doc-repository.service';
+import { Component, OnInit, HostListener, HostBinding, Input } from '@angular/core';
 
 @Component( {
 	selector: 'app-sidebar',
@@ -6,6 +7,9 @@ import { Component, OnInit, HostListener, HostBinding } from '@angular/core';
 	styleUrls: ['./sidebar.component.scss'],
 } )
 export class SidebarComponent implements OnInit {
+	@Input() public treeData?: ITreeData;
+
+	
 	private header: HTMLElement | null = null;
 	private logoLink: HTMLElement | null = null;
 

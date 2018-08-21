@@ -1,6 +1,7 @@
+import { ApiDocRepositoryService, ITreeData } from './../../services/repository/api-doc-repository/api-doc-repository.service';
 import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { SymbolKind } from './../../types/typedoc/typedoc';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 
@@ -29,6 +30,8 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	public isInitialized = false;
 	public breadcrumbPath: string[] = [];
 
+	public navigation?: ITreeData;
+
 	public SymbolKind = SymbolKind;
 	public SymbolLabel = _.values( symbolLabel );
 
@@ -42,7 +45,7 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 			this.searchedItems = undefined;
 		} else {
 			this._searchedString = str;
-			this.ApiDoc.ApiDoc.findMany( str.includes( '/' ) ? {canonicalPath:str} : {name: str} ).then( searchResults => {
+			this.ApiDocRepository.ApiDoc.findMany( str.includes( '/' ) ? {canonicalPath:str} : {name: str} ).then( searchResults => {
 				this.searchedItems = searchResults.toChainable( Set.ETransformationMode.ATTRIBUTES ).value() as any[];
 			} );
 		}
@@ -56,9 +59,11 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 
 	public constructor(
 		private route: ActivatedRoute,
+		private ApiDocRepository: ApiDocRepositoryService,
 		private ApiDoc: ApiDocService,
 		private pairs: PairsPipe,
-		private versionManager: VersionManagerService
+		private versionManager: VersionManagerService,
+		private zone: NgZone
 	) {}
 
 	private async onSearchBarChange( event: KeyboardEvent ) {
@@ -71,34 +76,37 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 
 
 
-	private async getChildren( id: number ){
-		this.currentSymbolId = id;
-		const subItems = await this.ApiDoc.ApiDoc.findMany( {ancestor: id, exported: true} );
-		return subItems.toChainable( Set.ETransformationMode.ATTRIBUTES )
-		.groupBy( 'kind' )
-		.reduce(
-			( acc, symbols: any[] ) => {
-				const firstItem = _.first( symbols );
-				if ( firstItem ) {
-					const kindStr = SymbolKind[firstItem.kind];
-					acc[kindStr] = symbols;
-				}
-				return acc;
-			},
-			{} as {[kind: string]: ISymbolDef[]}
-		).value();
+	private groupChildren( set: ISymbolDef[] ){
+		return _.chain( set )
+			.groupBy( 'kind' )
+			.reduce(
+				( acc, symbols: any[] ) => {
+					const firstItem = _.first( symbols );
+					if ( firstItem ) {
+						const kindStr = SymbolKind[firstItem.kind];
+						acc[kindStr] = symbols;
+					}
+					return acc;
+				},
+				{} as {[kind: string]: ISymbolDef[]}
+			).value();
 	}
 
 	private async setSearch( searchData: string | number ) {
-		console.log( 'setting search', searchData );
-
-		const idSearchCriterionKey = _.isString( searchData ) ? 'canonicalPath' : 'identifier';
-		const idSearchCriterion = {[idSearchCriterionKey]: searchData};
-		const thisItem = await this.ApiDoc.ApiDoc.find( idSearchCriterion );
-		if ( thisItem && thisItem.attributes ){
-			this.breadcrumbPath = thisItem.attributes.canonicalPath.split( '/' );
-			this.currentDocPage = {item:thisItem.attributes, children: await this.getChildren( thisItem.attributes.identifier )};
-		} else {
+		console.info( 'Setting search:', searchData );
+		try{
+			const currentDocPage = await this.ApiDocRepository.getSymbolAndChildren( searchData );
+			this.breadcrumbPath = currentDocPage.currentSymbol.canonicalPath.split( '/' );
+			const navigation = await this.ApiDocRepository.getTreeData( [currentDocPage.currentSymbol.canonicalPath] );
+			this.zone.run( () => {
+				this.currentDocPage = {
+					item:currentDocPage.currentSymbol,
+					children: this.groupChildren( currentDocPage.children ),
+				};
+				this.navigation = navigation;
+			} );
+		} catch ( err ) {
+			console.error( err );
 			this.currentDocPage = null;
 		}
 	}
@@ -114,24 +122,25 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		this.ApiDoc.loadData()
 		.then( () => {
 			this.isInitialized = true;
-			if ( window.location.pathname === '/api' ){
-				this.route.queryParams.subscribe( queryParams => {
-					console.log( {queryParams} );
-					const symbolId = queryParams.symbolId ? parseInt( queryParams.symbolId, 10 ) : 0;
+			this.route.queryParams.subscribe( queryParams => {
+				console.log( {queryParams} );
+
+				if ( queryParams.symbolId && queryParams.symbolPath ){
+					throw new Error();
+				} else if ( queryParams.symbolId ){
+					const symbolId = parseInt( queryParams.symbolId, 10 );
 					this.setSearch( symbolId );
-					console.log( 'Reseting prompt' );
-					if ( this.searchInput ) {
-						this.searchInput.nativeElement.value = '';
-					}
-					this.seachedString = '';
-				} );
-			} else {
-				this.setSearch( window.location.pathname.replace( /^.*?\/api\//, '' ) );
-			}
-			//this.route.subscribe(params => console.log({params}));
-			/*this.route.params.subscribe(data => {
-				console.log(data);
-			});*/
+				} else if ( queryParams.symbolPath ){
+					this.setSearch( queryParams.symbolPath );
+				} else {
+					this.setSearch( 0 );
+				}
+				console.log( 'Reseting prompt' );
+				if ( this.searchInput ) {
+					this.searchInput.nativeElement.value = '';
+				}
+				this.seachedString = '';
+			} );
 		} );
 	}
 

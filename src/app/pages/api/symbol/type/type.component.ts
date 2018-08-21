@@ -10,10 +10,13 @@ export interface ITypeError {
 export interface ITypeSymbol {
 	type: 'symbol';
 	value: ISymbolDef;
+	typeArguments?: IType[];
 }
+
 export interface ITypeOutSymbol {
 	type: 'outSymbol';
 	value: string;
+	typeArguments?: IType[];
 }
 export interface ITypeIntrinsic {
 	type: 'intrinsic';
@@ -42,9 +45,13 @@ export type IType = ITypeError | ITypeSymbol | ITypeOutSymbol | ITypeIntrinsic |
 	styleUrls: ['./type.component.scss'],
 } )
 export class TypeComponent implements OnInit {
-	@Input() public rawType: ParameterTypeDefinition | undefined;
+	@Input() public rawType?: ParameterTypeDefinition;
 	
-	@Input() protected type: IType | undefined;
+	@Input() public type?: IType;
+
+	private static typesCache: {
+		[key: string]: ISymbolDef | null;
+	} = {};
 	
 	public constructor( protected ApiDoc: ApiDocService ) { }
 	
@@ -58,14 +65,33 @@ export class TypeComponent implements OnInit {
 			}
 			
 			case 'reference': {
-				const parameterType = await this.ApiDoc.ApiDoc.find( {identifier: parameter.id} );
-				return parameterType ? {
-					type: 'symbol',
-					value: parameterType.attributes as ISymbolDef,
-				} : {
-					type: 'outSymbol',
-					value: parameter.name,
-				};
+				if ( parameter.id ){
+					if ( !( parameter.id in TypeComponent.typesCache ) ){
+						const typeItem = await this.ApiDoc.ApiDoc.find( {identifier: parameter.id} );
+						TypeComponent.typesCache[parameter.id] = typeItem && typeItem.attributes;
+					}
+					const parameterType = TypeComponent.typesCache[parameter.id];
+					return parameterType ? {
+						type: 'symbol',
+						value: parameterType,
+						typeArguments: parameter.typeArguments,
+					} as ITypeSymbol : {
+						type: 'outSymbol',
+						value: parameter.name,
+						typeArguments: parameter.typeArguments,
+					} as ITypeOutSymbol;
+				} else if ( parameter.name ){
+					return {
+						type: 'outSymbol',
+						value: parameter.name,
+						typeArguments: parameter.typeArguments,
+					} as ITypeOutSymbol;
+				} else {
+					return {
+						type: 'error',
+					};
+				}
+
 			}
 			
 			case 'array': {

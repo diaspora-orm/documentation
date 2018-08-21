@@ -87,7 +87,6 @@ export class CookieConsentComponent implements AfterViewInit {
 		};
 		this._position =  'bottom';
 		if ( _.every( _.values( this.consentMatrice ), v => !v ) ){
-			console.log( 'first init' );
 			this.transition = 'bottomIn';
 			this.consentMatrice = {
 				apiDoc: true,

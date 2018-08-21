@@ -10,7 +10,7 @@
 	</ng-template>
 	<div *ngIf="symbol?.hasChildren; then titleLink; else titleNoLink"></div>
 	<ng-template #titleLink>
-		<a [href]="'/api/' + symbol?.canonicalPath">
+		<a [routerLink]="[]" [queryParams]="{symbolPath: symbol?.canonicalPath}">
 			<ng-container *ngTemplateOutlet="symbolTitle"></ng-container>
 		</a>
 	</ng-template>

@@ -2,7 +2,7 @@ import { ITreeData } from './api-doc-repository.service';
 import { ApiDocService, ISymbolDef } from './../../api-doc/api-doc.service';
 import { Injectable } from '@angular/core';
 import { Model, Entity, Set, QueryLanguage } from '@diaspora/diaspora';
-import * as _ from 'lodash/fp';
+import * as _ from 'lodash';
 
 export interface ISymbolAndChildren{
 	currentSymbol: ISymbolDef;
@@ -30,12 +30,8 @@ const recomposeArr = ( set: Set<ISymbolDef>, descendingTree?: ITreeData ) => {
 				.union( [descendingTree] ) :
 			chainable.map( item => ( { item } ) ) )
 		.compact<ITreeData>()
-		.value()
-		.sort( ( a,b ) => {
-			const str1 = a.item.name.toLowerCase();
-			const str2 = b.item.name.toLowerCase();
-			return str1 < str2 ? -1 : +( str1 > str2 );
-		} );
+		.sortBy( 'item.kind', x => x.item.name.toLowerCase() )
+		.value();
 };
 
 
@@ -116,8 +112,6 @@ export class ApiDocRepositoryService {
 		return tree;
 	}
 	
-	public async getSymbolAndChildren( canonicalPath: string ): Promise<ISymbolAndChildren>;
-	public async getSymbolAndChildren( identifier: number ): Promise<ISymbolAndChildren>;
 	public async getSymbolAndChildren( id: string | number ): Promise<ISymbolAndChildren>{
 		const symbolAndChildren = await this._getSymbolAndChildren( id );
 		if ( !symbolAndChildren.currentSymbol.attributes ){

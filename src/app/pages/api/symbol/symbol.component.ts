@@ -45,15 +45,10 @@ export class SymbolComponent implements OnInit {
 				const fullUrl = `${baseUrl}${source.file}#L${source.line}`;
 				return `<a href="${fullUrl}" target="_blank">${source.file} line ${source.line}</a>`;
 			}
-		} ).join( '<br/>' );
+		} ).map( v => `<p>${v}</p>` ).join( '' );
 	}
 	public get isTyped(){
-		return this.symbol && (
-			this.symbol.kind !== SymbolKind.Root &&
-			this.symbol.kind !== SymbolKind.Module &&
-			this.symbol.kind !== SymbolKind.Namespace &&
-			this.symbol.kind !== SymbolKind.Enum
-		);
+		return this.symbol && !_.isNil( this.symbol.type );
 	}
 	
 	public constructor( protected ApiDoc: ApiDocService, protected VersionService: VersionManagerService ) { }

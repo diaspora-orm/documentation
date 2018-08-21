@@ -194,7 +194,7 @@ export class ApiDocService {
 		const ancestorId = ancestor ? ancestor.identifier : undefined;
 
 		return {
-			exported: symbol.flags.isExported || false,
+			exported: symbol.flags.isExported || symbol.id === 0,
 			kind: symbol.kind,
 			name: symbol.name,
 			identifier: symbol.id,

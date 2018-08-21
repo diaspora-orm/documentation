@@ -1,6 +1,6 @@
 <li>
-	<b [class]="kindClass"><i class="tsd-kind-icon tiny"></i>{{current?.name}}</b>
-	<ul *ngIf="children.length > 0">
-		<!--<app-section *ngFor="let child of children" [current]="child"></app-section>-->
+	<a [routerLink]="[]" [queryParams]="linkTarget"><b [class]="kindClass"><i class="tsd-kind-icon tiny"></i>{{item?.name}}</b></a>
+	<ul *ngIf="children?.length > 0">
+		<app-section *ngFor="let child of children" [parent]="item" [item]="child.item" [children]="child.children"></app-section>
 	</ul>
 </li>

@@ -25,22 +25,21 @@ export enum ECommandType {
 }
 
 
-const isCodeLineExecuted = (item: ICodeLine): item is ICodeLineExecuted => {
-	return !_.isNil(item.code)  && _.isNil((item as any).text);
-};
+const isCodeLineExecuted = ( item: ICodeLine ): item is ICodeLineExecuted =>
+	!_.isNil( item.code )  && _.isNil( ( item as any ).text );
 
 
-@Component({
+@Component( {
 	selector: 'app-ioarea',
 	templateUrl: './ioarea.component.html',
-	styleUrls: ['./ioarea.component.scss']
-})
+	styleUrls: ['./ioarea.component.scss'],
+} )
 export class IOAreaComponent implements OnInit {
 	private static context = {};
 
-	public history: {command: string, response: string, errored: boolean}[] = [];
+	public history: Array<{command: string; response: string; errored: boolean}> = [];
 
-	public liveCodingText: string | null = null;
+	public liveCodingText: string | null = null;
 	public lines: ICodeLine[] = [];
 	private resetInstruction: ICodeLineExecuted = {
 		code: '',
@@ -54,63 +53,63 @@ export class IOAreaComponent implements OnInit {
 	/**
 	 * @see https://stackoverflow.com/questions/8403108/calling-eval-in-particular-context
 	 */
-	private static evalInContext(js: string) {
+	private static evalInContext( js: string ) {
 		// Return the results of the in-line anonymous function we .call with the passed context
 		// tslint:disable-next-line:no-eval
-		return (function() { return eval(js); }).call(IOAreaComponent.context);
+		return ( function() { return eval( js ); } ).call( IOAreaComponent.context );
 	}
 
-	private getPointClass(code: ICodeLineDisplayed, index: number) {
+	private getPointClass( code: ICodeLineDisplayed, index: number ) {
 		return {
 			['type-' + code.type]: true,
-			active: index === this.currentLineIndex
+			active: index === this.currentLineIndex,
 		};
 	}
 
-	constructor(private http: HttpClient) {
+	public constructor( private http: HttpClient ) {
 		// Make the HTTP request:
-		this.http.get('/assets/content/demo.json')
-		.subscribe((cnt: any) => {
+		this.http.get( '/assets/content/demo.json' )
+		.subscribe( ( cnt: any ) => {
 			this.lines = cnt as ICodeLine[];
-			this.resetInstruction = cnt.slice(-1);
+			this.resetInstruction = cnt.slice( -1 );
 			this.playLoop();
-		});
-		(window as any).Diaspora = Diaspora;
+		} );
+		( window as any ).Diaspora = Diaspora;
 	}
 
-	ngOnInit() {
+	public ngOnInit() {
 	}
 
-	private async setFrame(frameNumber: number) {
-		console.log('set frame', frameNumber);
+	private async setFrame( frameNumber: number ) {
+		console.log( 'set frame', frameNumber );
 		const frameDiff = frameNumber - this.currentLineIndex;
-		if (frameDiff > 0) {
-			for (let i = 0; i < frameDiff; i++) {
+		if ( frameDiff > 0 ) {
+			for ( let i = 0; i < frameDiff; i++ ) {
 				const newCodeLine = this.lines[this.currentLineIndex];
-				if (newCodeLine) {
-					await this.doAction(newCodeLine as any);
+				if ( newCodeLine ) {
+					await this.doAction( newCodeLine as any );
 				}
 				this.currentLineIndex++;
 			}
-		} else if (frameDiff < 0) {
-			await this.doAction(this.resetInstruction);
+		} else if ( frameDiff < 0 ) {
+			await this.doAction( this.resetInstruction );
 			this.currentLineIndex = -1;
 			this.history = [];
-			await this.setFrame(frameNumber);
-		} else if (this.playing) {
-			await this.doAction(this.lines[this.currentLineIndex] as any);
+			await this.setFrame( frameNumber );
+		} else if ( this.playing ) {
+			await this.doAction( this.lines[this.currentLineIndex] as any );
 		}
 		this.playing = false;
 		// this.history =
 	}
 
-	private eval(command: string) {
+	private eval( command: string ) {
 		try {
 			return {
 				error: false,
-				return: IOAreaComponent.evalInContext(command),
+				return: IOAreaComponent.evalInContext( command ),
 			};
-		} catch (e) {
+		} catch ( e ) {
 			return {
 				error: true,
 				return: e,
@@ -120,43 +119,42 @@ export class IOAreaComponent implements OnInit {
 
 
 
-	private stringifyOutput(content: any, depth: number = 0): string {
-		const stringifySub = (item: any) => {
-			return this.stringifyOutput(item, depth + 1).split('\n').map(s => `\t${s}`).join('\n').replace(/^\t/, '');
-		};
+	private stringifyOutput( content: any, depth: number = 0 ): string {
+		const stringifySub = ( item: any ) =>
+			this.stringifyOutput( item, depth + 1 ).split( '\n' ).map( s => `\t${s}` ).join( '\n' ).replace( /^\t/, '' );
 
-		if (_.isObject(content)) {
-			if (depth > 2) {
+		if ( _.isObject( content ) ) {
+			if ( depth > 2 ) {
 				return '<span class="t-o">[object]</span>';
 			}
-			if (!_.isPlainObject(content)) {
-				return `<span class="t-c">${content.constructor.name}</span>(${stringifySub(_.assign({}, content))})`;
+			if ( !_.isPlainObject( content ) ) {
+				return `<span class="t-c">${content.constructor.name}</span>(${stringifySub( _.assign( {}, content ) )})`;
 			} else {
-				const str = _.chain(content)
-				.mapValues((value, key) => `<span class="t-k">${key}</span>: ${stringifySub(value)}`)
-				.join('\n\t')
+				const str = _.chain( content )
+				.mapValues( ( value, key ) => `<span class="t-k">${key}</span>: ${stringifySub( value )}` )
+				.join( '\n\t' )
 				.value();
 				return str.length > 0 ? `{${str}\n}` : '{}';
 			}
-		} else if (_.isUndefined(content)) {
+		} else if ( _.isUndefined( content ) ) {
 			return '<span class="t-u">undefined</span>';
-		} else if (_.isNull(content)) {
+		} else if ( _.isNull( content ) ) {
 			return '<span class="t-n">null</span>';
 		} else {
-			return JSON.stringify(content);
+			return JSON.stringify( content );
 		}
 	}
 
-	private async awaitResolution(promise: Promise<any>) {
-		console.log({promise});
+	private async awaitResolution( promise: Promise<any> ) {
+		console.log( {promise} );
 		try {
 			return {
-				output: this.stringifyOutput(await promise),
+				output: this.stringifyOutput( await promise ),
 				errored: false,
 			};
-		} catch (error) {
+		} catch ( error ) {
 			return {
-				output: this.stringifyOutput(error),
+				output: this.stringifyOutput( error ),
 				errored: false,
 			};
 		}
@@ -164,77 +162,77 @@ export class IOAreaComponent implements OnInit {
 
 
 
-	private async doAction(codeLine: ICodeLineDisplayed): Promise<false>;
-	private async doAction(codeLine: ICodeLineExecuted): Promise<true>;
-	private async doAction(codeLine: ICodeLine) {
-		if (isCodeLineExecuted(codeLine)) {
-			const result = await this.eval(codeLine.code);
-			console.log({codeLine, currentLineIndex: this.currentLineIndex, result, ctx: IOAreaComponent.context});
+	private async doAction( codeLine: ICodeLineDisplayed ): Promise<false>;
+	private async doAction( codeLine: ICodeLineExecuted ): Promise<true>;
+	private async doAction( codeLine: ICodeLine ) {
+		if ( isCodeLineExecuted( codeLine ) ) {
+			const result = await this.eval( codeLine.code );
+			console.log( {codeLine, currentLineIndex: this.currentLineIndex, result, ctx: IOAreaComponent.context} );
 			return false;
 		} else {
-			const result = this.eval(codeLine.code || codeLine.text);
-			console.log({codeLine, currentLineIndex: this.currentLineIndex, result, ctx: IOAreaComponent.context});
-			const resolution = await this.awaitResolution(result.return);
-			this.history.push({
+			const result = this.eval( codeLine.code || codeLine.text );
+			console.log( {codeLine, currentLineIndex: this.currentLineIndex, result, ctx: IOAreaComponent.context} );
+			const resolution = await this.awaitResolution( result.return );
+			this.history.push( {
 				command: codeLine.text,
 				response: resolution.output,
 				errored: resolution.errored || result.error,
-			});
-			this.history = this.history.slice(-4);
+			} );
+			this.history = this.history.slice( -4 );
 			return true;
 		}
 	}
 
 	private async playLoop() {
-		while (this.playing) {
+		while ( this.playing ) {
 			const currentLine = this.lines[this.currentLineIndex];
-			if (!currentLine) {
+			if ( !currentLine ) {
 				return;
 			}
-			if (isCodeLineExecuted(currentLine)) {
-				await this.doAction(currentLine);
+			if ( isCodeLineExecuted( currentLine ) ) {
+				await this.doAction( currentLine );
 				this.currentLineIndex++;
 			} else {
-				await this.writeTextToLive(currentLine.text);
-				if (!this.playing) {
+				await this.writeTextToLive( currentLine.text );
+				if ( !this.playing ) {
 					this.liveCodingText = null;
 					return;
 				}
-				await new Promise(resolve => setTimeout(resolve, 500));
-				if (!this.playing) {
+				await new Promise( resolve => setTimeout( resolve, 500 ) );
+				if ( !this.playing ) {
 					this.liveCodingText = null;
 					return;
 				}
 
 				this.liveCodingText = null;
-				await this.doAction(currentLine);
-				await new Promise(resolve => setTimeout(resolve, 1000));
-				if (!this.playing) {
+				await this.doAction( currentLine );
+				await new Promise( resolve => setTimeout( resolve, 1000 ) );
+				if ( !this.playing ) {
 					return;
 				}
 
 				this.currentLineIndex++;
 			}
-			if (this.currentLineIndex === this.lines.length) {
+			if ( this.currentLineIndex === this.lines.length ) {
 				this.history = [];
 				this.currentLineIndex = 0;
 			}
 		}
 	}
 
-	private async writeTextToLive(text: string) {
+	private async writeTextToLive( text: string ) {
 		this.liveCodingText = null;
 		const textLength = text.length;
 		let i = 0;
-		return new Promise(resolve => {
-			const loopInterval = setInterval(() => {
-				if (i === textLength || !this.playing) {
-					clearInterval(loopInterval);
-					return resolve(true);
+		return new Promise( resolve => {
+			const loopInterval = setInterval( () => {
+				if ( i === textLength || !this.playing ) {
+					clearInterval( loopInterval );
+					return resolve( true );
 				}
 				i++;
-				this.liveCodingText = text.substr(0, i);
-			}, 50);
-		});
+				this.liveCodingText = text.substr( 0, i );
+			},                                50 );
+		} );
 	}
 }
