@@ -5,7 +5,7 @@
 
 $color-primary: $c1light;
 $color-secondary: $c1dark;
-@import '../../node_modules/milligram/src/milligram.sass';
+@import'../../node_modules/milligram/src/milligram.sass';
 
 pre{
 	border-left-color: $c1dark;
@@ -54,8 +54,10 @@ button, .button{
 
 
 
-@import 'vendor/scss/mixins';
-@import 'vendor/scss/icons';
+//@import'../../node_modules/milligram/src/milligram.sass';
+@import '../../node_modules/typedoc-default-themes/bin/default/assets/css/main.css';
+//@import 'vendor/scss/mixins';
+//@import 'vendor/scss/icons';
 .tsd-kind-icon{
 	display: inline-block;
 	top: -3px;
