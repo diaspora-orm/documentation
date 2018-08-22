@@ -1,0 +1,1 @@
+git clone https://github.com/TypeStrong/typedoc-default-themes.git node_modules/typedoc-default-themes

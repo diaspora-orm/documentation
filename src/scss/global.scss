@@ -54,16 +54,14 @@ button, .button{
 
 
 
-//@import'../../node_modules/milligram/src/milligram.sass';
-@import '../../node_modules/typedoc-default-themes/bin/default/assets/css/main.css';
-//@import 'vendor/scss/mixins';
-//@import 'vendor/scss/icons';
+@import '../../node_modules/typedoc-default-themes/src/default/assets/css/setup/mixins.sass';
+@import '../../node_modules/typedoc-default-themes/src/default/assets/css/setup/icons';
 .tsd-kind-icon{
 	display: inline-block;
 	top: -3px;
 	
 	&:before{
-		background-image: url(/assets/images/typedoc/icons@2x.png);
+		background-image: url(../../node_modules/typedoc-default-themes/src/default/assets/images/icons@2x.png);
 		margin: 0px 10px;
 		background-size: 238px 204px;
 		width: 17px;
