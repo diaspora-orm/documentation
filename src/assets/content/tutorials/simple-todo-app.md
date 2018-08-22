@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Managing datas is one of the most important part of an application, and many common patterns consider it as a specific module. For instance, the MVC (_**Model** View Controller_), MVP (_**Model** View Presenter_) & MVVM (_**Model**-View View-**Model**_) have all a dedicated part for data management, called **Model**.
+Managing datas is one of the most important part of an application, and many common patterns consider it as a specific module. For instance, the [MVC (_**Model** View Controller_)](!https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [MVP (_**Model** View Presenter_)](!https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) & [MVVM (_**Model**-View View-**Model**_)](!https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) have all a dedicated part for data management, called **Model**.
 
 Because it is built as an ORM, **Diaspora** is able to take care of most of the **Model** module, because it allows abstraction on the data. By using such tools, you can only write code to insert, modify or retrieve data from a store, without writing additional logic to convert your raw stored datas into logical components living in your application.
 

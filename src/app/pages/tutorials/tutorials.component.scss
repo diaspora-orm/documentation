@@ -323,34 +323,42 @@ p[data-value] {
 
 
 
+$cursorWidth: 5px;
 
 :host ::ng-deep ngx-md {
 	& > *{
 		margin-bottom: 15px;
 		position: relative;
-		padding-left: 5px;
+		padding-left: $cursorWidth;
 		
 		&::before{
 			content: "";
 			top: 0;
 			bottom: 0;
-			left: -5px;
+			left: 0;
 			position: absolute;
-			transition: 0.5s border-left;
+			transition: 0.5s border-left-width, 0.5s left;
 			border-left: 0 solid $progress-color;
 		}
 		&.active::before{
-			border-left-width: 5px;
+			border-left-width: $cursorWidth;
+			left:-$cursorWidth;
 		}
 	}
 	& > pre{
 		overflow-y: visible;
 	}
 	& > pre, & > blockquote{
-		margin-left:3px;
+		$preQuoteMargin: 3px;
+
+
+		margin-left: $preQuoteMargin;
 
 		&::before{
-			left: -8px;
+			left: -$preQuoteMargin;
+		}
+		&.active::before{
+			left: -($cursorWidth + $preQuoteMargin);
 		}
 	}
 	& > ul li{

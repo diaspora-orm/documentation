@@ -1,13 +1,15 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { NgxMdComponent } from 'ngx-md';
+import { NgxMdComponent, NgxMdService } from 'ngx-md';
 import { ActivatedRoute } from '@angular/router';
 
+import * as _ from 'lodash';
 
-
-function scrollIt( target: HTMLElement | Window, destination: {
+interface IScrollDest{
 	top?: number;
 	left?: number;
-},                 duration = 500 ) {
+}
+
+const  scrollIt = ( target: HTMLElement | Window, destination: IScrollDest, duration = 500 ) => {
 	const start = target instanceof HTMLElement ? {
 		top: target.scrollTop,
 		left: target.scrollLeft,
@@ -82,7 +84,7 @@ function scrollIt( target: HTMLElement | Window, destination: {
 
 		scroll();
 	} );
-}
+};
 
 const SCROLL_COOLDOWN = 500;
 
@@ -354,7 +356,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	public constructor( private el: ElementRef, private activatedRoute: ActivatedRoute ) {
+	public constructor( private el: ElementRef, private activatedRoute: ActivatedRoute, private markdown: NgxMdService ) {
 		this.activatedRoute.params.subscribe( data => {
 			this.tutoIdentifier = data.tutoName;
 		} );
@@ -385,6 +387,22 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		this.mute = localStorage.getItem( MUTE_STORAGE_KEY ) === 'yes';
 		this.sectionIndex = -1;
 		this.autoPlay = false;
+
+		this.markdown.renderer.link = ( href: string, title: string, text: string ) => {
+			const isBlankTarget = href[0] === '!';
+			const attrs = {
+				title,
+				href: isBlankTarget ? href.slice( 1 ) : href,
+				target: isBlankTarget ? '_blank' : undefined,
+			};
+			const attrsStr = _.chain( attrs )
+			.omitBy( _.isNil )
+			.toPairs()
+			.map( kv => `${kv[0]}="${kv[1]}"` )
+			.join( ' ' )
+			.value();
+			return `<a ${attrsStr}>${text}</a>`;
+		};
 	}
 
 	public async ngAfterViewInit() {
