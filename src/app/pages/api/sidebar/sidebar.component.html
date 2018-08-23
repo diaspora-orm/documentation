@@ -5,6 +5,6 @@
 		</ul>
 	</article>
 	<footer>
-		<button [ngClass]="{pressed: searchOnlyExported}" (click)="searchOnlyExported = !searchOnlyExported">Only exported</button>
+		<button [ngClass]="{'button-outline': onlyExported}" (click)="toggleExported()">Only exported</button>
 	</footer>
 </aside>

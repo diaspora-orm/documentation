@@ -5,14 +5,24 @@
 
 $color-primary: $c1light;
 $color-secondary: $c1dark;
-@import'../../node_modules/milligram/src/milligram.sass';
+@import '../../node_modules/milligram-sass/src/milligram.sass';
 
+// Milligram override recalls
+.button.button-outline, button.button-outline, input[type='button'].button-outline, input[type='reset'].button-outline, input[type='submit'].button-outline {
+	background-color: transparent;
+	color: $color-primary;
+}
+// Miligram overrides
+$linkTransitionDuration: 0.2s;
+button, .button{
+	transition: $linkTransitionDuration all;
+}
 pre{
 	border-left-color: $c1dark;
 }
 a{
 	color: $c1light;
-	transition: 0.33s color;
+	transition: $linkTransitionDuration color;
 	
 	&:hover{
 		color: $c1dark;
@@ -34,19 +44,6 @@ body{
 }
 
 
-
-// Miligram overrides
-button, .button{
-	transition: 0.3s background-color;
-	
-	&.pressed{
-		background-color: $c1dark;
-
-		&:hover{
-			background-color: $c1light;
-		}
-	}
-}
 
 
 

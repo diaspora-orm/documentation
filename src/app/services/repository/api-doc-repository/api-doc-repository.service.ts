@@ -100,7 +100,7 @@ export class ApiDocRepositoryService {
 		}
 	}
 	
-	public async getTreeData( canonicalPaths: string[] ){
+	public async getTreeData( canonicalPaths: Array<string | number> ){
 		let tree: ITreeData | undefined = undefined;
 		const cache = {} as ITreeCache;
 		for ( let path of canonicalPaths ){

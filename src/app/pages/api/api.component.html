@@ -1,10 +1,8 @@
-<app-sidebar [treeData]="navigation"></app-sidebar>
+<app-sidebar [treeData]="navigation" [(onlyExported)]="onlyExported"></app-sidebar>
 <section class="container">
-	<div *ngIf="isInitialized; then dataTable; else noDataTable">
-	</div>
-	
-	
-	<ng-template #dataTable>
+	<ng-container *ngIf="hasInitialized; then mainBody; else loader">
+	</ng-container>
+	<ng-template #mainBody>
 		<lazy-page>
 			<div class="breadcrumb">
 				<ng-container *ngIf="isSearchMode; then searchBreadcrumb; else symbolsBreadcrumb"></ng-container>
@@ -32,6 +30,11 @@
 				</datalist>-->
 			</header>
 			<section>
+				<!-- Add loader over content-->
+				<ng-container *ngIf="isLoading">
+					<ng-container *ngTemplateOutlet="loader"></ng-container>
+				</ng-container>
+				
 				<ng-container *ngIf="isSearchMode; then blockSearch; else blockContent"></ng-container>
 				
 				<!-- Search results-->
@@ -74,8 +77,10 @@
 			</section>
 		</lazy-page>
 	</ng-template>
-	
-	<ng-template #noDataTable>
+</section>
+
+<ng-template #loader>
+	<div class="loader-bg">
 		<!-- Loader from https://codepen.io/ikoshowa/pen/qOMvpy -->
 		<div class="bookshelf_wrapper" id="loader">
 			<ul class="books_list">
@@ -88,5 +93,5 @@
 			</ul>
 			<div class="shelf"></div>
 		</div>
-	</ng-template>
-</section>
+	</div>
+</ng-template>

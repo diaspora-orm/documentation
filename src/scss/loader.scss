@@ -47,7 +47,7 @@ $delay : $duration/6;
 	&:nth-child(odd){
 		border-color: $c2dark;
 	}
-
+	
 	&.first {
 		top: -140px;
 		height: 140px;
@@ -278,4 +278,21 @@ $delay : $duration/6;
 		transform: translateX(0px) rotateZ(-90deg);
 	}
 	
+}
+
+
+
+
+
+
+// CUSTOMS FOR VARIANTS
+.loader-bg{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: transparentize($bodyColor, 0.2);
+	z-index: 1;
+	pointer-events: all;
 }
