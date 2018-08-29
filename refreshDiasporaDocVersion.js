@@ -13,7 +13,7 @@ try{
 
 	const docFiles = fs.readdirSync(docPath);
 	const matcher = /(\/\*\s*<doc-versions>\s*\*\/)(.*?)(\/\*\s*<\/doc-versions>\s*\*\/)/;
-	const docFilesJson = JSON.stringify(docFiles.map(version => version.replace('.json', '')).sort(compareVersions).reverse());
+	const docFilesJson = JSON.stringify(docFiles.map(version => version.replace('.json', '')).sort(compareVersions).reverse()).replace(/"/g, "'");
 
 	fs.readdirSync(environmentPath).forEach(file => {
 		const envFileContent = fs.readFileSync(path.join(environmentPath, file), 'UTF-8');
