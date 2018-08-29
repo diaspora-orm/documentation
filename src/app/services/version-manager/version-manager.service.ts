@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 
 
 const AUTHORIZE_KEY = 'authorizeUsage';
+
 @Injectable( {
 	providedIn: 'root',
 } )
@@ -20,6 +21,10 @@ export class VersionManagerService implements ICookieDependentService {
 			console.info( 'Disabling LocalStorage for ApiDoc' );
 			localStorage.removeItem( AUTHORIZE_KEY );
 		}
+	}
+
+	public get latest(){
+		return this.version;
 	}
 	
 	public constructor() { }

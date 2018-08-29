@@ -1,11 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 
-/*declare function require(name: string): any;
-import { DiasporaStatic } from '@diaspora/diaspora';
-const Diaspora: DiasporaStatic = require('@diaspora/diaspora/dist/es5/diaspora.standalone.min.js');*/
-
+import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { IOAreaComponent } from './ioarea/ioarea.component';
+
 import { Diaspora } from '@diaspora/diaspora';
 
 @Component( {
@@ -21,6 +19,12 @@ export class IndexComponent implements OnInit {
 	public get storeContent() {
 		return _.get( Diaspora, 'dataSources.mySource.adapter.store.ToDo.items', false );
 	}
+
+	public get latestVersion(){
+		return this.VersionManagerService.latest;
+	}
+
+	public constructor( private VersionManagerService: VersionManagerService ){}
 
 	public ngOnInit() {
 	}
