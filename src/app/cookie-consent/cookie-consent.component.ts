@@ -112,7 +112,7 @@ export class CookieConsentComponent implements AfterViewInit {
 		}
 	}
 	
-	private dismiss(): void {
+	public dismiss(): void {
 		this.transition = this.position === 'top' ? 'topOut' : 'bottomOut';
 	}
 	

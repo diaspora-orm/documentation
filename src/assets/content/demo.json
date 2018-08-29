@@ -44,6 +44,6 @@
         "type":"find"
     },
     {
-        "code": "for(const i in this){delete this[i];}delete Diaspora.models.ToDo; delete Diaspora.dataSources.mySource.adapter.store.ToDo; delete Diaspora.adapters.mySource"
+        "code": "for(const i in this){delete this[i];}delete Diaspora.models.ToDo; delete Diaspora._dataSources.mySource.adapter.store.ToDo"
     }
 ]

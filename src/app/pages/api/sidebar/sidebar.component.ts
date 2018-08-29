@@ -29,7 +29,7 @@ export class SidebarComponent implements OnInit {
 	}
 
 	
-	public toggleExported( event: MouseEvent ) {
+	public toggleExported() {
 		this.onlyExported = !this.onlyExported;
 	}
 	

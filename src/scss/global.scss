@@ -7,11 +7,6 @@ $color-primary: $c1light;
 $color-secondary: $c1dark;
 @import '../../node_modules/milligram-sass/src/milligram.sass';
 
-// Milligram override recalls
-.button.button-outline, button.button-outline, input[type='button'].button-outline, input[type='reset'].button-outline, input[type='submit'].button-outline {
-	background-color: transparent;
-	color: $color-primary;
-}
 // Miligram overrides
 $linkTransitionDuration: 0.2s;
 button, .button{

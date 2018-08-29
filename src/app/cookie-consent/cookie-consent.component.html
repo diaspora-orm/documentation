@@ -1,5 +1,4 @@
 <div class="cookie-law-wrapper"
-[ngStyle]="currentStyles"
 [@transition]="transition"
 (@transition.done)="afterDismissAnimation($event)">
 
@@ -11,7 +10,7 @@
 	
 	<div class="button-group">
 		<button role="button" (click)="applyPreferences()" [innerHTML]="acceptLabel"></button>
-		<button role="button" class="dismiss" (click)="dismiss($event)">Dismiss</button>
+		<button role="button" class="dismiss" (click)="dismiss()">Dismiss</button>
 	</div>
 </div>
 
