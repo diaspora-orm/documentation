@@ -5,7 +5,7 @@
 
 $color-primary: $c1light;
 $color-secondary: $c1dark;
-@import '../../node_modules/milligram-sass/src/milligram.sass';
+@import '~milligram-sass/src/milligram.sass';
 
 // Miligram overrides
 $linkTransitionDuration: 0.2s;
@@ -62,5 +62,29 @@ body{
 	}
 	&.tiny:before{
 		transform: scale(1.5);
+	}
+}
+
+
+
+
+
+
+@import './diff2html';
+
+.d2h-file-diff {
+	overflow-x: unset;
+}
+.d2h-file-wrapper {
+	padding-left: 0!important;
+}
+.d2h-diff-table{
+	margin: 0;
+
+	td{
+/*		height: 1rem;
+		line-height: 1rem;
+		white-space: pre-wrap;*/
+		padding: 0;
 	}
 }

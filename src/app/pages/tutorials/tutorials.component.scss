@@ -5,8 +5,8 @@ $progress-color: $c1light;
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
-    padding-top: $reducedHeaderHeight;
-    transition: 0.5s padding-top;
+	padding-top: $reducedHeaderHeight;
+	transition: 0.5s padding-top;
 }
 
 #toggle-text{
@@ -331,35 +331,44 @@ $cursorWidth: 5px;
 		position: relative;
 		padding-left: $cursorWidth;
 		
+		$transitionDuration: 0.25s;
 		&::before{
 			content: "";
 			top: 0;
 			bottom: 0;
 			left: 0;
 			position: absolute;
-			transition: 0.5s border-left-width, 0.5s left;
+			transition:
+				$transitionDuration border-left-width,
+				$transitionDuration left,
+				$transitionDuration opacity;
 			border-left: 0 solid $progress-color;
+			opacity: 0;
 		}
 		&.active::before{
 			border-left-width: $cursorWidth;
 			left:-$cursorWidth;
+			opacity: 1;
 		}
 	}
 	& > pre{
 		overflow-y: visible;
 	}
+	
+	$preQuoteMargin: 3px;
 	& > pre, & > blockquote{
-		$preQuoteMargin: 3px;
-
-
 		margin-left: $preQuoteMargin;
-
+		
 		&::before{
 			left: -$preQuoteMargin;
 		}
 		&.active::before{
 			left: -($cursorWidth + $preQuoteMargin);
 		}
+	}
+	blockquote{
+		margin: 0 0 10px $preQuoteMargin;
+		padding: 5px;
 	}
 	& > ul li{
 		margin-bottom: 0;
