@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment.dev';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Title } from '@angular/platform-browser';
@@ -9,6 +10,8 @@ import { Title } from '@angular/platform-browser';
 } )
 export class AppComponent {
 	private title = 'app';
+
+	public tutorials = environment.tutorials;
 
 	public constructor( private el: ElementRef, private titleService: Title ) {
 		this.doScroll();

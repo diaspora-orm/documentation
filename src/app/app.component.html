@@ -1,13 +1,16 @@
 <nav id="header">
-	<menu>
-		<menuitem><a href="/api">API</a></menuitem>
+	<ul>
+		<li><a href="/api">API</a></li>
 
-		<menuitem id="logoLink"><a href="/"><img src="/assets/images/logo.svg" /></a></menuitem>
+		<li id="logoLink"><a href="/"><img src="/assets/images/logo.svg" /></a></li>
 
-		<menuitem><a href="/tutorials"><span>Tutorials</span></a></menuitem>
-		<menuitem><a href="/tutorials/simple-todo-app"><span>Simple ToDo app</span></a></menuitem>
-		<menuitem><a href="/tutorials/fullstack-diaspora"><span>Fullstack Diaspora integration</span></a></menuitem>
-	</menu>
+		<li>
+			<a href="/tutorials"><span>Tutorials</span></a>
+			<ul>
+				<li *ngFor="let pair of tutorials | pairs"><a [href]="'/tutorials/' + pair.key">{{pair.value}}</a></li>
+			</ul>
+		</li>
+	</ul>
 </nav>
 <router-outlet></router-outlet>
 <app-cookie-consent></app-cookie-consent>

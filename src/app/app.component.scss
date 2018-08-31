@@ -9,8 +9,13 @@ nav{
 	right: 0;
 	z-index: 2;
 	transition: height $headerCollapseTime;
-
-	menu {
+	
+	> ul > li{
+		&:first-child{
+			background-color: $c2dark;
+		}
+	}
+	ul {
 		flex: 1 1 100%;
 		padding: 0;
 		margin: 0;
@@ -18,30 +23,28 @@ nav{
 		transition: padding $headerCollapseTime, margin $headerCollapseTime, background-color $headerCollapseTime;
 		font-weight: 800;
 		font-size: 1.5em;
-
+		
 		a {
 			color: $bodyColor;
 		}
-
-		menuitem{
+		
+		li{
 			flex: 1 1 auto;
-
+			margin: 0;
+			
 			background-color: $c1light;
-
-			&:first-child{
-				background-color: $c2dark;
-			}
+			
 			&#logoLink{
 				background: linear-gradient(to right, $c2dark 0%,$c1light 100%);
 				flex: 0 0 auto;
-
+				
 				img{
 					width: $normalHeaderHeight;
 					height: $normalHeaderHeight;
 					transition: width $headerCollapseTime, height $headerCollapseTime;
 				}
 			}
-
+			
 			&, a{
 				flex: 1 1 auto;
 				display: flex;
@@ -58,14 +61,14 @@ nav{
 	display: block;
 	padding-top: $normalHeaderHeight;
 	transition: padding-top $headerCollapseTime;
-  flex: 1 1 100%;
-  display: flex;
-  flex-direction: column;
+	flex: 1 1 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 :host:not(.attop){
 	padding-top: $reducedHeaderHeight;
-
+	
 	nav{
 		height: $reducedHeaderHeight;
 		#logoLink img {

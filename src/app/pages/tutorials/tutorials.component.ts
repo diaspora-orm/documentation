@@ -198,8 +198,8 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 	@ViewChild( 'fullScreenButton' ) private fullScreenButton?: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'muteButton' ) private muteButton?: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'presentation' ) private presentation?: ElementRef<HTMLElement>;
-	private sections: HTMLElement[];
-	public tutoIdentifier: string | null = null;
+	private sections: HTMLElement[] = [];
+	public tutoIdentifier!: string;
 	private allowScroll = true;
 	private currentSpeechSynthesis: CustomSynthesis | null = null;
 
