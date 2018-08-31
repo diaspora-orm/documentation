@@ -1,7 +1,7 @@
-import { environment } from './../../../environments/environment';
 import { ICookieDependentService } from './../../ICookieDependentService';
 import { Injectable } from '@angular/core';
 
+import { environment } from './../../../environments/environment.dev';
 
 const AUTHORIZE_KEY = 'authorizeUsage';
 

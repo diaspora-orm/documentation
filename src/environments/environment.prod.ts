@@ -1,5 +1,6 @@
-export const environment = {
-  production: true,
-  googleAnalyticsKey: 'UA-61219056-7',
-  docsVersions: /* <doc-versions> */['0.3.0-alpha.13']/* </doc-versions> */,
-};
+import { commonEnvironment } from './environment';
+
+export const environment = Object.assign( commonEnvironment, {
+	production: true,
+	googleAnalyticsKey: 'UA-61219056-7',
+} );
