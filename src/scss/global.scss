@@ -72,19 +72,50 @@ body{
 
 @import './diff2html';
 
+$linenumWidth: 30px;
+$linenumPadd: 3px;
+$whitespaceWidth: 10px;
+td.d2h-code-linenumber{
+	width: 2*$linenumWidth + 2*$linenumPadd + $whitespaceWidth;
+	padding: 0 $linenumPadd;
+	position: static;
+	//display: block;
+	white-space: nowrap;
+	vertical-align: top;
+	
+	> div{
+		width: $linenumWidth;
+		padding: 0;
+		float: none;
+		display: inline-block;
+		vertical-align: text-bottom;
+	}
+}
+
 .d2h-file-diff {
-	overflow-x: unset;
+	overflow-x: hidden;
 }
 .d2h-file-wrapper {
 	padding-left: 0!important;
 }
 .d2h-diff-table{
 	margin: 0;
-
-	td{
-/*		height: 1rem;
-		line-height: 1rem;
-		white-space: pre-wrap;*/
+	
+	> tr > td{
+		height: auto;
 		padding: 0;
+	}
+}
+.d2h-code-line-ctn {
+	white-space: pre-wrap;
+}
+.d2h-code-line {
+	margin-left: 0;
+	padding: 0;
+	white-space: unset;
+}
+td{
+	&.d2h-info, &.d2h-cntx, &.d2h-ins, &.d2h-del{
+		padding: 0 $linenumPadd;
 	}
 }
