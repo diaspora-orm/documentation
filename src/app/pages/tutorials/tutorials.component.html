@@ -1,5 +1,6 @@
 
 <figure>
+	<app-outliner></app-outliner>
 	<figcaption #scroller (mousewheel)="handleScroll($event)">
 		
 		<ngx-md [path]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></ngx-md>

@@ -25,6 +25,7 @@ import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 import { TypeComponent } from './pages/api/symbol/type/type.component';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { SectionComponent } from './pages/api/sidebar/section/section.component';
+import { OutlinerComponent } from './pages/tutorials/outliner/outliner.component';
 
 @NgModule( {
 	declarations: [
@@ -44,6 +45,7 @@ import { SectionComponent } from './pages/api/sidebar/section/section.component'
 		TypeComponent,
 		CookieConsentComponent,
 		SectionComponent,
+		OutlinerComponent,
 	],
 	imports: [
 		BrowserModule,
