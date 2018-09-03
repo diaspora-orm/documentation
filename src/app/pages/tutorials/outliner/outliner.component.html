@@ -1,3 +1,10 @@
-<p>
-  outliner works!
-</p>
+<ng-container *ngTemplateOutlet="headingTreeTemplate;context:{items:headingTree}"></ng-container>
+
+<ng-template #headingTreeTemplate let-items="items">
+	<ul *ngIf="items">
+		<li *ngFor="let item of items">
+			<a [routerLink]="['.']" [fragment]="item.link" [innerHTML]="buildHeading(item)"></a>
+			<ng-container *ngTemplateOutlet="headingTreeTemplate;context:{items:item.children}"></ng-container>
+		</li>
+	</ul>
+</ng-template>

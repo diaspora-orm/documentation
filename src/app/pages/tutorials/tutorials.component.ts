@@ -1,8 +1,12 @@
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { NgxMdComponent, NgxMdService } from 'ngx-md';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import * as _ from 'lodash';
+import { OutlinerComponent } from './outliner/outliner.component';
+import { MatSidenavContainer } from '@angular/material';
+import { AHeaderSizedComponent } from '../../header-sized-component';
+import { SassVarService } from '../../services/sass-var/sass-var.service';
 
 interface IScrollDest{
 	top?: number;
@@ -188,16 +192,18 @@ const MUTE_STORAGE_KEY = 'muted';
 	templateUrl: './tutorials.component.html',
 	styleUrls: ['./tutorials.component.scss'],
 } )
-export class TutorialsComponent implements OnInit, AfterViewInit {
-	@ViewChild( NgxMdComponent ) private tutoComponent?: NgxMdComponent;
-	@ViewChild( 'scroller' ) private scroller?: ElementRef<HTMLElement>;
-	@ViewChild( 'progress' ) private progress?: ElementRef<HTMLProgressElement>;
-	@ViewChild( 'cursor' ) private cursor?: ElementRef<HTMLElement>;
-	@ViewChild( 'autoPlayButton' ) private autoPlayButton?: ElementRef<HTMLButtonElement>;
-	@ViewChild( 'playButton' ) private playButton?: ElementRef<HTMLButtonElement>;
-	@ViewChild( 'fullScreenButton' ) private fullScreenButton?: ElementRef<HTMLButtonElement>;
-	@ViewChild( 'muteButton' ) private muteButton?: ElementRef<HTMLButtonElement>;
-	@ViewChild( 'presentation' ) private presentation?: ElementRef<HTMLElement>;
+export class TutorialsComponent extends AHeaderSizedComponent implements OnInit, AfterViewInit {
+	@ViewChild( MatSidenavContainer ) public sidenavContainer!: MatSidenavContainer;
+	@ViewChild( OutlinerComponent ) private outliner!: OutlinerComponent;
+	@ViewChild( NgxMdComponent ) private tutoComponent!: NgxMdComponent;
+	@ViewChild( 'scroller' ) private scroller!: ElementRef<HTMLElement>;
+	@ViewChild( 'progress' ) private progress!: ElementRef<HTMLProgressElement>;
+	@ViewChild( 'cursor' ) private cursor!: ElementRef<HTMLElement>;
+	@ViewChild( 'autoPlayButton' ) private autoPlayButton!: ElementRef<HTMLButtonElement>;
+	@ViewChild( 'playButton' ) private playButton!: ElementRef<HTMLButtonElement>;
+	@ViewChild( 'fullScreenButton' ) private fullScreenButton!: ElementRef<HTMLButtonElement>;
+	@ViewChild( 'muteButton' ) private muteButton!: ElementRef<HTMLButtonElement>;
+	@ViewChild( 'presentation' ) private presentation!: ElementRef<HTMLElement>;
 	private sections: HTMLElement[] = [];
 	public tutoIdentifier!: string;
 	private allowScroll = true;
@@ -208,7 +214,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		return this.sectionIndex >= 0 ? this.sections[this.sectionIndex] : null;
 	}
 	private get tutoContent() {
-		return this.tutoComponent ? ( ( this.tutoComponent as any )._el as ElementRef<HTMLElement> ) : null;
+		return ( this.tutoComponent as any )._el as ElementRef<HTMLElement>;
 	}
 
 
@@ -227,6 +233,10 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 			},          SCROLL_COOLDOWN );
 
 			console.log( `Changing slide from ${ this.sectionIndex } to ${ index }` );
+
+			if ( index === 0 || this.sectionIndex === 0 ){
+				this.el.nativeElement.dispatchEvent( new CustomEvent( 'atTopEnabled', {bubbles: true, detail: index === 0} ) );
+			}
 
 			/*const wasAutoPlaying = this.autoPlay;
 			// Prevent autoplay if scrolling back
@@ -259,7 +269,7 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 
 			// Finalize
 			if ( this.target ) {
-				location.hash = this.target.id;
+				this.router.navigate( [this.target.id] );
 			}
 		}
 	}
@@ -356,7 +366,18 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	public constructor( private el: ElementRef, private activatedRoute: ActivatedRoute, private markdown: NgxMdService ) {
+	public get footerHeight(){
+		return this.sassVar.getNumeric( 'footer-height', this.el.nativeElement );
+	}
+
+	public constructor(
+		private el: ElementRef<HTMLElement>,
+		private activatedRoute: ActivatedRoute,
+		private markdown: NgxMdService,
+		private router: Router,
+		sassVar: SassVarService
+	 ) {
+		super( sassVar );
 		this.activatedRoute.params.subscribe( data => {
 			this.tutoIdentifier = data.tutoName;
 		} );
@@ -369,18 +390,20 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		(element.parentElement ? element.parentElement.scrollTop : 0)*/;
 	}
 
-	private async getSections() {
-		if ( this.tutoContent ) {
-			let childNodes = this.tutoContent.nativeElement.childNodes;
-			while ( childNodes.length === 0 ) {
-				await new Promise( resolve => setTimeout( resolve, 10 ) );
-				childNodes = this.tutoContent.nativeElement.childNodes;
-			}
-			this.sections = Array
+	private async awaitTutoContentInitialized(){
+		let childNodes = this.tutoContent.nativeElement.childNodes;
+		while ( childNodes.length === 0 ) {
+			await new Promise( resolve => setTimeout( resolve, 0 ) );
+			childNodes = this.tutoContent.nativeElement.childNodes;
+		}
+	}
+	
+	private getSections() {
+		const childNodes = this.tutoContent.nativeElement.childNodes;
+		this.sections = Array
 			.from( childNodes )
 			.filter( element => element instanceof HTMLElement ) as HTMLElement[];
-			console.log( 'sections:', this.sections );
-		}
+		console.log( 'sections:', this.sections );
 	}
 
 	public async ngOnInit() {
@@ -406,7 +429,14 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 	}
 
 	public async ngAfterViewInit() {
-		await this.getSections();
+		await this.awaitTutoContentInitialized();
+		this.sidenavContainer.autosize = true;
+		this.getSections();
+		this.resetTutorialContentIds();
+		this.outliner.tutoContentSet.next( this.tutoComponent );
+		setTimeout( () => {
+			this.sidenavContainer.autosize = false;
+		},          500 );
 	}
 
 	private refreshScollAndCursor( target: HTMLElement | null ) {
@@ -426,9 +456,11 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	public handleScroll( event: MouseWheelEvent ) {
+	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
 		event.preventDefault();
-		const delta = event.wheelDelta / 120;
+		const delta = event.type === 'wheel' ?
+			- event.deltaY :
+			event.wheelDelta / 120;
 		if ( delta >= SectionChange.Next ) {
 			if ( this.sectionIndex > 0 ) {
 				this.autoPlay = false;
@@ -447,5 +479,32 @@ export class TutorialsComponent implements OnInit, AfterViewInit {
 			}
 		}
 		return false;
+	}
+
+	private resetTutorialContentIds(){
+		const sectionIndexes: number[] = [];
+		let notHeadingIndex = 0;
+		this.sections.forEach( section => {
+			if ( section instanceof HTMLHeadingElement ){
+				notHeadingIndex = 0;
+				const headingLevel = parseInt( section.tagName.slice( 1 ) ) - 1;
+				if ( headingLevel === 0 ){
+					return;
+				}
+				if ( sectionIndexes.length < headingLevel ){
+					sectionIndexes.push( 1 );
+				} else if ( sectionIndexes.length > headingLevel ){
+					sectionIndexes.pop();
+				} else {
+					sectionIndexes[sectionIndexes.length - 1]++;
+				}
+				console.log( sectionIndexes );
+
+				section.id = `${( sectionIndexes.join( '-' ) )}>${section.innerText}`;
+			} else {
+				notHeadingIndex++;
+				section.id = `${( sectionIndexes.join( '-' ) )}:${notHeadingIndex}`;
+			}
+		} );
 	}
 }

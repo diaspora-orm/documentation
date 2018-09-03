@@ -7,6 +7,13 @@ $color-primary: $c1light;
 $color-secondary: $c1dark;
 @import '~milligram-sass/src/milligram.sass';
 
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+
+body{
+	@include define-custom-property('reduced-header-height', $reducedHeaderHeight);
+	@include define-custom-property('normal-header-height', $normalHeaderHeight);
+}
 // Miligram overrides
 $linkTransitionDuration: 0.2s;
 button, .button{
@@ -38,6 +45,11 @@ body{
 	flex-direction: column;
 }
 
+
+
+.topFixed{
+	transition: top $headerCollapseTime;
+}
 
 
 

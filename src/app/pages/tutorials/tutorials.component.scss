@@ -1,13 +1,20 @@
 @import '../../../scss/vars.scss';
 
 $progress-color: $c1light;
-:host {
-	display: flex;
+$footer-height: 70px;
+:host{
+	@include define-custom-property('footer-height', $footer-height);
+
+	height: calc(100vh - #{$reducedHeaderHeight});
+    display: flex;
 	flex-direction: column;
-	height: 100vh;
-	padding-top: $reducedHeaderHeight;
-	transition: 0.5s padding-top;
+	transition: $headerCollapseTime height;
 }
+:host-context(.attop){
+	height: calc(100vh - #{$normalHeaderHeight});
+}
+/*:host {
+}*/
 
 #toggle-text{
 	position: absolute;
@@ -91,6 +98,7 @@ figure{
 	flex-direction: row;
 	justify-content: stretch;
 	flex: 1 1 100%;
+	overflow-x: hidden;
 }
 
 
@@ -103,6 +111,7 @@ figure{
 	box-shadow: -2px 0 5px 1px #333;
 }
 .player-buttons{
+	flex: 1 0 auto;
 	display: inline-flex;
 	flex-direction: row;
 	justify-content: space-around;
@@ -119,7 +128,7 @@ figure{
 	background-color: $c1light;
 	border-color: $c1dark;
 	transition: all 0.5s;
-	margin: 0.5rem;
+	margin: 0 0.5rem;
 	text-align: center;
 	flex: 0 0 1em;
 	
@@ -130,11 +139,16 @@ figure{
 }
 footer {
 	background-color: $c2dark;
-	//    padding: 0.3rem;
 	color: #ddd;
-	//	padding: $meter-height + $foot-padding $foot-padding $foot-padding;
 	text-align: center;
 	line-height: 1rem;
+	flex: 0 0 $footer-height;
+
+
+	display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+	align-items: center;
 }
 
 
@@ -161,6 +175,7 @@ footer {
 /* Styling an indeterminate progress bar */
 
 progress{
+	flex: 0 0 auto;
 	cursor: pointer;
 	margin: 0;
 	
@@ -280,7 +295,6 @@ progress{
 			-moz-linear-gradient( left, $c1light, $c1dark);
 		}
 	}
-	
 }
 
 /* Fallback technique styles */
@@ -302,7 +316,6 @@ progress{
 }
 
 p[data-value] { 
-	
 	position: relative; 
 	
 	/* The percentage will automatically fall in place as soon as we make the width fluid. Now making widths fluid. */
@@ -373,4 +386,8 @@ $cursorWidth: 5px;
 	& > ul li{
 		margin-bottom: 0;
 	}
+}
+
+mat-sidenav{
+	width: 350px;
 }

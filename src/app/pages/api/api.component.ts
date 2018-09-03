@@ -1,7 +1,8 @@
+import { SassVarService } from './../../services/sass-var/sass-var.service';
 import { ApiDocRepositoryService, ITreeData, ISymbolAndChildren } from './../../services/repository/api-doc-repository/api-doc-repository.service';
 import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { SymbolKind } from './../../types/typedoc/typedoc';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit, NgZone, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit, NgZone, EventEmitter, Output, Input, HostBinding } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 
@@ -11,6 +12,8 @@ import { Entity, Set } from '@diaspora/diaspora';
 import { ApiDocService, symbolLabel, ISymbolDef } from '../../services/api-doc/api-doc.service';
 import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 import { resolve } from 'url';
+import { HostListener } from '@angular/core';
+import { AHeaderSizedComponent } from '../../header-sized-component';
 
 
 enum ESearchCriterionReady{
@@ -25,7 +28,7 @@ enum ESearchCriterionReady{
 	styleUrls: ['./api.component.scss'],
 	providers: [PairsPipe],
 } )
-export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
+export class ApiComponent extends AHeaderSizedComponent implements OnInit, AfterViewInit, AfterContentInit {
 	@ViewChild( 'breadcrumb' ) public breadcrumb?: ElementRef<HTMLElement>;
 	@ViewChild( 'searchInput' ) public searchInput?: ElementRef<HTMLInputElement>;
 	
@@ -92,7 +95,10 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		}
 	}
 	
+	private logoLink!: HTMLElement;
 	
+	@HostBinding( 'style.padding-left' )
+	public docPadLeft = '0px';
 	
 	
 	
@@ -154,8 +160,11 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 		private ApiDoc: ApiDocService,
 		private pairs: PairsPipe,
 		private versionManager: VersionManagerService,
-		private zone: NgZone
-	) {}
+		private zone: NgZone,
+		sassVar: SassVarService
+	) {
+		super( sassVar );
+	}
 	
 	private async onSearchBarChange( event: KeyboardEvent ) {
 		if ( !event.target || !( event.target instanceof HTMLInputElement ) ) {
@@ -182,12 +191,6 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 	}
 	
 	public ngOnInit() {
-		console.log( 'Reseting prompt' );
-		if ( this.searchInput ) {
-			this.searchInput.nativeElement.value = '';
-		}
-		this.seachedString = '';
-		
 		// Initialize the data store. On the end of the promise, the data is inserted in the data store.
 		this.ApiDoc.loadData()
 		.then( () => {
@@ -203,9 +206,6 @@ export class ApiComponent implements OnInit, AfterViewInit, AfterContentInit {
 					this.symbolId = 0;
 				}
 				console.log( 'Reseting prompt' );
-				if ( this.searchInput ) {
-					this.searchInput.nativeElement.value = '';
-				}
 				this.seachedString = '';
 			} );
 		} );

@@ -1,19 +1,26 @@
 
 <figure>
-	<app-outliner></app-outliner>
-	<figcaption #scroller (mousewheel)="handleScroll($event)">
-		
-		<ngx-md [path]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></ngx-md>
-		
-		<i id="cursor" #cursor></i>
-	</figcaption>
-	<div id="resize-handle">
-		<div id="toggle-text"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
-	</div>
-	<!--<img width="400" height="400" src=""/>-->
-	<div id="canvas-container">
-		<div id="canvas" #presentation></div>
-	</div>
+	<mat-sidenav-container>
+		<!-- TODO: use better define fixedBottomGap -->
+		<mat-sidenav mode="side" opened fixedInViewport="true" [fixedTopGap]="headerHeight" [fixedBottomGap]="footerHeight" class="topFixed">
+			<app-outliner></app-outliner>
+		</mat-sidenav>
+		<mat-sidenav-content>
+			<figcaption #scroller (mousewheel)="handleScroll($event)" (DOMMouseWheel)="handleScroll($event)" (wheel)="handleScroll($event)">
+				
+				<ngx-md [path]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></ngx-md>
+				
+				<i id="cursor" #cursor></i>
+			</figcaption>
+			<div id="resize-handle">
+				<div id="toggle-text"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+			</div>
+			<!--<img width="400" height="400" src=""/>-->
+			<div id="canvas-container">
+				<div id="canvas" #presentation></div>
+			</div>
+		</mat-sidenav-content>
+	</mat-sidenav-container>
 </figure>
 <footer>
 	<progress max="100" value="0" #progress>
@@ -23,9 +30,45 @@
 		</div>
 	</progress>
 	<div class="player-buttons">
-		<button #autoPlayButton   title="Toggle auto-play" class="player-button" (click)="autoPlay   = !autoPlay  "><i class="fa"               aria-hidden="true" aria-label="Toggle auto-play"></i></button>
-		<button #playButton       title="Toggle play"      class="player-button" (click)="isPlaying  = !isPlaying "><i class="fa"               aria-hidden="true" aria-label="Toggle play"     ></i></button>
-		<button #fullScreenButton title="Go fullscreen"    class="player-button" (click)="fullscreen = !fullscreen"><i class="fa fa-arrows-alt" aria-hidden="true" aria-label="Toggle auto-play"></i></button>
-		<button #muteButton       title="Toggle sound"     class="player-button" (click)="mute       = !mute      "><i class="fa"               aria-hidden="true" aria-label="Toggle sound"    ></i></button>
+		<button
+			#autoPlayButton
+			title="Toggle auto-play"
+			class="player-button"
+			(click)="autoPlay = !autoPlay">
+			<i
+				class="fa"
+				aria-hidden="true"
+				aria-label="Toggle auto-play"></i>
+		</button>
+		<button
+			#playButton
+			title="Toggle play"
+			class="player-button"
+			(click)="isPlaying = !isPlaying">
+			<i
+				class="fa"
+				aria-hidden="true"
+				aria-label="Toggle play"></i>
+		</button>
+		<button
+			#fullScreenButton
+			title="Go fullscreen"
+			class="player-button"
+			(click)="fullscreen = !fullscreen">
+			<i
+				class="fa fa-arrows-alt"
+				aria-hidden="true"
+				aria-label="Toggle auto-play"></i>
+		</button>
+		<button
+			#muteButton
+			title="Toggle sound"
+			class="player-button"
+			(click)="mute = !mute">
+			<i
+				class="fa"
+				aria-hidden="true"
+				aria-label="Toggle sound"></i>
+		</button>
 	</div>
 </footer>

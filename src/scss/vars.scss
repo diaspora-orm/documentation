@@ -12,3 +12,18 @@ $bodyColor: #ddd;
 $dark: #606c76;
 
 $headerCollapseTime: 0.5s;
+
+
+
+
+$prefix: "--"; //Prefix string for custom CSS properties
+
+//Merges a variable name with $prefix
+@function custom-property-name($name) {
+    @return $prefix + $name;
+}
+
+// Defines a custom property
+@mixin define-custom-property($name, $value) {
+    #{custom-property-name($name)}: $value;
+}

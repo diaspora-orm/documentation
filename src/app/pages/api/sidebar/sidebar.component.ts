@@ -1,5 +1,7 @@
-import { ITreeData } from './../../../services/repository/api-doc-repository/api-doc-repository.service';
 import { Component, OnInit, HostListener, HostBinding, Input, EventEmitter, Output } from '@angular/core';
+
+import { ITreeData } from './../../../services/repository/api-doc-repository/api-doc-repository.service';
+import { AHeaderSizedComponent } from '../../../header-sized-component';
 
 @Component( {
 	selector: 'app-sidebar',
@@ -9,12 +11,10 @@ import { Component, OnInit, HostListener, HostBinding, Input, EventEmitter, Outp
 export class SidebarComponent implements OnInit {
 	@Input() public treeData?: ITreeData;
 	
-	
-	private header: HTMLElement | null = null;
-	private logoLink: HTMLElement | null = null;
+	private logoLink!: HTMLElement;
 	
 	
-	@HostBinding( 'style.flex-basis' )
+	@HostBinding( 'style.width' )
 	public width?: string;
 
 	private _onlyExported = true;
@@ -33,27 +33,21 @@ export class SidebarComponent implements OnInit {
 		this.onlyExported = !this.onlyExported;
 	}
 	
-	public constructor() { }
-	
 	public ngOnInit() {
-		this.header = document.querySelector<HTMLElement>( '#header' );
-		if ( this.header ){
-			this.logoLink = this.header.querySelector<HTMLElement>( '#logoLink' );
-			this.resize();
+		const logoLink = document.querySelector<HTMLElement>( '#logoLink' );
+		if ( !logoLink ){
+			throw new Error( 'Unable to find the logo link' );
 		}
+		this.logoLink = logoLink;
+
+		this.onResize();
 	}
 	
-	@HostListener( 'document:scroll' )
-	@HostListener( 'window:resize' )
-	private resize( timeout = true ){
-		if ( !this.header || !this.logoLink ){
-			this.width = undefined;
-			return;
-		}
+	protected onResize( timeout = true ){
 		this.width = `${( this.logoLink.clientWidth * 4 / 6 ) + ( this.logoLink.getBoundingClientRect().left )}px`;
 		if ( timeout ){
 			setTimeout( () => {
-				this.resize( false );
+				this.onResize( false );
 			},          500 );
 		}
 	}

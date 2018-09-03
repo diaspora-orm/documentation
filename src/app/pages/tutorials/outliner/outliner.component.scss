@@ -1,0 +1,25 @@
+ul{
+	list-style-type: none;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+
+
+$headingSizes: (
+"1": 1.5,
+"2": 1.375,
+"3": 1.25,
+"4": 1.125,
+"5": 1,
+"6": 0.875
+);
+
+:host ::ng-deep{
+	@each $headingLevel, $sizeFactor in $headingSizes {
+		h#{$headingLevel} {
+			font-size: $sizeFactor * 1.5rem;
+			margin-bottom: 5px;
+		}
+	}
+}
