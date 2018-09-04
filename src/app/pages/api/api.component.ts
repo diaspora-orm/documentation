@@ -1,4 +1,4 @@
-import { SassVarService } from './../../services/sass-var/sass-var.service';
+import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
 import { ApiDocRepositoryService, ITreeData, ISymbolAndChildren } from './../../services/repository/api-doc-repository/api-doc-repository.service';
 import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { SymbolKind } from './../../types/typedoc/typedoc';
@@ -161,9 +161,9 @@ export class ApiComponent extends AHeaderSizedComponent implements OnInit, After
 		private pairs: PairsPipe,
 		private versionManager: VersionManagerService,
 		private zone: NgZone,
-		sassVar: SassVarService
+		headSizer: HeadSizerService
 	) {
-		super( sassVar );
+		super( headSizer );
 	}
 	
 	private async onSearchBarChange( event: KeyboardEvent ) {

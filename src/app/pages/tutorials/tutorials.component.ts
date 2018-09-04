@@ -1,3 +1,4 @@
+import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { NgxMdComponent, NgxMdService } from 'ngx-md';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -235,7 +236,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			console.log( `Changing slide from ${ this.sectionIndex } to ${ index }` );
 
 			if ( index === 0 || this.sectionIndex === 0 ){
-				this.el.nativeElement.dispatchEvent( new CustomEvent( 'atTopEnabled', {bubbles: true, detail: index === 0} ) );
+				this.headSizer.atTopEnabled = index === 0;
 			}
 
 			/*const wasAutoPlaying = this.autoPlay;
@@ -269,7 +270,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 
 			// Finalize
 			if ( this.target ) {
-				this.router.navigate( [this.target.id] );
+				this.router.navigate( [], {fragment: this.target.id} );
 			}
 		}
 	}
@@ -375,9 +376,10 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		private activatedRoute: ActivatedRoute,
 		private markdown: NgxMdService,
 		private router: Router,
-		sassVar: SassVarService
+		private sassVar: SassVarService,
+		headSizer: HeadSizerService
 	 ) {
-		super( sassVar );
+		super( headSizer );
 		this.activatedRoute.params.subscribe( data => {
 			this.tutoIdentifier = data.tutoName;
 		} );
