@@ -226,14 +226,14 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			return;
 		}
 		if ( this.allowScroll ) {
-			scrollIt( window, { top: Infinity}, 500 );
+			//scrollIt( window, { top: Infinity}, 500 );
 			// Set a timeout before which we won't be able to trigger a second scroll
 			this.allowScroll = false;
 			setTimeout( () => {
 				this.allowScroll = true;
 			},          SCROLL_COOLDOWN );
 
-			console.log( `Changing slide from ${ this.sectionIndex } to ${ index }` );
+			//console.info( `Changing slide from ${ this.sectionIndex } to ${ index }` );
 
 			if ( index === 0 || this.sectionIndex === 0 ){
 				this.headSizer.atTopEnabled = index === 0;
@@ -386,6 +386,13 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		this.sections = [];
 	}
 
+	private gotoFragment( fragment: string ){
+		const sectionIndex = _.findIndex( this.sections, section => section.id === fragment );
+		if ( sectionIndex < 0 ){
+			throw new Error( `Could not find section with fragment "${fragment}"` );
+		}
+		this.sectionIndex = sectionIndex;
+	}
 	private static getVMiddle( element: HTMLElement ) {
 		return element.offsetTop +
 		( element.offsetHeight / 2 )/* +
@@ -410,7 +417,6 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 
 	public async ngOnInit() {
 		this.mute = localStorage.getItem( MUTE_STORAGE_KEY ) === 'yes';
-		this.sectionIndex = -1;
 		this.autoPlay = false;
 
 		this.markdown.renderer.link = ( href: string, title: string, text: string ) => {
@@ -439,6 +445,11 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		setTimeout( () => {
 			this.sidenavContainer.autosize = false;
 		},          500 );
+
+		// Load fragment 
+		this.activatedRoute.fragment.subscribe( fragment => {
+			this.gotoFragment( fragment );
+		} );
 	}
 
 	private refreshScollAndCursor( target: HTMLElement | null ) {
@@ -448,14 +459,12 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		this.sections.forEach( element => element.classList.remove( 'active' ) );
 		target.classList.add( 'active' );
 		const targetMiddle = TutorialsComponent.getVMiddle( target );
-		if ( this.cursor ) {
-			this.cursor.nativeElement.style.opacity = '1';
-			this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
-		}
-		if ( this.scroller ) {
-			const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
-			scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
-		}
+
+		this.cursor.nativeElement.style.opacity = '1';
+		this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
+		
+		const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
+		scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
 	}
 
 	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
@@ -500,7 +509,6 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				} else {
 					sectionIndexes[sectionIndexes.length - 1]++;
 				}
-				console.log( sectionIndexes );
 
 				section.id = `${( sectionIndexes.join( '-' ) )}>${section.innerText}`;
 			} else {

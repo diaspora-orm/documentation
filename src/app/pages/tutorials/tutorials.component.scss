@@ -63,6 +63,7 @@ figcaption {
 	position: relative;
 	padding: 0 15px;
 	text-align: justify;
+	max-height: 100%;
 }
 
 $cursor-height:10px;
@@ -390,4 +391,7 @@ $cursorWidth: 5px;
 
 mat-sidenav{
 	width: 350px;
+}
+mat-sidenav-content{
+	overflow: unset;
 }
