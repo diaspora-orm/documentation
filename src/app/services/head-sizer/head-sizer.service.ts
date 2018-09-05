@@ -1,7 +1,7 @@
 import { SassVarService } from './../sass-var/sass-var.service';
 import { BehaviorSubject } from 'rxjs';
 import { fromEvent } from 'rxjs';
-import { Injectable, Inject, HostListener } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 
 @Injectable( {
 	providedIn: 'root',

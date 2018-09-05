@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, HostBinding, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, HostBinding, Input, EventEmitter, Output } from '@angular/core';
 
 import { ITreeData } from './../../../services/repository/api-doc-repository/api-doc-repository.service';
 import { AHeaderSizedComponent } from '../../../header-sized-component';

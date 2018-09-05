@@ -12,7 +12,6 @@ import { Entity, Set } from '@diaspora/diaspora';
 import { ApiDocService, symbolLabel, ISymbolDef } from '../../services/api-doc/api-doc.service';
 import { PairsPipe } from '../../pipes/pairs/pairs.pipe';
 import { resolve } from 'url';
-import { HostListener } from '@angular/core';
 import { AHeaderSizedComponent } from '../../header-sized-component';
 
 

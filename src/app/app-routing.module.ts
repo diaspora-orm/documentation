@@ -1,4 +1,4 @@
-import { environment } from './../environments/environment.prod';
+import { environment } from './../environments/environment';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -17,7 +17,7 @@ export const routes: Routes = [
 @NgModule( {
 	imports: [ RouterModule.forRoot(
 		routes,
-		{ enableTracing: !environment.production }
+		{ enableTracing: !environment.production && false }
 	) ],
 	exports: [ RouterModule ],
 } )

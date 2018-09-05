@@ -1,8 +1,8 @@
 import { HeadSizerService } from './services/head-sizer/head-sizer.service';
 import { Subject } from 'rxjs';
-import { environment } from './../environments/environment.dev';
+import { environment } from './../environments/environment';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
-import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 @Component( {

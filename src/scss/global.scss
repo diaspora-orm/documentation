@@ -58,8 +58,9 @@ body{
 
 
 
-@import '../../node_modules/typedoc-default-themes/src/default/assets/css/setup/mixins.sass';
-@import '../../node_modules/typedoc-default-themes/src/default/assets/css/setup/icons';
+@import '~typedoc-default-themes/src/default/assets/css/setup/mixins';
+@import '~typedoc-default-themes/src/default/assets/css/setup/icons';
+
 .tsd-kind-icon{
 	display: inline-block;
 	top: -3px;
