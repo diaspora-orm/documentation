@@ -1,5 +1,5 @@
 import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { NgxMdComponent, NgxMdService } from 'ngx-md';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -540,5 +540,57 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				section.id = `${( sectionIndexes.join( '-' ) )}:${notHeadingIndex}`;
 			}
 		} );
+	}
+
+	public scollProgress( $event: MouseEvent ){
+		var x = $event.pageX - this.progress.nativeElement.offsetLeft;
+		var percent = x / this.progress.nativeElement.offsetWidth;
+		
+		this.sectionIndex = Math.floor( ( this.sections.length ) * percent );
+	}
+
+	@HostListener( 'window:keydown', ['$event'] )
+	private scrollKeyboard( $event: KeyboardEvent ){
+		switch ( $event.keyCode ){
+			case 38:{ // Arrow up
+				this.sectionIndex--;
+				$event.preventDefault();
+				return false;
+			}
+
+			case 40:{ // Arrow down
+				this.sectionIndex++;
+				$event.preventDefault();
+				return false;
+			}
+
+			case 33:{ // Page up
+				const found = _.findLastIndex(
+					this.sections,
+					section => section instanceof HTMLHeadingElement,
+					this.sectionIndex - 1
+				);
+				if ( found === -1 ){
+					throw new Error( 'Could not find previous heading' );
+				}
+				this.sectionIndex = found;
+				$event.preventDefault();
+				return false;
+			}
+
+			case 34:{ // Page down
+				const found = _.findIndex(
+					this.sections,
+					section => section instanceof HTMLHeadingElement,
+					this.sectionIndex + 1
+				);
+				if ( found === -1 ){
+					throw new Error( 'Could not find next heading' );
+				}
+				this.sectionIndex = found;
+				$event.preventDefault();
+				return false;
+			}
+		}
 	}
 }

@@ -23,7 +23,7 @@
 	</mat-sidenav-container>
 </figure>
 <footer>
-	<progress max="100" value="0" #progress>
+	<progress max="100" value="0" #progress (click)="scollProgress($event)">
 		<!-- Browsers that support HTML5 progress element will ignore the html inside `progress` element. Whereas older browsers will ignore the `progress` element and instead render the html inside it. -->
 		<div class="progress-bar">
 			<span style="width: 0%">0%</span>
