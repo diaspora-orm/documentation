@@ -187,6 +187,7 @@ enum AutoPlayIcons {
 }
 
 const MUTE_STORAGE_KEY = 'muted';
+const MARGIN_SCROLL = 25;
 
 @Component( {
 	selector: 'app-tutorials',
@@ -218,6 +219,10 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		return ( this.tutoComponent as any )._el as ElementRef<HTMLElement>;
 	}
 
+	private get tutoContainerHeight(){
+		return this.scroller.nativeElement.clientHeight;
+	}
+
 
 	private _sectionIndex = -1;
 	public get sectionIndex() {return this._sectionIndex; }
@@ -226,29 +231,20 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			return;
 		}
 		if ( this.allowScroll ) {
-			//scrollIt( window, { top: Infinity}, 500 );
 			// Set a timeout before which we won't be able to trigger a second scroll
 			this.allowScroll = false;
 			setTimeout( () => {
 				this.allowScroll = true;
 			},          SCROLL_COOLDOWN );
 
-			//console.info( `Changing slide from ${ this.sectionIndex } to ${ index }` );
-
 			if ( index === 0 || this.sectionIndex === 0 ){
 				this.headSizer.atTopEnabled = index === 0;
 			}
 
-			/*const wasAutoPlaying = this.autoPlay;
-			// Prevent autoplay if scrolling back
-			if()
-			this._autoPlay = false;*/
+			const scrollDirection = index > this.sectionIndex ? SectionChange.Next : SectionChange.Previous;
 			// Do scroll
 			this._sectionIndex = index;
-			// Restore autoplay status
-			// this._autoPlay = wasAutoPlaying;
-
-			this.refreshScollAndCursor( this.target );
+			this.refreshScollAndCursor( this.target, scrollDirection );
 			// Update progress infos
 			const frac = this.sections.length === 0 ? 0 : ( ( index + 1 ) / this.sections.length );
 			const percent = Math.round( frac * 1000 ) / 10;
@@ -273,6 +269,12 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				this.router.navigate( [], {fragment: this.target.id} );
 			}
 		}
+	}
+	public get currentSection(){
+		return this.sections[this.sectionIndex];
+	}
+	public set currentSection( section: HTMLElement ){
+		this.sectionIndex = _.indexOf( this.sections, section );
 	}
 
 	private _autoPlay = false;
@@ -387,16 +389,15 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	}
 
 	private gotoFragment( fragment: string ){
-		const sectionIndex = _.findIndex( this.sections, section => section.id === fragment );
-		if ( sectionIndex < 0 ){
+		const section = _.find( this.sections, section => section.id === fragment );
+		if ( !section ){
 			throw new Error( `Could not find section with fragment "${fragment}"` );
 		}
-		this.sectionIndex = sectionIndex;
+		this.currentSection = section;
 	}
 	private static getVMiddle( element: HTMLElement ) {
 		return element.offsetTop +
-		( element.offsetHeight / 2 )/* +
-		(element.parentElement ? element.parentElement.scrollTop : 0)*/;
+		( element.offsetHeight / 2 );
 	}
 
 	private async awaitTutoContentInitialized(){
@@ -411,8 +412,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		const childNodes = this.tutoContent.nativeElement.childNodes;
 		this.sections = Array
 			.from( childNodes )
-			.filter( element => element instanceof HTMLElement ) as HTMLElement[];
-		console.log( 'sections:', this.sections );
+			.filter( element => element instanceof HTMLElement && !( element instanceof HTMLHRElement ) ) as HTMLElement[];
 	}
 
 	public async ngOnInit() {
@@ -427,11 +427,11 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				target: isBlankTarget ? '_blank' : undefined,
 			};
 			const attrsStr = _.chain( attrs )
-			.omitBy( _.isNil )
-			.toPairs()
-			.map( kv => `${kv[0]}="${kv[1]}"` )
-			.join( ' ' )
-			.value();
+				.omitBy( _.isNil )
+				.toPairs()
+				.map( kv => `${kv[0]}="${kv[1]}"` )
+				.join( ' ' )
+				.value();
 			return `<a ${attrsStr}>${text}</a>`;
 		};
 	}
@@ -452,26 +452,50 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		} );
 	}
 
-	private refreshScollAndCursor( target: HTMLElement | null ) {
+	private refreshScollAndCursor( target: HTMLElement | null, changeDirection: SectionChange ) {
 		if ( !target ) {
 			return;
 		}
 		this.sections.forEach( element => element.classList.remove( 'active' ) );
 		target.classList.add( 'active' );
 		const targetMiddle = TutorialsComponent.getVMiddle( target );
-
+		
 		this.cursor.nativeElement.style.opacity = '1';
 		this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
 		
 		const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
-		scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
+
+		if ( target.clientHeight <= this.tutoContainerHeight ){
+			scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
+		} else {
+			if ( changeDirection === SectionChange.Next ){
+				scrollIt( this.scroller.nativeElement, {top:target.offsetTop - MARGIN_SCROLL} );
+			} else if ( changeDirection === SectionChange.Previous ){
+				scrollIt( this.scroller.nativeElement, {top:target.offsetTop + target.clientHeight - this.tutoContainerHeight + MARGIN_SCROLL} );
+			}
+		}
 	}
 
 	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
-		event.preventDefault();
 		const delta = event.type === 'wheel' ?
 			- event.deltaY :
 			event.wheelDelta / 120;
+
+		if ( this.currentSection.clientHeight > this.tutoContainerHeight ){
+			if ( delta >= SectionChange.Next ){ // Going upwards
+				// Has space upwards
+				if ( this.currentSection.offsetTop <= this.scroller.nativeElement.scrollTop + MARGIN_SCROLL ){
+					return true;
+				}
+			} else if ( delta <= SectionChange.Previous ){ // Going downwards
+				// Has space downwards
+				if ( this.currentSection.offsetTop + this.currentSection.clientHeight >= this.scroller.nativeElement.scrollTop + this.tutoContainerHeight - MARGIN_SCROLL ){
+					return true;
+				}
+			}
+		}
+		
+		event.preventDefault();
 		if ( delta >= SectionChange.Next ) {
 			if ( this.sectionIndex > 0 ) {
 				this.autoPlay = false;
