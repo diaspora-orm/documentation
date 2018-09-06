@@ -6,6 +6,8 @@ import * as _ from 'lodash';
 import { Diaspora, Entity, Set, DiasporaStatic, Model } from '@diaspora/diaspora';
 
 
+// tslint:disable-next-line:no-eval
+const AsyncFunction = eval( 'Object.getPrototypeOf( async function(){} ).constructor' );
 export interface ICodeLineDisplayed {
 	code?: string;
 	text: string;
@@ -15,6 +17,10 @@ export interface ICodeLineExecuted {
 	code: string;
 }
 export type ICodeLine = ICodeLineDisplayed | ICodeLineExecuted;
+const isCodeLineDisplayed = ( code: any ): code is ICodeLineDisplayed => code &&
+	typeof code.text === 'string' &&
+	typeof code.type === 'string' &&
+	( typeof code.code === 'undefined' || typeof code.code === 'string' ); 
 
 export enum ECommandType {
 	SETUP = 'setup',
@@ -24,9 +30,13 @@ export enum ECommandType {
 	FIND = 'find',
 }
 
+export interface IRepl{
+	command: string;
+	response: string;
+	errored: boolean;
+}
 
-const isCodeLineExecuted = ( item: ICodeLine ): item is ICodeLineExecuted =>
-!_.isNil( item.code )  && _.isNil( ( item as any ).text );
+const isCodeLineExecuted = ( item: ICodeLine ): item is ICodeLineExecuted => !_.isNil( item.code )  && _.isNil( ( item as any ).text );
 
 
 @Component( {
@@ -35,9 +45,9 @@ const isCodeLineExecuted = ( item: ICodeLine ): item is ICodeLineExecuted =>
 	styleUrls: ['./ioarea.component.scss'],
 } )
 export class IOAreaComponent implements OnInit {
-	private static context = {};
+	private context = new Map<string, any>();
 	
-	public history: Array<{command: string; response: string; errored: boolean}> = [];
+	public history: IRepl[] = [];
 	
 	public liveCodingText: string | null = null;
 	public lines: ICodeLine[] = [];
@@ -45,7 +55,7 @@ export class IOAreaComponent implements OnInit {
 		code: '',
 	};
 	private currentLineIndex = 0;
-	private playing = true;
+	private playing = false;
 	
 	private static symbolNames = new Map<any, string>( [
 		[DiasporaStatic, '>Diaspora'],
@@ -63,21 +73,24 @@ export class IOAreaComponent implements OnInit {
 	] ); 
 	
 	private isCodeLineExecuted = isCodeLineExecuted;
-	
-	/**
-	 * @see https://stackoverflow.com/questions/8403108/calling-eval-in-particular-context
-	 */
-	private static evalInContext( js: string ) {
-		// Return the results of the in-line anonymous function we .call with the passed context
-		// tslint:disable-next-line:no-eval
-		const retVal = ( function() { return eval( js ); } ).call( IOAreaComponent.context );
-		if ( !( retVal instanceof Error ) ){
-			const declarationNameMatch = js.match( /(?:const|var|let)\s+([\w_]+)\s+=/ );
-			console.log( {declarationNameMatch} );
+
+	private async evalInContext( js: string ) {
+		const [, varDeclaration, instruction] = js.match( /^(?:\s*(?:(?:const|var|let)\s+|this\.)([\w_]+)\s*=)?\s*((?:.|[\r\n])*)$/ );
+
+		const instructionWithReturn = `return ${instruction}`;
+		const fct = new AsyncFunction( ...this.context.keys(), instructionWithReturn );
+		const retVal = await fct( ...this.context.values() );
+		
+		if ( retVal instanceof Error ){
+			throw retVal;
 		}
+		if ( varDeclaration ){
+			this.context.set( varDeclaration, retVal ); 
+		}
+		return retVal;
 	}
 	
-	public static getCtorName( content: any ){
+	public static unmangleType( content: any ){
 		const symbolNamesIterable = IOAreaComponent.symbolNames.entries();
 		for ( let [ctor, name] of symbolNamesIterable ) {
 			if ( content.constructor == ctor ){
@@ -103,7 +116,11 @@ export class IOAreaComponent implements OnInit {
 		this.http.get( '/assets/content/demo.json' )
 		.subscribe( ( cnt: any ) => {
 			this.lines = cnt as ICodeLine[];
-			this.resetInstruction = cnt.slice( -1 );
+			const lastInstruction = _.last( this.lines );
+			if ( !lastInstruction || isCodeLineDisplayed( lastInstruction ) ) {
+				throw new Error( 'Invalid reset code line' );
+			}
+			this.resetInstruction = lastInstruction;
 			this.playLoop();
 		} );
 		( window as any ).Diaspora = Diaspora;
@@ -114,7 +131,7 @@ export class IOAreaComponent implements OnInit {
 	
 	private async setFrame( frameNumber: number ) {
 		const frameDiff = frameNumber - this.currentLineIndex;
-		if ( frameDiff > 0 ) {
+		if ( frameDiff > 0 ) { // Going forward
 			for ( let i = 0; i < frameDiff; i++ ) {
 				const newCodeLine = this.lines[this.currentLineIndex];
 				if ( newCodeLine ) {
@@ -122,23 +139,20 @@ export class IOAreaComponent implements OnInit {
 				}
 				this.currentLineIndex++;
 			}
-		} else if ( frameDiff < 0 ) {
-			await this.doAction( this.resetInstruction );
-			this.currentLineIndex = -1;
-			this.history = [];
+		} else if ( frameDiff < 0 ) { // Going backward
+			await this.reset();
 			await this.setFrame( frameNumber );
-		} else if ( this.playing ) {
+		} else if ( this.playing ) { // Replay
 			await this.doAction( this.lines[this.currentLineIndex] as any );
 		}
 		this.playing = false;
-		// this.history =
 	}
 	
-	private eval( command: string ) {
+	private async eval( command: string ): Promise<{error: false; return: any} | {error: true; return: Error}> {
 		try {
 			return {
 				error: false,
-				return: IOAreaComponent.evalInContext( command ),
+				return: await this.evalInContext( command ),
 			};
 		} catch ( e ) {
 			console.error( 'Error in eval:', e );
@@ -147,6 +161,13 @@ export class IOAreaComponent implements OnInit {
 				return: e,
 			};
 		}
+	}
+
+	private async reset(){
+		await this.doAction( this.resetInstruction );
+		this.currentLineIndex = -1;
+		this.history = [];
+		this.context = new Map<string, any>();
 	}
 	
 	
@@ -160,7 +181,7 @@ export class IOAreaComponent implements OnInit {
 				return '<span class="t-o">[object]</span>';
 			}
 			if ( !_.isPlainObject( content ) ) {
-				return `<span class="t-c">${IOAreaComponent.getCtorName( content )}</span>(${stringifySub( _.assign( {}, content ) )})`;
+				return `<span class="t-c">${IOAreaComponent.unmangleType( content )}</span>(${stringifySub( _.assign( {}, content ) )})`;
 			} else {
 				const str = _.chain( content )
 				.mapValues( ( value, key ) => `<span class="t-k">${key}</span>: ${stringifySub( value )}` )
@@ -177,20 +198,6 @@ export class IOAreaComponent implements OnInit {
 		}
 	}
 	
-	private async awaitResolution( promise: Promise<any> ) {
-		try {
-			return {
-				output: this.stringifyOutput( await promise ),
-				errored: false,
-			};
-		} catch ( error ) {
-			return {
-				output: this.stringifyOutput( error ),
-				errored: false,
-			};
-		}
-	}
-	
 	
 	
 	private async doAction( codeLine: ICodeLineDisplayed ): Promise<false>;
@@ -200,12 +207,11 @@ export class IOAreaComponent implements OnInit {
 			const result = await this.eval( codeLine.code );
 			return false;
 		} else {
-			const result = this.eval( codeLine.code || codeLine.text );
-			const resolution = await this.awaitResolution( result.return );
+			const result = await this.eval( codeLine.code || codeLine.text );
 			this.history.push( {
 				command: codeLine.text,
-				response: resolution.output,
-				errored: resolution.errored || result.error,
+				response: this.stringifyOutput( result.return ),
+				errored: result.error,
 			} );
 			this.history = this.history.slice( -4 );
 			return true;
