@@ -52,7 +52,7 @@ To create a data source, use the [`createNamedDataSource`]() method of the `Dias
 * __The type of the adapter__: one of the keys of the [`Diaspora.adapters`]() object, that identify the kind of the *adapter*. We'll begin with the *in-memory adapter* identified by `inMemory`
 * __Some optional configuration parameters__: see the *adapter*'s documentation to check the options you can set. The *in-memory adapter* does not have additionnal configurations, so we won't provide those parameters.
 
-<div id="d2h-972161" class="d2h-file-wrapper" data-lang="ts">
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -137,7 +137,8 @@ In this case, if our store was a *MongoDB* database, the ID would be generated b
 
 > TODO: Elaborate the distinction between Entity, attributes & properties
 
-<div id="d2h-972161" class="d2h-file-wrapper" data-lang="ts">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -269,6 +270,7 @@ In this case, if our store was a *MongoDB* database, the ID would be generated b
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 #### Declare the *model* ([commit]())
 
@@ -276,12 +278,13 @@ Each data type is manipulated through a *model*, that is generated using the [`D
 
 * __The name of the model__: an arbitrary string that name the kind of data the model manipulates. It is used to determine the name of the *collection* (or *table*) that will contain our data. Here, we are manipulating `ToDos`.
 * __A configuration object__, that contains at least the following properties:
-  * __The sources__ in which we are storing the data (the `main` data source in our example)
-  * __The attributes__ of the data, with their type, default value or a flag to indicates if the property is required for the entity to be valid.
+    * __The sources__ in which we are storing the data (the `main` data source in our example)
+    * __The attributes__ of the data, with their type, default value or a flag to indicates if the property is required for the entity to be valid.
 
 This method also takes a type parameter to help Typescript know what the `attributes` of our entities looks like. Our entities of the `ToDos` model will contain the `ITodo` interface defined above.
 
-<div id="d2h-972161" class="d2h-file-wrapper" data-lang="ts">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -562,6 +565,7 @@ This method also takes a type parameter to help Typescript know what the `attrib
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ---
 
@@ -577,7 +581,8 @@ Because we are using the *in-memory adapter*, our data source is reinitialized e
 
 We'll see more about the `insert` & `insertMany` methods later, so just trust me for now and write the following:
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -840,6 +845,7 @@ We'll see more about the `insert` & `insertMany` methods later, so just trust me
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 #### Querying for data
 
@@ -859,7 +865,8 @@ Searches methods ([`Model.find`]() & [`Model.findMany`]()) takes following param
 * __An optional options object__: used to customize query, skip items or limit the size of the set. You can check out the [API documentation]() for more informations about the query options.
 * __An optional data-source resolvable value to fetch data from__: it can be either the name of the data source (like `main` as defined above), a [data access layer]() or an [adapter](). This parameter is useful for models that exists in several data sources, but we'll see that later.
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -1633,13 +1640,14 @@ Searches methods ([`Model.find`]() & [`Model.findMany`]()) takes following param
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 #### Using data in views
 
 This part is mainly specific to Vue.js, so we won't enter too much in details. Simply apply the following changes in your code:
 
-
-    <div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -2189,7 +2197,7 @@ This part is mainly specific to Vue.js, so we won't enter too much in details. S
         </div>
     </div>
 </div>
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -2676,6 +2684,7 @@ This part is mainly specific to Vue.js, so we won't enter too much in details. S
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 Now, look closer the iteration over each *ToDos* displayed:
 
@@ -2701,8 +2710,8 @@ To insert data in the store, we'll use the [`Model.insert`]() method, that takes
 
 Once our item is inserted in the data source, we simply have to refresh our searches to display the new values.
 
-
-    <div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -3057,7 +3066,7 @@ Once our item is inserted in the data source, we simply have to refresh our sear
         </div>
     </div>
 </div>
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -3158,6 +3167,7 @@ Once our item is inserted in the data source, we simply have to refresh our sear
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 Now, you can enter text in our label input, and press enter: the new *ToDo* is created, persisted, then displayed in the list.
 
@@ -3166,10 +3176,10 @@ Now, you can enter text in our label input, and press enter: the new *ToDo* is c
 The update of *ToDos* can be done in two ways:
 
 * By using the [`Model.update`]() or [`Model.updateMany`]() methods, taking following parameters:
-  * __The search query__: [See above]().
-  * __The actual object update__: an object that contains the properties to update, with the new values.
-  * __An optional options object__: [See above]().
-  * __An optional data-source resolvable value to update data from__: [See above]().
+    * __The search query__: [See above]().
+    * __The actual object update__: an object that contains the properties to update, with the new values.
+    * __An optional options object__: [See above]().
+    * __An optional data-source resolvable value to update data from__: [See above]().
 * Or by using the [`Entity.persist`]() and [`Set.persist`]() methods, taking a single optional parameter: a **data-source resolvable value** ([see above]()).
 
 In our case, we'll use both methods: the **AppComponent** updates all entities with [`Model.updateMany`](), and **TodoItemComponent** instances will each update their own *ToDo* with [`Entity.persist`]().
@@ -3178,7 +3188,8 @@ In our case, we'll use both methods: the **AppComponent** updates all entities w
 
 The checkbox at the left of our input is used to mark all items as finished or unfinished, depending on the current state of the checkbox. (see [the specs](https://github.com/tastejs/todomvc/blob/master/app-spec.md#user-content-mark-all-as-complete)).
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -3321,6 +3332,7 @@ The checkbox at the left of our input is used to mark all items as finished or u
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 #### Finish a single *ToDo*
 
@@ -3330,7 +3342,8 @@ From the **TodoItemComponent**, we have access to the [`Entity`]() it represents
 
 Because we are modifying a property used for queries from within a child component of the **AppComponent**, we need to trigger a search refresh every time a data is changed. We can do it by emitting events using *Vue.js* built-in event emitter, and bind that event at the **AppComponent** level.
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -3497,7 +3510,7 @@ Because we are modifying a property used for queries from within a child compone
         </div>
     </div>
 </div>
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -3816,12 +3829,14 @@ Because we are modifying a property used for queries from within a child compone
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 #### Update *ToDo* label
 
 Now that you understand better how to update entities, we'll do the label update a bit quicker. Because editing the label does not change the search results, we don't need to trigger a refresh.
 
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -4564,22 +4579,24 @@ Now that you understand better how to update entities, we'll do the label update
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ### Deleting *ToDos*
 
 Just like for the update, we have 2 options to delete *ToDos*:
 
 * Either by using the [`Model.delete`]() or [`Model.deleteMany`]() methods, taking following parameters:
-  * __The search query__: [See above]().
-  * __An optional options object__: [See above]().
-  * __An optional data-source resolvable value to update data from__: [See above]().
+    * __The search query__: [See above]().
+    * __An optional options object__: [See above]().
+    * __An optional data-source resolvable value to update data from__: [See above]().
 * Or by using the [`Entity.destroy`]() and [`Set.destroy`]() methods, taking a single optional parameter: a **data-source resolvable value** ([see above]()).
 
 Again, we'll use both of them, using the *model* method at the **AppComponent** level, and the *entity* method in the **TodoItemComponent**.
 
 This part requires a bit of extra-code for *Vue.js* to match the specs, by toggling a class on the **TodoItemComponent** `li` tag to display the **delete** button. We also have to edit the `saveEdit` method to delete the entity when the label is empty (or contains only whitespaces).
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -4856,7 +4873,7 @@ This part requires a bit of extra-code for *Vue.js* to match the specs, by toggl
         </div>
     </div>
 </div>
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -5453,10 +5470,12 @@ This part requires a bit of extra-code for *Vue.js* to match the specs, by toggl
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 If you try the application now, you can see that an error is thrown when deleting the entity. This is normal, because the entity reflects the state of an item in data sources. Just after the call of `Entity.destroy`, the entity's attributes for the data source is set to `null`, because the entity does not exist anymore in the source, but still exists in your code, but *Vue.js* detects a change. That's why we need to add a flag on the **TodoItemcomponent** to prevent the component from accessing our entity's attributes after deletion.
 
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -5841,6 +5860,7 @@ If you try the application now, you can see that an error is thrown when deletin
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ---
 
@@ -5858,7 +5878,8 @@ The app should have 3 different kinds of displays:
 
 We'll use an enum to differenciate each display mode.
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -6726,6 +6747,7 @@ We'll use an enum to differenciate each display mode.
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ### Add routing
 
@@ -6735,7 +6757,8 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
 
 > Again, check out the [app specifications]() about routing.
 
-<div id="d2h-549383" class="d2h-file-wrapper" data-lang="html">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="html">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -6847,7 +6870,7 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
         </div>
     </div>
 </div>
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -7604,7 +7627,7 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
         </div>
     </div>
 </div>
-<div id="d2h-066534" class="d2h-file-wrapper" data-lang="ts">
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -7747,7 +7770,7 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
         </div>
     </div>
 </div>
-<div id="d2h-117390" class="d2h-file-wrapper" data-lang="ts">
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -7837,7 +7860,7 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
         </div>
     </div>
 </div>
-<div id="d2h-365642" class="d2h-file-wrapper" data-lang="ts">
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -8188,6 +8211,7 @@ To make things clearer, we are going to move the *display mode*'s enumeration `E
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ### Remove test data, change data source and other quick modifications
 
@@ -8198,7 +8222,8 @@ This is our final action on this app ! Here is what we still need to do:
 * Change the data source from an *in-memory adapter* to a *web-storage adapter* (that use *localStorage*)
 * Rename the model to `todos-diaspora` to match the specs.
 
-<div id="d2h-401237" class="d2h-file-wrapper" data-lang="vue">
+<!-- #region -->
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -8363,7 +8388,7 @@ This is our final action on this app ! Here is what we still need to do:
         </div>
     </div>
 </div>
-<div id="d2h-865887" class="d2h-file-wrapper" data-lang="vue">
+<div class="d2h-file-wrapper" data-lang="vue">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -8713,7 +8738,7 @@ This is our final action on this app ! Here is what we still need to do:
         </div>
     </div>
 </div>
-<div id="d2h-972161" class="d2h-file-wrapper" data-lang="ts">
+<div class="d2h-file-wrapper" data-lang="ts">
     <div class="d2h-file-header">
     <span class="d2h-file-name-wrapper">
     <span class="d2h-icon-wrapper"><svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">
@@ -8916,6 +8941,7 @@ This is our final action on this app ! Here is what we still need to do:
         </div>
     </div>
 </div>
+<!-- #endregion -->
 
 ---
 
