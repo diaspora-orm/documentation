@@ -1,6 +1,6 @@
-import { Component, Input, ElementRef } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { NgxMdComponent } from 'ngx-md';
+import { Component, Input, ElementRef, OnInit } from '@angular/core';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { ShowdownDirective } from 'ngx-showdown';
 
 export interface IHeadingTree{
 	text: string;
@@ -24,14 +24,10 @@ const headingsIterator = ( headings: HTMLHeadingElement[] ) => {
 	templateUrl: './outliner.component.html',
 	styleUrls: ['./outliner.component.scss'],
 } )
-export class OutlinerComponent {
-	public tutoContentSet = new Subject<NgxMdComponent>();
+export class OutlinerComponent implements OnInit {
+	@Input() public sections!: BehaviorSubject<HTMLElement[]>;
 	
 	public headingTree: IHeadingTree[] | undefined;
-	
-	public constructor() {
-		this.tutoContentSet.subscribe( this.loadTutoContent.bind( this ) );
-	}
 	
 	private static buildTree(
 		iterator: {
@@ -63,18 +59,21 @@ export class OutlinerComponent {
 		return headingTree.length > 0 ? headingTree : undefined;
 	}
 	
-	private loadTutoContent( tutoContent: NgxMdComponent ){
-		const tutoHtmlElement = ( tutoContent as any as {_el: ElementRef<HTMLElement>} )._el.nativeElement;
+	private retrieveHeadings( sections: HTMLElement[] ){
 		
-		const headings = tutoHtmlElement.querySelectorAll<HTMLHeadingElement>( 'h1,h2,h3,h4,h5,h6' );
+		const headings = sections.filter( section => section instanceof HTMLHeadingElement ) as HTMLHeadingElement[];
 		
-		const iterator = headingsIterator( Array.from( headings ) );
+		const iterator = headingsIterator( headings );
 		this.headingTree = OutlinerComponent.buildTree( iterator );
 	}
 	
 	public buildHeading( item: IHeadingTree ){
 		const headingTag = `h${item.level}`;
 		return `<${headingTag}>${item.text}</${headingTag}>`;
+	}
+
+	public ngOnInit(){
+		this.sections.subscribe( sections => this.retrieveHeadings( sections ) );
 	}
 }
 

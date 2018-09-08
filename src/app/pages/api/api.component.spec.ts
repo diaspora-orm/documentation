@@ -1,7 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ApiDocService } from './../../services/api-doc/api-doc.service';
 import { RouterTestingModule } from '@angular/router/testing';
-import { NgxMdComponent } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 import { ApiComponent } from './api.component';
 import { LazyRenderModule } from 'angular-lazy-render';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
@@ -42,7 +42,7 @@ describe( 'ApiComponent', () => {
 				MockSidebarComponent,
 				MockPairsPipe,
 				MockTypeComponent,
-				NgxMdComponent,
+				ShowdownDirective,
 			],
 			providers: [ ApiDocService ],
 		} )

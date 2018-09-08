@@ -34,8 +34,9 @@
     "lodash": "^4.17.10",
     "milligram": "^1.3.0",
     "ngx-clipboard": "^11.1.3",
-    "ngx-md": "^6.0.0",
+    "ngx-showdown": "^4.0.2",
     "rxjs": "^6.2.2",
+    "showdown": "^1.8.6",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {

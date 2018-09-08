@@ -1,6 +1,6 @@
 <article>
 	<pre>{{signature?.name}}<ng-container *ngTemplateOutlet="typeParameters"></ng-container>(<ng-container *ngTemplateOutlet="callSignatureParameters"></ng-container>): <app-type [rawType]="signature?.type"></app-type></pre>
-	<ngx-md [data]="signature?.summary"></ngx-md>
+	<showdown [value]="signature?.summary"></showdown>
 	
 	<section>
 		<h4>Parameters</h4>
@@ -30,7 +30,7 @@
 
 <ng-template #withParams>
 	<ul>
-		<li *ngFor="let parameter of parameters"><b>{{parameter.name}}</b> (<app-type [rawType]="parameter.type"></app-type>): <ngx-md [data]="parameter.summary"></ngx-md></li>
+		<li *ngFor="let parameter of parameters"><b>{{parameter.name}}</b> (<app-type [rawType]="parameter.type"></app-type>): <showdown [value]="parameter.summary"></showdown></li>
 	</ul>
 </ng-template>
 <ng-template #withoutParams>

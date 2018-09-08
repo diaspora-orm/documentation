@@ -1,6 +1,6 @@
 import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
-import { NgxMdComponent, NgxMdService } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import * as _ from 'lodash';
@@ -8,6 +8,7 @@ import { OutlinerComponent } from './outliner/outliner.component';
 import { MatSidenavContainer } from '@angular/material';
 import { AHeaderSizedComponent } from '../../header-sized-component';
 import { SassVarService } from '../../services/sass-var/sass-var.service';
+import { BehaviorSubject } from 'rxjs';
 
 interface IScrollDest{
 	top?: number;
@@ -197,7 +198,7 @@ const MARGIN_SCROLL = 25;
 export class TutorialsComponent extends AHeaderSizedComponent implements OnInit, AfterViewInit {
 	@ViewChild( MatSidenavContainer ) public sidenavContainer!: MatSidenavContainer;
 	@ViewChild( OutlinerComponent ) private outliner!: OutlinerComponent;
-	@ViewChild( NgxMdComponent ) private tutoComponent!: NgxMdComponent;
+	@ViewChild( ShowdownDirective ) private tutoComponent!: ShowdownDirective;
 	@ViewChild( 'scroller' ) private scroller!: ElementRef<HTMLElement>;
 	@ViewChild( 'progress' ) private progress!: ElementRef<HTMLProgressElement>;
 	@ViewChild( 'cursor' ) private cursor!: ElementRef<HTMLElement>;
@@ -206,17 +207,33 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	@ViewChild( 'fullScreenButton' ) private fullScreenButton!: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'muteButton' ) private muteButton!: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'presentation' ) private presentation!: ElementRef<HTMLElement>;
-	private sections: HTMLElement[] = [];
 	public tutoIdentifier!: string;
 	private allowScroll = true;
 	private currentSpeechSynthesis: CustomSynthesis | null = null;
 
 
+	public sections = new BehaviorSubject<HTMLElement[]>( [] );
+	private get currentSections(){
+		return this.sections.value;
+	}
+	private set currentSections( sections: HTMLElement[] ){
+		this.sections.next( sections );
+	}
+
+	public section = new BehaviorSubject<HTMLElement | undefined>( undefined );
+	public get currentSection(){
+		return this.section.value;
+	}
+	public set currentSection( section: HTMLElement | undefined ){
+		this.section.next( section );
+	}
+
+
 	public get target() {
-		return this.sectionIndex >= 0 ? this.sections[this.sectionIndex] : null;
+		return this.sectionIndex >= 0 ? this.currentSections[this.sectionIndex] : null;
 	}
 	private get tutoContent() {
-		return ( this.tutoComponent as any )._el as ElementRef<HTMLElement>;
+		return ( this.tutoComponent as any )._elementRef as ElementRef<HTMLElement>;
 	}
 
 	private get tutoContainerHeight(){
@@ -227,7 +244,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	private _sectionIndex = -1;
 	public get sectionIndex() {return this._sectionIndex; }
 	public set sectionIndex( index: number ) {
-		if ( index >= this.sections.length ) {
+		if ( index >= this.currentSections.length ) {
 			return;
 		}
 		if ( this.allowScroll ) {
@@ -246,7 +263,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			this._sectionIndex = index;
 			this.refreshScollAndCursor( this.target, scrollDirection );
 			// Update progress infos
-			const frac = this.sections.length === 0 ? 0 : ( ( index + 1 ) / this.sections.length );
+			const frac = this.currentSections.length === 0 ? 0 : ( ( index + 1 ) / this.currentSections.length );
 			const percent = Math.round( frac * 1000 ) / 10;
 			if ( this.progress ) {
 				this.progress.nativeElement.value = percent;
@@ -266,15 +283,9 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 
 			// Finalize
 			if ( this.target ) {
-				this.router.navigate( [], {fragment: this.target.id} );
+				this.router.navigate( [], {fragment: this.target.id } );
 			}
 		}
-	}
-	public get currentSection(){
-		return this.sections[this.sectionIndex];
-	}
-	public set currentSection( section: HTMLElement ){
-		this.sectionIndex = _.indexOf( this.sections, section );
 	}
 
 	private _autoPlay = false;
@@ -376,7 +387,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	public constructor(
 		private el: ElementRef<HTMLElement>,
 		private activatedRoute: ActivatedRoute,
-		private markdown: NgxMdService,
+		//private markdown: ShowdownService,
 		private router: Router,
 		private sassVar: SassVarService,
 		headSizer: HeadSizerService
@@ -385,10 +396,16 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		this.activatedRoute.params.subscribe( data => {
 			this.tutoIdentifier = data.tutoName;
 		} );
-		this.sections = [];
+		this.section.subscribe( newSection => {
+			this.sectionIndex = _.indexOf( this.currentSections, newSection );
+		} );
 	}
 
 	private gotoFragment( fragment: string ){
+		// Check if the transition was already done (when scrolling)
+		if ( this.section.value && this.section.value.id === fragment ){
+			return;
+		}
 		const section = _.find( this.sections, section => section.id === fragment );
 		if ( !section ){
 			throw new Error( `Could not find section with fragment "${fragment}"` );
@@ -410,16 +427,19 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	
 	private getSections() {
 		const childNodes = this.tutoContent.nativeElement.childNodes;
-		this.sections = Array
+		this.currentSections = Array
 			.from( childNodes )
-			.filter( element => element instanceof HTMLElement && !( element instanceof HTMLHRElement ) ) as HTMLElement[];
+			.filter( element => element instanceof HTMLElement &&
+				element.innerHTML && 
+				!( element instanceof HTMLHRElement )
+			) as HTMLElement[];
 	}
 
 	public async ngOnInit() {
 		this.mute = localStorage.getItem( MUTE_STORAGE_KEY ) === 'yes';
 		this.autoPlay = false;
 
-		this.markdown.renderer.link = ( href: string, title: string, text: string ) => {
+		/*this.markdown.renderer.link = ( href: string, title: string, text: string ) => {
 			const isBlankTarget = href[0] === '!';
 			const attrs = {
 				title,
@@ -433,7 +453,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				.join( ' ' )
 				.value();
 			return `<a ${attrsStr}>${text}</a>`;
-		};
+		};*/
 	}
 
 	public async ngAfterViewInit() {
@@ -441,14 +461,15 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		this.sidenavContainer.autosize = true;
 		this.getSections();
 		this.resetTutorialContentIds();
-		this.outliner.tutoContentSet.next( this.tutoComponent );
 		setTimeout( () => {
 			this.sidenavContainer.autosize = false;
 		},          500 );
 
 		// Load fragment 
 		this.activatedRoute.fragment.subscribe( fragment => {
-			this.gotoFragment( fragment );
+			if ( fragment ){
+				this.gotoFragment( fragment );
+			}
 		} );
 	}
 
@@ -456,7 +477,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		if ( !target ) {
 			return;
 		}
-		this.sections.forEach( element => element.classList.remove( 'active' ) );
+		this.currentSections.forEach( element => element.classList.remove( 'active' ) );
 		target.classList.add( 'active' );
 		const targetMiddle = TutorialsComponent.getVMiddle( target );
 		
@@ -481,7 +502,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			- event.deltaY :
 			event.wheelDelta / 120;
 
-		if ( this.currentSection.clientHeight > this.tutoContainerHeight ){
+		if ( this.currentSection && this.currentSection.clientHeight > this.tutoContainerHeight ){
 			if ( delta >= SectionChange.Next ){ // Going upwards
 				// Has space upwards
 				if ( this.currentSection.offsetTop <= this.scroller.nativeElement.scrollTop + MARGIN_SCROLL ){
@@ -505,7 +526,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				console.warn( 'Can\'t go to previous section' );
 			}
 		} else if ( delta <= SectionChange.Previous ) {
-			if ( this.sectionIndex < this.sections.length - 1 ) {
+			if ( this.sectionIndex < this.currentSections.length - 1 ) {
 				this.autoPlay = false;
 				this.sectionIndex += SectionChange.Next;
 				return true;
@@ -519,7 +540,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	private resetTutorialContentIds(){
 		const sectionIndexes: number[] = [];
 		let notHeadingIndex = 0;
-		this.sections.forEach( section => {
+		this.currentSections.forEach( section => {
 			if ( section instanceof HTMLHeadingElement ){
 				notHeadingIndex = 0;
 				const headingLevel = parseInt( section.tagName.slice( 1 ) ) - 1;
@@ -546,7 +567,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		var x = $event.pageX - this.progress.nativeElement.offsetLeft;
 		var percent = x / this.progress.nativeElement.offsetWidth;
 		
-		this.sectionIndex = Math.floor( ( this.sections.length ) * percent );
+		this.sectionIndex = Math.floor( ( this.currentSections.length ) * percent );
 	}
 
 	@HostListener( 'window:keydown', ['$event'] )
@@ -566,7 +587,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 
 			case 33:{ // Page up
 				const found = _.findLastIndex(
-					this.sections,
+					this.currentSections,
 					section => section instanceof HTMLHeadingElement,
 					this.sectionIndex - 1
 				);
@@ -580,7 +601,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 
 			case 34:{ // Page down
 				const found = _.findIndex(
-					this.sections,
+					this.currentSections,
 					section => section instanceof HTMLHeadingElement,
 					this.sectionIndex + 1
 				);

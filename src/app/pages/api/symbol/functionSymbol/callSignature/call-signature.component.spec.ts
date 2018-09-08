@@ -5,7 +5,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CallSignatureComponent } from './call-signature.component';
 import { TypeComponent } from '../../type/type.component';
-import { NgxMdComponent } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 
 describe( 'CallSignatureComponent', () => {
 	let component: CallSignatureComponent;
@@ -14,7 +14,7 @@ describe( 'CallSignatureComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule ],
-			declarations: [ CallSignatureComponent, TypeComponent, NgxMdComponent ],
+			declarations: [ CallSignatureComponent, TypeComponent, ShowdownDirective ],
 			providers: [ ApiDocService ],
 		} )
 		.compileComponents();

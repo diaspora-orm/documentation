@@ -339,7 +339,7 @@ p[data-value] {
 
 $cursorWidth: 5px;
 
-:host ::ng-deep ngx-md {
+:host ::ng-deep showdown {
 	& > *{
 		margin-bottom: 15px;
 		position: relative;

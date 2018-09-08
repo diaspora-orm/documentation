@@ -3,12 +3,12 @@
 	<mat-sidenav-container>
 		<!-- TODO: use better define fixedBottomGap -->
 		<mat-sidenav mode="side" opened fixedInViewport="true" [fixedTopGap]="headerHeight" [fixedBottomGap]="footerHeight" class="topFixed">
-			<app-outliner></app-outliner>
+			<app-outliner [sections]="sections"></app-outliner>
 		</mat-sidenav>
 		<mat-sidenav-content>
 			<figcaption #scroller (mousewheel)="handleScroll($event)" (DOMMouseWheel)="handleScroll($event)" (wheel)="handleScroll($event)">
 				
-				<ngx-md [path]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></ngx-md>
+				<showdown [src]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></showdown>
 				
 				<i id="cursor" #cursor></i>
 			</figcaption>

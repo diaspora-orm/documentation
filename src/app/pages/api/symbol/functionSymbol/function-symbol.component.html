@@ -15,7 +15,7 @@
 	<ng-template #titleNoLink><ng-container *ngTemplateOutlet="symbolTitle"></ng-container></ng-template>
 
 	<section>
-		<ngx-md [data]="symbol?.summary"></ngx-md>
+		<showdown [value]="symbol?.summary"></showdown>
 	</section>
 
 	<section>

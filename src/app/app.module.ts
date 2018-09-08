@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
-import { NgxMdModule } from 'ngx-md';
+import { ShowdownModule } from 'ngx-showdown';
 import { ClipboardModule } from 'ngx-clipboard';
 import { LazyRenderModule } from 'angular-lazy-render';
 import { CookieLawModule } from 'angular2-cookie-law';
@@ -27,6 +27,7 @@ import { TypeComponent } from './pages/api/symbol/type/type.component';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { SectionComponent } from './pages/api/sidebar/section/section.component';
 import { OutlinerComponent } from './pages/tutorials/outliner/outliner.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule( {
 	declarations: [
@@ -51,12 +52,13 @@ import { OutlinerComponent } from './pages/tutorials/outliner/outliner.component
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
-		NgxMdModule.forRoot(),
+		ShowdownModule,
 		ClipboardModule,
 		LazyRenderModule,
 		BrowserAnimationsModule,
 		FormsModule,
 		MatSidenavModule,
+		HttpClientModule,
 	],
 	providers: [Title],
 	bootstrap: [AppComponent],

@@ -17,7 +17,7 @@
 	<ng-template #titleNoLink><ng-container *ngTemplateOutlet="symbolTitle"></ng-container></ng-template>
 
 	<section>
-		<ngx-md *ngIf="symbol?.summary; else noContent;" [data]="currentDef ? symbol?.comment : symbol?.summary"></ngx-md>
+		<showdown *ngIf="symbol?.summary; else noContent;" [value]="currentDef ? symbol?.comment : symbol?.summary"></showdown>
 		<ng-template #noContent><p><em>No description...</em></p></ng-template>
 		<footer>
 			<span *ngIf="symbol?.sources?.length > 0" [innerHTML]="sources"></span>
