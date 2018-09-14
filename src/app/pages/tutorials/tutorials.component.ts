@@ -396,7 +396,12 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		this.activatedRoute.params.subscribe( data => {
 			this.tutoIdentifier = data.tutoName;
 		} );
+		let skip = true;
 		this.section.subscribe( newSection => {
+			if ( skip ){
+				skip = false;
+				return;
+			}
 			this.sectionIndex = _.indexOf( this.currentSections, newSection );
 		} );
 	}
@@ -406,7 +411,8 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		if ( this.section.value && this.section.value.id === fragment ){
 			return;
 		}
-		const section = _.find( this.sections, section => section.id === fragment );
+
+		const section = _.find( this.currentSections, section => section.id === fragment );
 		if ( !section ){
 			throw new Error( `Could not find section with fragment "${fragment}"` );
 		}
@@ -427,7 +433,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	
 	private getSections() {
 		const childNodes = this.tutoContent.nativeElement.childNodes;
-		this.currentSections = Array
+		return Array
 			.from( childNodes )
 			.filter( element => element instanceof HTMLElement &&
 				element.innerHTML && 
@@ -459,8 +465,9 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	public async ngAfterViewInit() {
 		await this.awaitTutoContentInitialized();
 		this.sidenavContainer.autosize = true;
-		this.getSections();
-		this.resetTutorialContentIds();
+		const sections = this.getSections();
+		const sectionsNewIds = this.resetTutorialContentIds( sections );
+		this.currentSections = sectionsNewIds;
 		setTimeout( () => {
 			this.sidenavContainer.autosize = false;
 		},          500 );
@@ -537,15 +544,15 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		return false;
 	}
 
-	private resetTutorialContentIds(){
+	private resetTutorialContentIds( sections: HTMLElement[] ){
 		const sectionIndexes: number[] = [];
 		let notHeadingIndex = 0;
-		this.currentSections.forEach( section => {
+		return sections.map( section => {
 			if ( section instanceof HTMLHeadingElement ){
 				notHeadingIndex = 0;
 				const headingLevel = parseInt( section.tagName.slice( 1 ) ) - 1;
 				if ( headingLevel === 0 ){
-					return;
+					return section;
 				}
 				if ( sectionIndexes.length < headingLevel ){
 					sectionIndexes.push( 1 );
@@ -560,6 +567,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				notHeadingIndex++;
 				section.id = `${( sectionIndexes.join( '-' ) )}:${notHeadingIndex}`;
 			}
+			return section;
 		} );
 	}
 

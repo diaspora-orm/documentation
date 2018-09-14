@@ -59,8 +59,7 @@ export class OutlinerComponent implements OnInit {
 		return headingTree.length > 0 ? headingTree : undefined;
 	}
 	
-	private retrieveHeadings( sections: HTMLElement[] ){
-		
+	private retrieveHeadings( sections: HTMLElement[] ){		
 		const headings = sections.filter( section => section instanceof HTMLHeadingElement ) as HTMLHeadingElement[];
 		
 		const iterator = headingsIterator( headings );
