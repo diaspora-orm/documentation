@@ -37,6 +37,6 @@
         "type":"find"
     },
     {
-        "code": "delete Diaspora.models.ToDo; delete Diaspora._dataSources.mySource"
+        "code": "delete Diaspora.models.ToDo, delete Diaspora._dataSources.mySource;"
     }
 ]
