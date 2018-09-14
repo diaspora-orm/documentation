@@ -1,6 +1,6 @@
 .install{
 	justify-content: center;
-	
+
 	& > .column{
 		flex: 0 1 0;
 	}
@@ -26,7 +26,7 @@ h3{
 	> *{
 		width: auto;
 		$tableWidth: 35%;
-		
+
 		&:first-child{
 			width: 100% - $tableWidth;
 		}
@@ -34,4 +34,8 @@ h3{
 			width: $tableWidth;
 		}
 	}
+}
+
+section.container{
+	margin-top: 50px;
 }

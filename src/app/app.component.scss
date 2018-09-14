@@ -9,11 +9,11 @@ nav{
 	right: 0;
 	z-index: 2;
 	transition: height $headerCollapseTime;
-	
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+	box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+
 	> ul > li{
-		&:first-child{
-			background-color: $c2dark;
-		}
+		background-color: white;
 	}
 	ul {
 		flex: 1 1 100%;
@@ -21,30 +21,29 @@ nav{
 		margin: 0;
 		display: flex;
 		transition: padding $headerCollapseTime, margin $headerCollapseTime, background-color $headerCollapseTime;
-		font-weight: 800;
-		font-size: 1.5em;
-		
+
 		a {
-			color: $bodyColor;
+			color: $c2dark;
+			font-size: 1.2em;
+			font-weight: 400;
 		}
-		
+
 		li{
 			flex: 1 1 auto;
 			margin: 0;
-			
-			background-color: $c1light;
-			
+			background-color: white;
+
 			&#logoLink{
-				background: linear-gradient(to right, $c2dark 0%,$c1light 100%);
+				// background: linear-gradient(to right, $c2dark 0%,$c1light 100%);
 				flex: 0 0 auto;
-				
+
 				img{
 					width: $normalHeaderHeight;
 					height: $normalHeaderHeight;
 					transition: width $headerCollapseTime, height $headerCollapseTime;
 				}
 			}
-			
+
 			&, a{
 				flex: 1 1 auto;
 				display: flex;
@@ -68,7 +67,7 @@ nav{
 
 :host:not(.attop){
 	padding-top: $reducedHeaderHeight;
-	
+
 	nav{
 		height: $reducedHeaderHeight;
 		#logoLink img {
@@ -76,4 +75,16 @@ nav{
 			height: $reducedHeaderHeight;
 		}
 	}
+}
+
+#logoLink img{
+	animation-name: popAnimation;
+	animation-duration: 300ms;
+}
+
+@keyframes popAnimation {
+	0%   {transform: scale(0);}
+    80%  {transform: scale(1);}
+    85%  {transform: scale(0.7);}
+    100% {transform: scale(1);}
 }
