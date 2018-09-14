@@ -5,7 +5,7 @@
 export const commonEnvironment = {
 	docsVersions: /* <doc-versions> */['0.3.0-alpha.13']/* </doc-versions> */,
 	tutorials: /* <tutorials> */{
-		'simple-todo-app': 'Simple ToDo app',
+		'simple-todo-app': 'Simple ToDo app', 'Darling' : 'Le best'
 	}, /* </tutorials> */
 };
 
