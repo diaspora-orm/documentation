@@ -12,6 +12,7 @@ export const routes: Routes = [
 	{ path: 'api', component: ApiComponent, data: { title: 'API' }  },
 	{ path: 'api/*path', component: ApiComponent, data: { title: 'API' }  },
 	{ path: 'tutorials/:tutoName', component: TutorialsComponent, data: { title: 'Tutorials' } },
+	{ path: 'guides/:guideName', component: TutorialsComponent, data: { title: 'Guides', guideMode: true } },
 ];
 
 @NgModule( {

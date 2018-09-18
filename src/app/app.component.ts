@@ -14,6 +14,7 @@ export class AppComponent {
 	private title = 'app';
 
 	public tutorials = environment.tutorials;
+	public guides = environment.guides;
 
 	public constructor(
 		private el: ElementRef,
