@@ -6,11 +6,13 @@ $contentVPadding: 5px;
 $contentHPadding: 20px;
 
 article{
-	box-shadow: 0 2px 4px 0px;
+	box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
 	margin: 10px 0;
 
 	&.exported{
-		border: 5px solid $c3light;
+		border: 1px solid $c2light;
+		border-radius: 3px;
+		margin: 40px 0;
 
 		section{
 			padding: $contentVPadding $contentHPadding - $exportedMargin $contentVPadding - $exportedMargin;
@@ -20,10 +22,11 @@ article{
 
 h2{
 	background-color: #eee;
-  padding: 5px 10px;
-  i{
-    margin-right: 5px;
-  }
+	padding: 5px 10px;
+	border-radius: 3px;
+	i{
+		margin-right: 5px;
+	}
 }
 
 section{
@@ -31,11 +34,11 @@ section{
 }
 
 :host(.current){
-  article{
-    box-shadow: none;
-    border: none;
-  }
-  h2{
-    background-color: transparent;
-  }
+	article{
+		box-shadow: none;
+		border: none;
+	}
+	h2{
+		background-color: transparent;
+	}
 }
