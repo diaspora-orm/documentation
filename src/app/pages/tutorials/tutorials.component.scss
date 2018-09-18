@@ -48,7 +48,7 @@ $footer-height: 70px;
 #canvas-container {
 	flex: 1 1 0;
 	align-self: center;
-	min-width: 400px;
+	//min-width: 400px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -394,4 +394,8 @@ mat-sidenav{
 }
 mat-sidenav-content{
 	overflow: unset;
+	display: flex;
+}
+img{
+	max-width: none;
 }

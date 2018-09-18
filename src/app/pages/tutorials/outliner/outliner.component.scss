@@ -15,11 +15,16 @@ $headingSizes: (
 "6": 0.875
 );
 
-:host ::ng-deep{
-	@each $headingLevel, $sizeFactor in $headingSizes {
-		h#{$headingLevel} {
-			font-size: $sizeFactor * 1.5rem;
-			margin-bottom: 5px;
+:host{
+	padding: 10px 15px;
+	display: block;
+
+	::ng-deep{
+		@each $headingLevel, $sizeFactor in $headingSizes {
+			h#{$headingLevel} {
+				font-size: $sizeFactor * 1.5rem;
+				margin-bottom: 5px;
+			}
 		}
 	}
 }
