@@ -1,11 +1,17 @@
 <nav id="header">
 	<ul>
 		<li id="logoLink"><a href="/"><img src="/assets/images/logo.svg" /></a></li>
-		<li><a href="/api">API</a></li>
+		<li><a [routerLink]="['api']">API</a></li>
 		<li>
-			<a href="/tutorials"><span>Tutorials</span></a>
+			<a><span>Tutorials</span></a>
 			<ul>
-				<li *ngFor="let pair of tutorials | pairs"><a [href]="'/tutorials/' + pair.key">{{pair.value}}</a></li>
+				<li *ngFor="let pair of tutorials | pairs"><a [routerLink]="['tutorials', pair.key]">{{pair.value}}</a></li>
+			</ul>
+		</li>
+		<li>
+			<a><span>Guides</span></a>
+			<ul>
+				<li *ngFor="let pair of guides | pairs"><a [routerLink]="['guides', pair.key]">{{pair.value}}</a></li>
 			</ul>
 		</li>
 	</ul>
