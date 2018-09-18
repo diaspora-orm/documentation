@@ -25,7 +25,7 @@ const headingsIterator = ( headings: HTMLHeadingElement[] ) => {
 	styleUrls: ['./outliner.component.scss'],
 } )
 export class OutlinerComponent implements OnInit {
-	@Input() public sections!: BehaviorSubject<HTMLElement[]>;
+	@Input() public sections?: BehaviorSubject<HTMLElement[]>;
 	
 	public headingTree: IHeadingTree[] | undefined;
 	
@@ -72,7 +72,11 @@ export class OutlinerComponent implements OnInit {
 	}
 
 	public ngOnInit(){
-		this.sections.subscribe( sections => this.retrieveHeadings( sections ) );
+		if ( this.sections ){
+			this.sections.subscribe( sections => this.retrieveHeadings( sections ) );
+		} else {
+			console.warn( 'Could not get BehaviorSubject for tutorial sections' );
+		}
 	}
 }
 

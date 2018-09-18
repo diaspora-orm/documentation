@@ -18,7 +18,7 @@ describe( 'AppComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ) ], 
-			declarations: [ AppComponent, MockProductEditorComponent, PairsPipe ],do.it
+			declarations: [ AppComponent, MockProductEditorComponent, PairsPipe ],
 		} ).compileComponents();
 	} ) );
 	it( 'should create the app', async( () => {

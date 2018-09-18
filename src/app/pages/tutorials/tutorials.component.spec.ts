@@ -1,3 +1,4 @@
+import { MatSidenavModule } from '@angular/material';
 import { HttpClientModule } from '@angular/common/http';
 import { routes } from './../../app-routing.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
@@ -12,8 +13,8 @@ describe( 'TutorialsComponent', () => {
 	
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
-			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule ],
 			declarations: [ TutorialsComponent, ShowdownDirective ],
+			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule, MatSidenavModule ],
 		} )
 		.compileComponents();
 	} ) );

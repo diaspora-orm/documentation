@@ -158,7 +158,7 @@ class MockApiDocService{
 				[] as ISmbl[]
 			) );
 		}
-		return previousList;
+		return previousList as ISymbolDef[];
 	}
 }
 

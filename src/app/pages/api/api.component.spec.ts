@@ -1,3 +1,4 @@
+import { MatSidenavModule } from '@angular/material';
 import { HttpClientModule } from '@angular/common/http';
 import { ApiDocService } from './../../services/api-doc/api-doc.service';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -34,7 +35,7 @@ describe( 'ApiComponent', () => {
 	
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
-			imports: [ LazyRenderModule, RouterTestingModule.withRoutes( [] ), HttpClientModule ],
+			imports: [ LazyRenderModule, RouterTestingModule.withRoutes( [] ), HttpClientModule, MatSidenavModule ],
 			declarations: [
 				ApiComponent,
 				MockSymbolComponent,

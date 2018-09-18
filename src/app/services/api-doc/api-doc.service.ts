@@ -85,7 +85,6 @@ const LinkRegexp = /{@link\s+(\S+)(?:\s+(.+?))?}/;
 const LinkRegexpG = new RegExp( LinkRegexp, 'g' );
 const API_DATA_SOURCE_NAME = 'apiStore';
 
-
 @Injectable( {
 	providedIn: 'root',
 } )
