@@ -16,13 +16,13 @@
 						</ng-template>
 						<ng-template #symbolsBreadcrumb>
 							<span *ngFor="let breadcrumbItem of breadcrumbPath; let i = index">
-								<a [routerLink]="[]" [queryParams]="{symbolPath: breadcrumbPath.slice(0, i + 1).join('/')}">
+								<a [routerLink]="[]" [queryParams]="{symbolPath: breadcrumbItem.canonicalPath}">
 									<span *ngIf="i !== breadcrumbPath.length -1; then breadcrumbNormalItem; else breadcrumbTailItem"></span>
 								</a>
 								
 								
-								<ng-template #breadcrumbTailItem><b>{{breadcrumbItem}}</b></ng-template>
-								<ng-template #breadcrumbNormalItem>{{breadcrumbItem}}</ng-template>
+								<ng-template #breadcrumbTailItem><b>{{breadcrumbItem.label}}</b></ng-template>
+								<ng-template #breadcrumbNormalItem>{{breadcrumbItem.label}}</ng-template>
 							</span>
 						</ng-template>
 					</div>

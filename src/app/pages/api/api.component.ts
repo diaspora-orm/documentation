@@ -1,5 +1,5 @@
 import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
-import { ApiDocRepositoryService, ITreeData, ISymbolAndChildren } from './../../services/repository/api-doc-repository/api-doc-repository.service';
+import { ApiDocRepositoryService, ITreeData, ISymbolAndChildren, IBreadcrumbItem } from './../../services/repository/api-doc-repository/api-doc-repository.service';
 import { VersionManagerService } from './../../services/version-manager/version-manager.service';
 import { SymbolKind } from './../../types/typedoc/typedoc';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterContentInit, NgZone, EventEmitter, Output, Input, HostBinding } from '@angular/core';
@@ -42,7 +42,7 @@ export class ApiComponent extends AHeaderSizedComponent implements OnInit, After
 	
 	private searchCriterionSet = ESearchCriterionReady.NONE;
 	
-	public breadcrumbPath: string[] = [];
+	public breadcrumbPath: IBreadcrumbItem[] = [];
 	
 	// Content of the sidebar
 	public navigation?: ITreeData;
@@ -127,7 +127,7 @@ export class ApiComponent extends AHeaderSizedComponent implements OnInit, After
 					console.error( 'Outdated search' );
 					return;
 				}
-				this.breadcrumbPath = currentDocPage.currentSymbol.canonicalPath.split( '/' );
+				this.breadcrumbPath = ( await this.ApiDocRepository.getBreadcrumb( currentDocPage.currentSymbol.canonicalPath, navigation ) ) || [];
 				this.zone.run( () => {
 					this.hasInitialized = true;
 					this.isLoading = false;

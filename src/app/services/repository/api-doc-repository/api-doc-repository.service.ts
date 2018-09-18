@@ -21,6 +21,11 @@ export interface IGetCurrentSymbolChildrenOpts{
 	children?: Set<ISymbolDef>;
 }
 
+export interface IBreadcrumbItem{
+	label: string;
+	canonicalPath: string;
+	symbol: ISymbolDef;
+}
 
 const recomposeArr = ( set: Set<ISymbolDef>, descendingTree?: ITreeData ) => {
 	const chainable = set.toChainable( Set.ETransformationMode.ATTRIBUTES );
@@ -133,5 +138,48 @@ export class ApiDocRepositoryService {
 		}
 		const children = opts && opts.children ? opts.children : await this.ApiDoc.findMany( this.maybeAddExportedQuery( {ancestor: currentSymbol.attributes.identifier} ) );
 		return { currentSymbol, children };
+	}
+
+	private static isSymbolInPath( symbol: ISymbolDef, path: string ){
+		const symbolName = symbol.canonicalPath;
+		if ( path.startsWith( symbolName ) ) {
+			const charAfter = path[symbol.canonicalPath.length];
+			if ( typeof charAfter === 'undefined' || charAfter.match( /(^\W|^$)/ ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private getBreadcrumbByPath( id: string, treeData: ITreeData ): IBreadcrumbItem[] | undefined{
+		if ( treeData.item.canonicalPath === id ){
+			return [{ label: treeData.item.name, canonicalPath: treeData.item.canonicalPath, symbol: treeData.item }];
+		} else if ( ApiDocRepositoryService.isSymbolInPath( treeData.item, id ) && treeData.children ){
+			const childTreeData = _.find( treeData.children, ( child: ITreeData ) => ApiDocRepositoryService.isSymbolInPath( child.item, id ) );
+			if ( childTreeData ){
+				const childBreadcrumb = this.getBreadcrumbByPath( id, childTreeData );
+				if ( childBreadcrumb ){
+					return [
+						{ label: treeData.item.name, canonicalPath: treeData.item.canonicalPath, symbol: treeData.item },
+						...childBreadcrumb,
+					];
+				} else {
+					return undefined;
+				}
+			}
+		}
+	}
+
+	public async getBreadcrumb( id: string | number, treeData?: ITreeData ){
+		const defaultedTreeData = treeData || await this.getTreeData( [id] );
+		
+		if ( !defaultedTreeData ){
+			throw new Error( 'Target not found' );
+		}
+		
+		if ( typeof id === 'number' ){
+			throw new Error( 'Not implemented' );
+		}
+		return this.getBreadcrumbByPath( id, defaultedTreeData );
 	}
 }
