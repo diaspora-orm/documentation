@@ -1,5 +1,5 @@
 import { ApiDocService } from './../../../../services/api-doc/api-doc.service';
-import { NgxMdComponent } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 import { TypeComponent } from './../type/type.component';
 import { CallSignatureComponent } from './callSignature/call-signature.component';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
@@ -15,7 +15,7 @@ describe( 'FunctionSymbolComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule ],
-			declarations: [ FunctionSymbolComponent, CallSignatureComponent, TypeComponent, NgxMdComponent ],
+			declarations: [ FunctionSymbolComponent, CallSignatureComponent, TypeComponent, ShowdownDirective ],
 			providers: [ ApiDocService ],
 		} )
 		.compileComponents();

@@ -4,7 +4,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SymbolComponent } from './symbol.component';
 import { TypeComponent } from './type/type.component';
-import { NgxMdComponent } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 import { HttpClientModule } from '@angular/common/http';
 
 describe( 'SymbolComponent', () => {
@@ -14,7 +14,7 @@ describe( 'SymbolComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule ],
-			declarations: [ SymbolComponent, TypeComponent, NgxMdComponent ],
+			declarations: [ SymbolComponent, TypeComponent, ShowdownDirective ],
 			providers: [ ApiDocService ],
 		} )
 		.compileComponents();

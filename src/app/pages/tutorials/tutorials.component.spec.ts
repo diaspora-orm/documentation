@@ -3,7 +3,7 @@ import { routes } from './../../app-routing.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TutorialsComponent } from './tutorials.component';
-import { NgxMdComponent } from 'ngx-md';
+import { ShowdownDirective } from 'ngx-showdown';
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe( 'TutorialsComponent', () => {
@@ -13,7 +13,7 @@ describe( 'TutorialsComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ), HttpClientModule ],
-			declarations: [ TutorialsComponent, NgxMdComponent ],
+			declarations: [ TutorialsComponent, ShowdownDirective ],
 		} )
 		.compileComponents();
 	} ) );

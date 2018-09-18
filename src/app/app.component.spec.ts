@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 
 import { Component } from '@angular/core';
+import { PairsPipe } from './pipes/pairs/pairs.pipe';
 
 
 @Component( {
@@ -17,7 +18,7 @@ describe( 'AppComponent', () => {
 	beforeEach( async( () => {
 		TestBed.configureTestingModule( {
 			imports: [ RouterTestingModule.withRoutes( [] ) ], 
-			declarations: [ AppComponent, MockProductEditorComponent ],
+			declarations: [ AppComponent, MockProductEditorComponent, PairsPipe ],do.it
 		} ).compileComponents();
 	} ) );
 	it( 'should create the app', async( () => {
