@@ -8,7 +8,7 @@
 		<mat-sidenav-content>
 			<figcaption #scroller (mousewheel)="handleScroll($event)" (DOMMouseWheel)="handleScroll($event)" (wheel)="handleScroll($event)">
 				
-				<showdown [src]="tutoIdentifier ? '/assets/content/tutorials/' + tutoIdentifier + '.md' : undefined"></showdown>
+				<showdown [src]="contentUrl"></showdown>
 				
 				<i id="cursor" #cursor></i>
 			</figcaption>

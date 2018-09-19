@@ -1,0 +1,12 @@
+
+<figure>
+	<mat-sidenav-container>
+		<!-- TODO: use better define fixedBottomGap -->
+		<mat-sidenav mode="side" opened fixedInViewport="true" [fixedTopGap]="headerHeight" class="topFixed">
+			<app-outliner [sections]="sections"></app-outliner>
+		</mat-sidenav>
+		<mat-sidenav-content>
+			<showdown [src]="contentUrl"></showdown>
+		</mat-sidenav-content>
+	</mat-sidenav-container>
+</figure>

@@ -1,96 +1,7 @@
-import { HeadSizerService } from './../../services/head-sizer/head-sizer.service';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
-import { ShowdownDirective } from 'ngx-showdown';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MarkdownViewerComponent } from './../markdown-viewer.component';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 
 import * as _ from 'lodash';
-import { OutlinerComponent } from './outliner/outliner.component';
-import { MatSidenavContainer } from '@angular/material';
-import { AHeaderSizedComponent } from '../../header-sized-component';
-import { SassVarService } from '../../services/sass-var/sass-var.service';
-import { BehaviorSubject } from 'rxjs';
-
-interface IScrollDest{
-	top?: number;
-	left?: number;
-}
-
-const  scrollIt = ( target: HTMLElement | Window, destination: IScrollDest, duration = 500 ) => {
-	const start = target instanceof HTMLElement ? {
-		top: target.scrollTop,
-		left: target.scrollLeft,
-	} : {
-		top: target.scrollY,
-		left: target.scrollX,
-	};
-
-	const destDefaulted = Object.assign( {}, start, destination );
-	const easings = {
-		easeInOutExpo: function( pos: number ) {
-			if ( pos === 0 ) {
-				return 0;
-			}
-			if ( pos === 1 ) {
-				return 1;
-			}
-			if ( ( pos /= 0.5 ) < 1 ) {
-				return 0.5 * Math.pow( 2, 10 * ( pos - 1 ) );
-			}
-			return 0.5 * ( -Math.pow( 2, -10 * --pos ) + 2 );
-		},
-	};
-
-	const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
-
-	const outSize = target instanceof HTMLElement ? {
-		height: Math.max( target.offsetHeight, target.clientHeight ),
-		width: Math.max( target.offsetWidth, target.clientWidth ),
-	} : {
-		height: target.innerHeight,
-		width: target.innerWidth,
-	};
-	const inSize = target instanceof HTMLElement ? {
-		height: target.scrollHeight,
-		width: target.scrollWidth,
-	} : {
-		height: target.document.body.scrollHeight,
-		width: target.document.body.scrollWidth,
-	};
-
-	const scrollableSize = {
-		height: inSize.height - outSize.height,
-		width: inSize.width - outSize.width,
-	};
-	const boundTarget = {
-		top: Math.min( scrollableSize.height, destDefaulted.top ),
-		left: Math.min( scrollableSize.width, destDefaulted.left ),
-	};
-
-	return new Promise( resolve => {
-		if ( 'requestAnimationFrame' in window === false ) {
-			target.scroll( boundTarget );
-			return resolve( false );
-		}
-
-		function scroll() {
-			const now = 'now' in window.performance ? performance.now() : new Date().getTime();
-			const time = Math.min( 1, ( ( now - startTime ) / duration ) );
-			const timeFunction = easings.easeInOutExpo( time );
-			target.scroll( {
-				left: Math.ceil( ( timeFunction * ( boundTarget.left - start.left ) ) + start.left ),
-				top: Math.ceil( ( timeFunction * ( boundTarget.top - start.top ) ) + start.top ),
-			} );
-
-			if ( timeFunction === 1 ) {
-				return resolve( true );
-			}
-
-			return requestAnimationFrame( scroll );
-		}
-
-		scroll();
-	} );
-};
 
 const SCROLL_COOLDOWN = 500;
 
@@ -190,15 +101,13 @@ enum AutoPlayIcons {
 const MUTE_STORAGE_KEY = 'muted';
 const MARGIN_SCROLL = 25;
 
+
 @Component( {
-	selector: 'app-tutorials',
-	templateUrl: './tutorials.component.html',
-	styleUrls: ['./tutorials.component.scss'],
+	selector: 'app-markdown-reader',
+	templateUrl: './markdown-reader.component.html',
+	styleUrls: ['./markdown-reader.component.scss', '../markdown-viewer.component.scss'],
 } )
-export class TutorialsComponent extends AHeaderSizedComponent implements OnInit, AfterViewInit {
-	@ViewChild( MatSidenavContainer ) public sidenavContainer!: MatSidenavContainer;
-	@ViewChild( OutlinerComponent ) private outliner!: OutlinerComponent;
-	@ViewChild( ShowdownDirective ) private tutoComponent!: ShowdownDirective;
+export class MarkdownReaderComponent extends MarkdownViewerComponent implements OnInit {
 	@ViewChild( 'scroller' ) private scroller!: ElementRef<HTMLElement>;
 	@ViewChild( 'progress' ) private progress!: ElementRef<HTMLProgressElement>;
 	@ViewChild( 'cursor' ) private cursor!: ElementRef<HTMLElement>;
@@ -207,33 +116,14 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	@ViewChild( 'fullScreenButton' ) private fullScreenButton!: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'muteButton' ) private muteButton!: ElementRef<HTMLButtonElement>;
 	@ViewChild( 'presentation' ) private presentation!: ElementRef<HTMLElement>;
-	public tutoIdentifier!: string;
+
 	private allowScroll = true;
 	private currentSpeechSynthesis: CustomSynthesis | null = null;
 
 
-	public sections = new BehaviorSubject<HTMLElement[]>( [] );
-	private get currentSections(){
-		return this.sections.value;
-	}
-	private set currentSections( sections: HTMLElement[] ){
-		this.sections.next( sections );
-	}
-
-	public section = new BehaviorSubject<HTMLElement | undefined>( undefined );
-	public get currentSection(){
-		return this.section.value;
-	}
-	public set currentSection( section: HTMLElement | undefined ){
-		this.section.next( section );
-	}
-
 
 	public get target() {
 		return this.sectionIndex >= 0 ? this.currentSections[this.sectionIndex] : null;
-	}
-	private get tutoContent() {
-		return ( this.tutoComponent as any )._elementRef as ElementRef<HTMLElement>;
 	}
 
 	private get tutoContainerHeight(){
@@ -241,8 +131,9 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 	}
 
 
-	private _sectionIndex = -1;
-	public get sectionIndex() {return this._sectionIndex; }
+	public get sectionIndex(){
+		return super.getSectionIndex();
+	}
 	public set sectionIndex( index: number ) {
 		if ( index >= this.currentSections.length ) {
 			return;
@@ -254,13 +145,9 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				this.allowScroll = true;
 			},          SCROLL_COOLDOWN );
 
-			if ( index === 0 || this.sectionIndex === 0 ){
-				this.headSizer.atTopEnabled = index === 0;
-			}
-
 			const scrollDirection = index > this.sectionIndex ? SectionChange.Next : SectionChange.Previous;
 			// Do scroll
-			this._sectionIndex = index;
+			super.setSectionIndex( index );
 			this.refreshScollAndCursor( this.target, scrollDirection );
 			// Update progress infos
 			const frac = this.currentSections.length === 0 ? 0 : ( ( index + 1 ) / this.currentSections.length );
@@ -380,65 +267,28 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		}
 	}
 
-	public get footerHeight(){
-		return this.sassVar.getNumeric( 'footer-height', this.el.nativeElement );
-	}
-
-	public constructor(
-		private el: ElementRef<HTMLElement>,
-		private activatedRoute: ActivatedRoute,
-		//private markdown: ShowdownService,
-		private router: Router,
-		private sassVar: SassVarService,
-		headSizer: HeadSizerService
-	 ) {
-		super( headSizer );
-		this.activatedRoute.params.subscribe( data => {
-			this.tutoIdentifier = data.tutoName;
-		} );
-		let skip = true;
-		this.section.subscribe( newSection => {
-			if ( skip ){
-				skip = false;
-				return;
-			}
-			this.sectionIndex = _.indexOf( this.currentSections, newSection );
-		} );
-	}
-
-	private gotoFragment( fragment: string ){
-		// Check if the transition was already done (when scrolling)
-		if ( this.section.value && this.section.value.id === fragment ){
+	private refreshScollAndCursor( target: HTMLElement | null, changeDirection: SectionChange ) {
+		if ( !target ) {
 			return;
 		}
+		this.currentSections.forEach( element => element.classList.remove( 'active' ) );
+		target.classList.add( 'active' );
+		const targetMiddle = MarkdownReaderComponent.getVMiddle( target );
+		
+		this.cursor.nativeElement.style.opacity = '1';
+		this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
+		
+		const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
 
-		const section = _.find( this.currentSections, section => section.id === fragment );
-		if ( !section ){
-			throw new Error( `Could not find section with fragment "${fragment}"` );
+		if ( target.clientHeight <= this.tutoContainerHeight ){
+			MarkdownReaderComponent.scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
+		} else {
+			if ( changeDirection === SectionChange.Next ){
+				MarkdownReaderComponent.scrollIt( this.scroller.nativeElement, {top:target.offsetTop - MARGIN_SCROLL} );
+			} else if ( changeDirection === SectionChange.Previous ){
+				MarkdownReaderComponent.scrollIt( this.scroller.nativeElement, {top:target.offsetTop + target.clientHeight - this.tutoContainerHeight + MARGIN_SCROLL} );
+			}
 		}
-		this.currentSection = section;
-	}
-	private static getVMiddle( element: HTMLElement ) {
-		return element.offsetTop +
-		( element.offsetHeight / 2 );
-	}
-
-	private async awaitTutoContentInitialized(){
-		let childNodes = this.tutoContent.nativeElement.childNodes;
-		while ( childNodes.length === 0 ) {
-			await new Promise( resolve => setTimeout( resolve, 0 ) );
-			childNodes = this.tutoContent.nativeElement.childNodes;
-		}
-	}
-	
-	private getSections() {
-		const childNodes = this.tutoContent.nativeElement.childNodes;
-		return Array
-			.from( childNodes )
-			.filter( element => element instanceof HTMLElement &&
-				element.innerHTML && 
-				!( element instanceof HTMLHRElement )
-			) as HTMLElement[];
 	}
 
 	public async ngOnInit() {
@@ -462,48 +312,6 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		};*/
 	}
 
-	public async ngAfterViewInit() {
-		await this.awaitTutoContentInitialized();
-		this.sidenavContainer.autosize = true;
-		const sections = this.getSections();
-		const sectionsNewIds = this.resetTutorialContentIds( sections );
-		this.currentSections = sectionsNewIds;
-		setTimeout( () => {
-			this.sidenavContainer.autosize = false;
-		},          500 );
-
-		// Load fragment 
-		this.activatedRoute.fragment.subscribe( fragment => {
-			if ( fragment ){
-				this.gotoFragment( fragment );
-			}
-		} );
-	}
-
-	private refreshScollAndCursor( target: HTMLElement | null, changeDirection: SectionChange ) {
-		if ( !target ) {
-			return;
-		}
-		this.currentSections.forEach( element => element.classList.remove( 'active' ) );
-		target.classList.add( 'active' );
-		const targetMiddle = TutorialsComponent.getVMiddle( target );
-		
-		this.cursor.nativeElement.style.opacity = '1';
-		this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
-		
-		const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
-
-		if ( target.clientHeight <= this.tutoContainerHeight ){
-			scrollIt( this.scroller.nativeElement, {top: targetMiddle - tutoContentRect.height / 2}, 500 );
-		} else {
-			if ( changeDirection === SectionChange.Next ){
-				scrollIt( this.scroller.nativeElement, {top:target.offsetTop - MARGIN_SCROLL} );
-			} else if ( changeDirection === SectionChange.Previous ){
-				scrollIt( this.scroller.nativeElement, {top:target.offsetTop + target.clientHeight - this.tutoContainerHeight + MARGIN_SCROLL} );
-			}
-		}
-	}
-
 	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
 		const delta = event.type === 'wheel' ?
 			- event.deltaY :
@@ -524,6 +332,7 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 		}
 		
 		event.preventDefault();
+		console.log( {sectionIndex: this.sectionIndex, sectionsCount: this.currentSections.length} );
 		if ( delta >= SectionChange.Next ) {
 			if ( this.sectionIndex > 0 ) {
 				this.autoPlay = false;
@@ -542,33 +351,6 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 			}
 		}
 		return false;
-	}
-
-	private resetTutorialContentIds( sections: HTMLElement[] ){
-		const sectionIndexes: number[] = [];
-		let notHeadingIndex = 0;
-		return sections.map( section => {
-			if ( section instanceof HTMLHeadingElement ){
-				notHeadingIndex = 0;
-				const headingLevel = parseInt( section.tagName.slice( 1 ) ) - 1;
-				if ( headingLevel === 0 ){
-					return section;
-				}
-				if ( sectionIndexes.length < headingLevel ){
-					sectionIndexes.push( 1 );
-				} else if ( sectionIndexes.length > headingLevel ){
-					sectionIndexes.pop();
-				} else {
-					sectionIndexes[sectionIndexes.length - 1]++;
-				}
-
-				section.id = `${( sectionIndexes.join( '-' ) )}>${section.innerText}`;
-			} else {
-				notHeadingIndex++;
-				section.id = `${( sectionIndexes.join( '-' ) )}:${notHeadingIndex}`;
-			}
-			return section;
-		} );
 	}
 
 	public scollProgress( $event: MouseEvent ){
@@ -621,5 +403,10 @@ export class TutorialsComponent extends AHeaderSizedComponent implements OnInit,
 				return false;
 			}
 		}
+	}
+
+	private static getVMiddle( element: HTMLElement ) {
+		return element.offsetTop +
+		( element.offsetHeight / 2 );
 	}
 }

@@ -10,6 +10,10 @@ export const commonEnvironment = {
 	}, /* </tutorials> */
 	guides: /* <guides> */{
 		'getting-started': 'Getting started',
+		'query-language': 'Query Language',
+		'events-in-diaspora' : 'Events in Diaspora',
+		'create-an-adapter': 'Create an adapter',
+		glossary: 'Glossary',
 	}, /* </guides> */
 };
 

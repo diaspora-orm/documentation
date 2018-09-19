@@ -1,0 +1,241 @@
+@import '../../../scss/vars.scss';
+
+$progress-color: $c1light;
+$footer-height: 70px;
+:host{
+	@include define-custom-property('footer-height', $footer-height);
+
+	height: calc(100vh - #{$reducedHeaderHeight});
+    display: flex;
+	flex-direction: column;
+	transition: $headerCollapseTime height;
+}
+:host-context(.attop){
+	height: calc(100vh - #{$normalHeaderHeight});
+}
+/*:host {
+}*/
+
+#toggle-text{
+	position: absolute;
+	right: 5px;
+	padding: 10px;
+	background-color: rgba(32,32,32,0.2);
+	border: 1px solid #aaa;
+	border-right-width: 0;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	transition: 0.5s all;
+	
+	&.text-hidden{
+		left: 0;
+		right: auto;
+		border-bottom-right-radius: 5px;
+		border-top-right-radius: 5px;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		border-left-width: 0;
+		border-right-width: 1px;
+		
+		.fa{
+			transform: scaleX(-1);
+		}
+	}
+}
+#canvas-container {
+	flex: 1 1 0;
+	align-self: center;
+	//min-width: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#canvas{
+	flex: 0 0 auto;
+}
+figcaption {
+	flex: 0 1 100%;
+	min-width: 200px;
+	overflow: auto;
+	position: relative;
+	padding: 0 15px;
+	text-align: justify;
+	max-height: 100%;
+}
+
+$cursor-height:10px;
+#cursor {
+	width: 0;
+	height: 0;
+	border-right: $cursor-height solid $progress-color;
+	border-top: $cursor-height solid transparent;
+	border-bottom: $cursor-height solid transparent;
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 0;
+	opacity: 0;
+	transition: 0.5s top;
+}
+
+$foot-padding: 10px;
+$meter-height: 5px;
+
+@keyframes animate-shine { 
+	0% {opacity: 0; width: 0;}
+	50% {opacity: .5;}
+	100% {opacity: 0; width: 95%;}
+}
+
+
+
+
+figure{
+	margin: 0; 
+	display: flex;
+	flex-direction: row;
+	justify-content: stretch;
+	flex: 1 1 100%;
+	overflow-x: hidden;
+}
+
+
+
+#resize-handle{
+	border-left: 5px simple #333;
+	cursor: ew-resize;
+	position: relative;
+	user-select: none;
+	box-shadow: -2px 0 5px 1px #333;
+}
+.player-buttons{
+	flex: 1 0 auto;
+	display: inline-flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+}
+.player-button {
+	font-size: 2rem;
+	padding: 1.25rem;
+	border-radius: 100%;
+	width: 1em;
+	height: 1em;
+	line-height: 1em;
+	box-sizing: content-box;
+	background-color: $c1light;
+	border-color: $c1dark;
+	transition: all 0.5s;
+	margin: 0 0.5rem;
+	text-align: center;
+	flex: 0 0 1em;
+	
+	&:hover{
+		background-color: $c1dark;
+		border-color: $c1light;
+	}
+}
+footer {
+	background-color: $c2dark;
+	color: #ddd;
+	text-align: center;
+	line-height: 1rem;
+	flex: 0 0 $footer-height;
+
+
+	display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+	align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url(https://fonts.googleapis.com/css?family=Expletus+Sans);
+
+
+
+
+
+
+$cursorWidth: 5px;
+
+:host ::ng-deep showdown {
+	& > *{
+		margin-bottom: 15px;
+		position: relative;
+		padding-left: $cursorWidth;
+		
+		$transitionDuration: 0.25s;
+		&::before{
+			content: "";
+			top: 0;
+			bottom: 0;
+			left: 0;
+			position: absolute;
+			transition:
+				$transitionDuration border-left-width,
+				$transitionDuration left,
+				$transitionDuration opacity;
+			border-left: 0 solid $progress-color;
+			opacity: 0;
+		}
+		&.active::before{
+			border-left-width: $cursorWidth;
+			left:-$cursorWidth;
+			opacity: 1;
+		}
+	}
+	& > pre{
+		overflow-y: visible;
+	}
+	
+	$preQuoteMargin: 3px;
+	& > pre, & > blockquote{
+		margin-left: $preQuoteMargin;
+		
+		&::before{
+			left: -$preQuoteMargin;
+		}
+		&.active::before{
+			left: -($cursorWidth + $preQuoteMargin);
+		}
+	}
+	blockquote{
+		margin: 0 0 10px $preQuoteMargin;
+		padding: 5px;
+	}
+	& > ul li{
+		margin-bottom: 0;
+	}
+}
+
+mat-sidenav{
+	width: 350px;
+}
+mat-sidenav-content{
+	padding: 0 15px;
+}
+img{
+	max-width: none;
+}
