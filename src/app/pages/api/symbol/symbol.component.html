@@ -19,8 +19,6 @@
 	<section>
 		<showdown *ngIf="symbol?.summary; else noContent;" [value]="currentDef ? symbol?.comment : symbol?.summary"></showdown>
 		<ng-template #noContent><p><em>No description...</em></p></ng-template>
-		<footer>
-			<span *ngIf="symbol?.sources?.length > 0" [innerHTML]="sources"></span>
-		</footer>
+		<footer *ngIf="symbol?.sources?.length > 0" [innerHTML]="sources"></footer>
 	</section>
 </article>

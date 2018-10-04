@@ -12,7 +12,8 @@ import { MatSidenavModule } from '@angular/material';
 import { AppComponent } from './app.component';
 import { IndexComponent } from './pages/index/index.component';
 import { ApiComponent } from './pages/api/api.component';
-import { TutorialsComponent } from './pages/tutorials/tutorials.component';
+import { MarkdownViewerComponent } from './pages/markdown-viewer/markdown-viewer.component';
+import { OutlinerComponent } from './pages/markdown-viewer/outliner/outliner.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { IOAreaComponent } from './pages/index/ioarea/ioarea.component';
 import { SymbolComponent } from './pages/api/symbol/symbol.component';
@@ -26,15 +27,15 @@ import { SidebarComponent } from './pages/api/sidebar/sidebar.component';
 import { TypeComponent } from './pages/api/symbol/type/type.component';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { SectionComponent } from './pages/api/sidebar/section/section.component';
-import { OutlinerComponent } from './pages/tutorials/outliner/outliner.component';
 import { HttpClientModule } from '@angular/common/http';
+import { MarkdownReaderComponent } from './pages/markdown-viewer/markdown-reader/markdown-reader.component';
 
 @NgModule( {
 	declarations: [
 		AppComponent,
 		IndexComponent,
 		ApiComponent,
-		TutorialsComponent,
+		MarkdownViewerComponent,
 		IOAreaComponent,
 		SymbolComponent,
 		FunctionSymbolComponent,
@@ -48,6 +49,7 @@ import { HttpClientModule } from '@angular/common/http';
 		CookieConsentComponent,
 		SectionComponent,
 		OutlinerComponent,
+		MarkdownReaderComponent,
 	],
 	imports: [
 		BrowserModule,

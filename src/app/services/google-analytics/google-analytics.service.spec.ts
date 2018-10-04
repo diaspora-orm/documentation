@@ -1,5 +1,5 @@
 import { IOAreaComponent } from './../../pages/index/ioarea/ioarea.component';
-import { TutorialsComponent } from './../../pages/tutorials/tutorials.component';
+import { MarkdownViewerComponent } from './../../pages/markdown-viewer/markdown-viewer.component';
 import { ApiComponent } from './../../pages/api/api.component';
 import { routes } from './../../app-routing.module';
 import { TestBed, inject } from '@angular/core/testing';
