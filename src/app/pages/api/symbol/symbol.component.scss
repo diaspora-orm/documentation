@@ -20,10 +20,10 @@ article{
 
 h2{
 	background-color: #eee;
-  padding: 5px 10px;
-  i{
-    margin-right: 5px;
-  }
+	padding: 5px 10px;
+	i{
+		margin-right: 5px;
+	}
 }
 
 section{
@@ -31,11 +31,16 @@ section{
 }
 
 :host(.current){
-  article{
-    box-shadow: none;
-    border: none;
-  }
-  h2{
-    background-color: transparent;
-  }
+	article{
+		box-shadow: none;
+		border: none;
+	}
+	h2{
+		background-color: transparent;
+	}
+}
+
+
+footer ::deep p{
+	margin-bottom: 0;
 }
