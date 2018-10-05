@@ -29,6 +29,7 @@ import { CookieConsentComponent } from './cookie-consent/cookie-consent.componen
 import { SectionComponent } from './pages/api/sidebar/section/section.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MarkdownReaderComponent } from './pages/markdown-viewer/markdown-reader/markdown-reader.component';
+import { RoadmapComponent } from './pages/roadmap/roadmap.component';
 
 @NgModule( {
 	declarations: [
@@ -50,6 +51,7 @@ import { MarkdownReaderComponent } from './pages/markdown-viewer/markdown-reader
 		SectionComponent,
 		OutlinerComponent,
 		MarkdownReaderComponent,
+		RoadmapComponent,
 	],
 	imports: [
 		BrowserModule,
