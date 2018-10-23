@@ -1,21 +1,10 @@
+import { content, IRoadmapItem, IRelatedIssue } from './content';
+
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build ---prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const commonEnvironment = {
-	docsVersions: /* <doc-versions> */['0.3.0-alpha.13']/* </doc-versions> */,
-	tutorials: /* <tutorials> */{
-		'simple-todo-app': 'Simple ToDo app',
-		Darling : 'Le best',
-	}, /* </tutorials> */
-	guides: /* <guides> */{
-		'getting-started': 'Getting started',
-		'query-language': 'Query Language',
-		'events-in-diaspora' : 'Events in Diaspora',
-		'create-an-adapter': 'Create an adapter',
-		glossary: 'Glossary',
-	}, /* </guides> */
-};
+export const commonEnvironment = Object.assign( {}, content );
 
 /*
  * In development mode, to ignore zone related error stack frames such as
