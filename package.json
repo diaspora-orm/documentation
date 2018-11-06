@@ -27,7 +27,7 @@
     "@angular/platform-browser": "^6.1.3",
     "@angular/platform-browser-dynamic": "^6.1.3",
     "@angular/router": "^6.1.3",
-    "@diaspora/diaspora": "^0.3.0-alpha.13",
+    "@diaspora/diaspora": "^0.3.0-alpha.14",
     "angular-lazy-render": "^0.1.2",
     "angular2-cookie-law": "^6.0.4",
     "core-js": "^2.5.7",
