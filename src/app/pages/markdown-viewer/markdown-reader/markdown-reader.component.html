@@ -7,18 +7,20 @@
 		</mat-sidenav>
 		<mat-sidenav-content>
 			<figcaption #scroller (mousewheel)="handleScroll($event)" (DOMMouseWheel)="handleScroll($event)" (wheel)="handleScroll($event)">
-				
+
 				<showdown [src]="contentUrl"></showdown>
-				
+
 				<i id="cursor" #cursor></i>
 			</figcaption>
 			<div id="resize-handle">
 				<div id="toggle-text"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
 			</div>
-			<!--<img width="400" height="400" src=""/>-->
+
+			<!--
 			<div id="canvas-container">
 				<div id="canvas" #presentation><img src="https://www.freeiconspng.com/uploads/no-image-icon-21.png"/></div>
 			</div>
+			-->
 		</mat-sidenav-content>
 	</mat-sidenav-container>
 </figure>
