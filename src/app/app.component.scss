@@ -25,13 +25,15 @@ nav{
 		a {
 			color: $c2dark;
 			font-size: 1.2em;
-			font-weight: 400;
+			font-weight: 500;
 		}
 
 		li{
 			flex: 1 1 auto;
 			margin: 0;
 			background-color: white;
+			position: relative;
+			transition: 200ms ease-in-out;
 
 			&#logoLink{
 				// background: linear-gradient(to right, $c2dark 0%,$c1light 100%);
@@ -52,6 +54,39 @@ nav{
 				justify-content: center;
 				align-items: center;
 			}
+
+			// ul li ul
+			ul{
+				list-style: none;
+				display: none;
+				position: absolute;
+				top: 80px;
+				border: 1px solid rgba(0,0,0,0.3);
+				border-radius: 4px;
+				width: 95%;
+
+				li{
+					border-radius: 4px;
+					a{
+						text-decoration: none;
+						padding: 3px 0;
+					}
+				}
+			}
+
+			&:hover {
+				a{
+					text-decoration: underline;
+				}
+				ul {
+					display: block;
+				}
+			}
+			transition: all 100ms ease-in-out;
+		}
+
+		.padder{
+			width: 50%;
 		}
 	}
 }
@@ -67,6 +102,10 @@ nav{
 
 :host:not(.attop){
 	padding-top: $reducedHeaderHeight;
+
+	ul li ul{
+		top: calc(#{$reducedHeaderHeight} - 5px);
+	}
 
 	nav{
 		height: $reducedHeaderHeight;
@@ -84,7 +123,7 @@ nav{
 
 @keyframes popAnimation {
 	0%   {transform: scale(0);}
-    80%  {transform: scale(1);}
-    85%  {transform: scale(0.7);}
-    100% {transform: scale(1);}
+	80%  {transform: scale(1);}
+	85%  {transform: scale(0.7);}
+	100% {transform: scale(1);}
 }

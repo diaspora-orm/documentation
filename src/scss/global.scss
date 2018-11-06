@@ -25,7 +25,7 @@ pre{
 a{
 	color: $c1light;
 	transition: $linkTransitionDuration color;
-	
+
 	&:hover{
 		color: $c1dark;
 	}
@@ -58,15 +58,14 @@ body{
 
 
 
-@import '~typedoc-default-themes/src/default/assets/css/setup/mixins';
-@import '~typedoc-default-themes/src/default/assets/css/setup/icons';
+@import './icons';
 
 .tsd-kind-icon{
 	display: inline-block;
 	top: -3px;
-	
+
 	&:before{
-		background-image: url(../../node_modules/typedoc-default-themes/src/default/assets/images/icons@2x.png);
+		background-image: url(images/icons@2x.png);
 		margin: 0px 10px;
 		background-size: 238px 204px;
 		width: 17px;
@@ -95,7 +94,7 @@ td.d2h-code-linenumber{
 	//display: block;
 	white-space: nowrap;
 	vertical-align: top;
-	
+
 	> div{
 		width: $linenumWidth;
 		padding: 0;
@@ -113,7 +112,7 @@ td.d2h-code-linenumber{
 }
 .d2h-diff-table{
 	margin: 0;
-	
+
 	> tr > td{
 		height: auto;
 		padding: 0;
@@ -131,4 +130,19 @@ td{
 	&.d2h-info, &.d2h-cntx, &.d2h-ins, &.d2h-del{
 		padding: 0 $linenumPadd;
 	}
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+	background: $c2dark;
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }

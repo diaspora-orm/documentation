@@ -1,9 +1,7 @@
 <aside>
-	<article>
-		<ul *ngIf="treeData">
-			<app-section [item]="treeData?.item" [children]="treeData?.children"></app-section>
-		</ul>
-	</article>
+	<ul *ngIf="treeData">
+		<app-section [item]="treeData?.item" [children]="treeData?.children"></app-section>
+	</ul>
 	<footer>
 		<button [ngClass]="{'button-outline': onlyExported}" (click)="toggleExported()">Only exported</button>
 	</footer>
