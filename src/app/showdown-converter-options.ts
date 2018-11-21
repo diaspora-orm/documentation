@@ -1,10 +1,19 @@
 import { ConverterOptions } from 'ngx-showdown';
+import { Dictionary, chain } from 'lodash';
 import * as showdown from 'showdown' ;
+import * as hljs from 'highlight.js';
 
-import * as _ from 'lodash';
 
+// Configure hljs
+const javascript = require( 'highlight.js/lib/languages/javascript' );
+const typescript = require( 'highlight.js/lib/languages/typescript' );
+const xml = require( 'highlight.js/lib/languages/xml' );
+hljs.registerLanguage( 'javascript', javascript );
+hljs.registerLanguage( 'typescript', typescript );
+hljs.registerLanguage( 'xml', xml );
+
+// Configure showdown extensions
 const AUTO_BLANK_ABSOLUTE_URI = true;
-
 function absolute( base:string, relative:string ) {
 	const stack = base.split( '/' );
 	const parts = relative.split( '/' );
@@ -74,7 +83,7 @@ showdown.extension( 'targetlink', () => ( {
 			attrs.title = title;
 		}
 
-		const attrsStr = _.chain( attrs )
+		const attrsStr = chain( attrs )
 			.toPairs()
 			.map( ( [ key, value ] ) => `${key}="${value.replace( /"/g, '&quot;' )}"` )
 			.join( ' ' )
@@ -82,10 +91,12 @@ showdown.extension( 'targetlink', () => ( {
 		return `<a ${attrsStr}>${linkText}</a>`;
 	},
 } ) );
+showdown.extension( 'hljs', require( 'showdown-highlight' ) );
 
 export class MyConverterOptions extends ConverterOptions{
 	public constructor(){
 		super( { extensions: [
+			'hljs',
 			'targetlink',
 		] } );
 	}
