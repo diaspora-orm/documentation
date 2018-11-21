@@ -50,6 +50,10 @@ body{
 
 
 
+pre > code{
+	white-space: pre-wrap;
+}
+
 .topFixed{
 	transition: top $headerCollapseTime;
 }
