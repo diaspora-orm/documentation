@@ -32,6 +32,9 @@ a{
 	&:visited{
 		color: $c2dark;
 	}
+	&.button:visited{
+		color: $bodyColor;
+	}
 }
 
 
@@ -49,6 +52,34 @@ body{
 
 .topFixed{
 	transition: top $headerCollapseTime;
+}
+.tabs-head {
+    display: flex;
+    list-style-type: none;
+	flex-direction: row;
+    margin-bottom: -1px !important;
+    z-index: 1;
+
+	li {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		border-bottom-color: transparent;
+
+		&.button-outline{
+			background-color: #fafafa;
+		}
+	}
+}
+.tabs{
+	.tab{
+		display: none;
+		border: 1px solid $c1dark;
+		padding: 0 1rem;
+
+		&.active{
+			display: block;
+		}
+	}
 }
 
 
