@@ -19,7 +19,7 @@ On a new NodeJS project, install Diaspora from both the development configuratio
 
 ```sh
 # Install latest dev version
-npm install -D {{ site.github.clone.ssh }}
+npm install -D git+ssh://git@github.com:@diaspora/diaspora
 ```
 
 </div>
@@ -29,7 +29,7 @@ npm install -D {{ site.github.clone.ssh }}
 
 ```sh
 # Install latest dev version
-yarn add {{ site.github.clone.ssh }}
+yarn add git+ssh://git@github.com:@diaspora/diaspora
 ```
 
 </div>
@@ -41,10 +41,10 @@ Note that the first version of Diaspora that supports adding an adapter is versi
 ```json
 {
 	"devDependencies": {
-		"diaspora": "git+ssh://git@github.com:GerkinDev/Diaspora.git"
+		"@diaspora/diaspora": "git+ssh://git@github.com:@diaspora/diaspora"
 	},
 	"peerDependencies": {
-		"diaspora": ">= 0.2.0"
+		"@diaspora/diaspora": ">= 0.3.0"
 	}
 }
 ```
@@ -54,53 +54,111 @@ Of course, you should idealy check the latest stable version.
 ## Write the adapter
 
 ```ts
-const DiasporaAdapter = require( '@diaspora/diaspora/lib/adapters/baseAdapter.js' );
-const DataStoreEntity = require( '@diaspora/diaspora/lib/dataStoreEntities/baseEntity.js' );
+import { Dictionary } from 'lodash';
 
-export namespace MySource{
-	// This class allows you to define custom logic with your datastore entity
-	export class MySourceEntity extends DataStoreEntity {
-		constructor( entity, dataSource ) {
-			super( entity, dataSource );
-		}
-	}
+import { Diaspora, Adapter, QueryLanguage } from '@diaspora/diaspora';
+import { IEntityProperties, IEntityAttributes } from '@diaspora/diaspora/dist/types/types/entity';
+import AAdapter = Adapter.Base.AAdapter;
+import AAdapterEntity = Adapter.Base.AAdapterEntity;
 
-	// Your adapter logic.
-	export class MySourceAdapter extends DiasporaAdapter {
-		constructor( config ) {
-			super( MyEntity );
+export namespace MyAdapter {
+	export class MySourceAdapter extends AAdapter<MySourceEntity> {
+		public constructor( dataSourceName: string, ...adapterArgs: any[] ) {
+			super( MySourceEntity, dataSourceName );
 		}
 
-		configureCollection( tableName, remaps ) {
+		public configureCollection(
+			tableName: string,
+			remaps: _.Dictionary<string> = {},
+			filters: _.Dictionary<any> = {}
+		) {
 			// Call parent `configureCollection` to store remappings & filters
-			super.configureCollection( tableName, remaps );
+			super.configureCollection( tableName, remaps, filters );
 			// Then, create your schema.
 			// Once you are done, don't forget to do one of the following:
 			this.emit( 'ready' ); // Everything is okay
-			this.emit( 'error', new Error()); // An error happened
+			this.emit( 'error', new Error() ); // An error happened
+
+			return this;
 		}
 
 		// Implement at least one method of each couple
 		// Insertion
-		async insertOne( table, entity ) {}
-		async insertMany( table, entity ) {}
+		public async insertOne(
+			table: string,
+			entity: IEntityAttributes
+		): Promise<IEntityProperties | undefined>{
+			throw new Error( 'Not implemented' );
+		}
+		public async insertMany( table: string, entities: IEntityAttributes[] ): Promise<IEntityProperties[]>{
+			throw new Error( 'Not implemented' );
+		}
+
 		// Search
-		async findOne( table, queryFind, options ) {}
-		async findMany( table, queryFind, options ) {}
+		public async findOne(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			options: QueryLanguage.IQueryOptions
+		): Promise<IEntityProperties | undefined>{
+			throw new Error( 'Not implemented' );
+		}
+		public async findMany(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			options: QueryLanguage.IQueryOptions
+		): Promise<IEntityProperties[]> {
+			throw new Error( 'Not implemented' );
+		}
+
 		// Update
-		async findOne( table, queryFind, update, options ) {}
-		async findMany( table, queryFind, update, options ) {}
+		public async updateOne(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			update: IEntityAttributes,
+			options: QueryLanguage.IQueryOptions
+		): Promise<IEntityProperties | undefined> {
+			throw new Error( 'Not implemented' );
+		}
+		public async updateMany(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			update: IEntityAttributes,
+			options: QueryLanguage.IQueryOptions
+		): Promise<IEntityProperties[]> {
+			throw new Error( 'Not implemented' );
+		}
+
 		// Deletion
-		async deleteOne( table, queryFind, options ) {}
-		async deleteMany( table, queryFind, options ) {}
+		public async deleteOne(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			options: QueryLanguage.IQueryOptions
+		): Promise<void> {
+			throw new Error( 'Not implemented' );
+		}
+		public async deleteMany(
+			table: string,
+			queryFind: QueryLanguage.SelectQueryOrCondition,
+			options: QueryLanguage.IQueryOptions
+		): Promise<void> {
+			throw new Error( 'Not implemented' );
+		}
+	}
+
+	// Define options or adapter-specific types here.
+	export namespace MySourceAdapter {
+	}
+
+
+	// This class allows you to define custom logic with your datastore entity
+	export class MySourceEntity extends AAdapterEntity {
+		public constructor( entity: IEntityProperties, dataSource: AAdapter ) {
+			super( entity, dataSource );
+		}
 	}
 }
 
-// Here, give a name to your adapter, and register it in Diaspora
-// You should check for the environment variable DISABLE_AUTOLOAD_DIASPORA_ADAPTERS.
-if( !process.env.DISABLE_AUTOLOAD_DIASPORA_ADAPTERS ){
- require( 'diaspora' ).registerAdapter( 'my-adapter', MyDiasporaAdapter );
-}
+Diaspora.registerAdapter( 'my-adapter', MyAdapter.MySourceAdapter );
 ```
 
 If you are planning to deploy your adapter on the client side, note that async functions are not really [widely supported](http://caniuse.com/#feat=async-functions), and you probably should either transform your adapter using bundlers or transscripters like [Babel](https://babeljs.io/) or use [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) instead.
@@ -112,18 +170,13 @@ You are ready to go! Don't hesitate to post your adapters link on this page, or 
 
 Now that your adapter is ready, you need to test it. Diaspora provides some ways to check that your adapter behave as expected. Here is a basic template:
 
-```js
-'use strict';
+```ts
+import { createDataSource, checkSpawnedAdapter, checkEachStandardMethods, checkApplications } from '@diaspora/diaspora/test/unit-test/adapters/utils';
 
-const AdapterTestUtils = require( '@diaspora/diaspora/test/adapters/utils' );
-const ADAPTER_LABEL = 'myAdapter';
-const CONFIG_HASH = {/* Configure your adapter here */};
-const ADAPTER_PREFIX_CAPITALIZED = 'MyAdapter';
-const DATA_SOURCE_NAME = 'myDataSource';
+const ADAPTER_LABEL = 'inMemory';
 
-const adapter = AdapterTestUtils.createDataSource( ADAPTER_LABEL, CONFIG_HASH);
-AdapterTestUtils.checkSpawnedAdapter( ADAPTER_LABEL, ADAPTER_PREFIX_CAPITALIZED );
-AdapterTestUtils.checkEachStandardMethods( ADAPTER_LABEL );
-AdapterTestUtils.checkApplications( ADAPTER_LABEL );
-AdapterTestUtils.checkRegisterAdapter( ADAPTER_LABEL, DATA_SOURCE_NAME );
+createDataSource( ADAPTER_LABEL, {} );
+checkSpawnedAdapter( ADAPTER_LABEL );
+checkEachStandardMethods( ADAPTER_LABEL );
+checkApplications( ADAPTER_LABEL );
 ```
