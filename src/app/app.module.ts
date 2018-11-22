@@ -1,9 +1,10 @@
+import { MyConverterOptions } from './showdown-converter-options';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
-import { ShowdownModule } from 'ngx-showdown';
+import { ShowdownModule, ConverterOptions } from 'ngx-showdown';
 import { ClipboardModule } from 'ngx-clipboard';
 import { LazyRenderModule } from 'angular-lazy-render';
 import { CookieLawModule } from 'angular2-cookie-law';
@@ -29,6 +30,7 @@ import { CookieConsentComponent } from './cookie-consent/cookie-consent.componen
 import { SectionComponent } from './pages/api/sidebar/section/section.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MarkdownReaderComponent } from './pages/markdown-viewer/markdown-reader/markdown-reader.component';
+
 
 @NgModule( {
 	declarations: [
@@ -62,7 +64,10 @@ import { MarkdownReaderComponent } from './pages/markdown-viewer/markdown-reader
 		MatSidenavModule,
 		HttpClientModule,
 	],
-	providers: [Title],
+	providers: [
+		Title,
+		{ provide: ConverterOptions, useClass: MyConverterOptions  },
+	],
 	bootstrap: [AppComponent],
 } )
 export class AppModule { }

@@ -32,6 +32,9 @@ a{
 	&:visited{
 		color: $c2dark;
 	}
+	&.button:visited{
+		color: $bodyColor;
+	}
 }
 
 
@@ -47,8 +50,40 @@ body{
 
 
 
+pre > code{
+	white-space: pre-wrap;
+}
+
 .topFixed{
 	transition: top $headerCollapseTime;
+}
+.tabs-head {
+    display: flex;
+    list-style-type: none;
+	flex-direction: row;
+    margin-bottom: -1px !important;
+    z-index: 1;
+
+	li {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		border-bottom-color: transparent;
+
+		&.button-outline{
+			background-color: #fafafa;
+		}
+	}
+}
+.tabs{
+	.tab{
+		display: none;
+		border: 1px solid $c1dark;
+		padding: 0 1rem;
+
+		&.active{
+			display: block;
+		}
+	}
 }
 
 
@@ -118,9 +153,6 @@ td.d2h-code-linenumber{
 		padding: 0;
 	}
 }
-.d2h-code-line-ctn {
-	white-space: pre-wrap;
-}
 .d2h-code-line {
 	margin-left: 0;
 	padding: 0;
@@ -129,20 +161,48 @@ td.d2h-code-linenumber{
 td{
 	&.d2h-info, &.d2h-cntx, &.d2h-ins, &.d2h-del{
 		padding: 0 $linenumPadd;
+
+		// hljs fix
+		display: table-cell;
+		overflow-x: unset;
+		border: none;
+	}
+	// hljs merge style
+	$blend-value: 90%;
+	$blend-value2: 40%;
+	.d2h-ins{
+		background-color: mix(#1b1818, #dfd, $blend-value);
+
+		ins{
+			background-color: mix(#97f295, #1b1818, $blend-value2);
+		}
+	}
+	.d2h-del{
+		background-color: mix(#1b1818, #fee8e9, $blend-value);
+
+		del{
+			background-color: mix(#ffb6ba, #1b1818, $blend-value2);
+		}
+	}
+	.d2h-code-line-ctn{
+		white-space: pre-wrap;
+		display: inline;
 	}
 }
+@import './highlightjs/atelier-plateau-dark';
+
 
 ::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
-    border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+	border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
+	border-radius: 10px;
 	background: $c2dark;
-    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+	// -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }

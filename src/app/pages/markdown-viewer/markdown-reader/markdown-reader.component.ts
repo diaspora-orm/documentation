@@ -38,18 +38,23 @@ class CustomSynthesis {
 		if ( !element ) {
 			return element;
 		}
-		if ( element.tagName.toUpperCase() === 'PRE' &&
+		// Standard MD Code tag
+		if ( ( element.tagName.toUpperCase() === 'PRE' &&
 		element.childNodes.length === 1 &&
-		( element.childNodes[0] as HTMLElement ).tagName.toUpperCase() === 'CODE' ) {
-			return ( element.childNodes[0] as HTMLElement ).getAttribute( 'title' );
+		( element.childNodes[0] as HTMLElement ).tagName.toUpperCase() === 'CODE' ) ) {
+			return ( element.childNodes[0] as HTMLElement ).getAttribute( 'aria-label' );
+		} else
+		// Hidden via ARIA
+		if ( element.getAttribute( 'aria-hidden' ) === 'true' ) {
+			return element.getAttribute( 'aria-label' );
 		}
 		return element.textContent;
 	}
 
 	private static getVoice( lang?: string ) {
 		const defaultedLang = lang || 'en';
-		const validVoices = speechSynthesis.getVoices().filter( voice =>
-			voice.lang.startsWith( defaultedLang ) );
+		const validVoices = speechSynthesis.getVoices()
+		.filter( voice => voice.lang.startsWith( defaultedLang ) );
 		return validVoices[0];
 	}
 
@@ -274,10 +279,10 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 		this.currentSections.forEach( element => element.classList.remove( 'active' ) );
 		target.classList.add( 'active' );
 		const targetMiddle = MarkdownReaderComponent.getVMiddle( target );
-		
+
 		this.cursor.nativeElement.style.opacity = '1';
 		this.cursor.nativeElement.style.top =  ( targetMiddle - 25 / 2 ) + 'px';
-		
+
 		const tutoContentRect = this.scroller.nativeElement.getBoundingClientRect();
 
 		if ( target.clientHeight <= this.tutoContainerHeight ){
@@ -303,19 +308,19 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 				target: isBlankTarget ? '_blank' : undefined,
 			};
 			const attrsStr = _.chain( attrs )
-				.omitBy( _.isNil )
-				.toPairs()
-				.map( kv => `${kv[0]}="${kv[1]}"` )
-				.join( ' ' )
-				.value();
+			.omitBy( _.isNil )
+			.toPairs()
+			.map( kv => `${kv[0]}="${kv[1]}"` )
+			.join( ' ' )
+			.value();
 			return `<a ${attrsStr}>${text}</a>`;
 		};*/
 	}
 
 	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
 		const delta = event.type === 'wheel' ?
-			- event.deltaY :
-			event.wheelDelta / 120;
+		- event.deltaY :
+		event.wheelDelta / 120;
 
 		if ( this.currentSection && this.currentSection.clientHeight > this.tutoContainerHeight ){
 			if ( delta >= SectionChange.Next ){ // Going upwards
@@ -330,7 +335,7 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 				}
 			}
 		}
-		
+
 		event.preventDefault();
 		console.log( {sectionIndex: this.sectionIndex, sectionsCount: this.currentSections.length} );
 		if ( delta >= SectionChange.Next ) {
@@ -356,7 +361,7 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 	public scollProgress( $event: MouseEvent ){
 		var x = $event.pageX - this.progress.nativeElement.offsetLeft;
 		var percent = x / this.progress.nativeElement.offsetWidth;
-		
+
 		this.sectionIndex = Math.floor( ( this.currentSections.length ) * percent );
 	}
 
@@ -376,11 +381,7 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 			}
 
 			case 33:{ // Page up
-				const found = _.findLastIndex(
-					this.currentSections,
-					section => section instanceof HTMLHeadingElement,
-					this.sectionIndex - 1
-				);
+				const found = _.findLastIndex( this.currentSections, section => section instanceof HTMLHeadingElement, this.sectionIndex - 1 );
 				if ( found === -1 ){
 					throw new Error( 'Could not find previous heading' );
 				}
@@ -390,11 +391,7 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 			}
 
 			case 34:{ // Page down
-				const found = _.findIndex(
-					this.currentSections,
-					section => section instanceof HTMLHeadingElement,
-					this.sectionIndex + 1
-				);
+				const found = _.findIndex( this.currentSections, section => section instanceof HTMLHeadingElement, this.sectionIndex + 1 );
 				if ( found === -1 ){
 					throw new Error( 'Could not find next heading' );
 				}

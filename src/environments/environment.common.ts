@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const commonEnvironment = {
-	docsVersions: /* <doc-versions> */['0.3.0-alpha.14','0.3.0-alpha.13']/* </doc-versions> */,
+	docsVersions: /* <doc-versions> */['0.3.0']/* </doc-versions> */,
 	tutorials: /* <tutorials> */{
 		'simple-todo-app': 'Simple ToDo app',
 	}, /* </tutorials> */
