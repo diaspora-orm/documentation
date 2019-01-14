@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "prepublish": "node refreshDiasporaDocVersion.js; echo 'done'"
+    "prepublish": "node refreshDiasporaDocVersion.js; echo 'done'",
+    "publish-doc": "npm run prepublish; npm run build:prod; npm run build:deploy"
   },
   "prettier": {
     "useTabs": true
