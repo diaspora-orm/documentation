@@ -7,7 +7,6 @@ import { FormsModule } from '@angular/forms';
 import { ShowdownModule, ConverterOptions } from 'ngx-showdown';
 import { ClipboardModule } from 'ngx-clipboard';
 import { LazyRenderModule } from 'angular-lazy-render';
-import { CookieLawModule } from 'angular2-cookie-law';
 import { MatSidenavModule } from '@angular/material';
 
 import { AppComponent } from './app.component';

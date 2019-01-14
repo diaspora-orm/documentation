@@ -5,9 +5,6 @@ import { trigger, state, style, animate, transition, AnimationTriggerMetadata } 
 
 import * as _ from 'lodash';
 
-import { CookieLawComponent } from 'angular2-cookie-law';
-import { DomSanitizer } from '@angular/platform-browser';
-
 export type CookieLawPosition = 'top' | 'bottom';
 export type CookieLawAnimation = 'topIn' | 'bottomIn' | 'topOut' | 'bottomOut';
 export const translateInOut: AnimationTriggerMetadata =
