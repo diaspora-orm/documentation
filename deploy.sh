@@ -22,5 +22,9 @@ cp index.html 404.html
 
 # Commit and push
 git add .
+if [ -z "$1" ]; then
+    echo "Go to dist/documentation then commit & push"
+    exit
+fi
 git commit -m $1
 git push

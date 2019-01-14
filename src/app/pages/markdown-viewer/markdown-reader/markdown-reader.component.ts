@@ -320,7 +320,7 @@ export class MarkdownReaderComponent extends MarkdownViewerComponent implements 
 	public handleScroll( event: MouseWheelEvent | WheelEvent ) {
 		const delta = event.type === 'wheel' ?
 		- event.deltaY :
-		event.wheelDelta / 120;
+		event.deltaY / 120;
 
 		if ( this.currentSection && this.currentSection.clientHeight > this.tutoContainerHeight ){
 			if ( delta >= SectionChange.Next ){ // Going upwards
